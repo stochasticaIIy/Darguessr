@@ -213,7 +213,7 @@ const BIN_ID = '6a724dd4da38895dfeba1777';
 const API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
 
 const T={
-  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشارك',l:'مرجع إعلان',sec:'60 ثانية',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل التحدي',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة غرفتان | المعاريف',hp:'???? د.م. / الشهر'},
+  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'مرجع إعلان',sec:'60 ثانية',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل التحدي',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة غرفتان | المعاريف',hp:'???? د.م. / الشهر'},
   en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'listing references',sec:'60 sec',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'2-bed | Maârif',hp:'???? MAD / month'}
 };
 
@@ -240,7 +240,8 @@ function saveSeenIds(ids) {
 
 async function loadListings() {
   try {
-    const res = await fetch('./listings.json');
+    // Add timestamp cache-busting query parameter to force fetching fresh listings.json
+    const res = await fetch('./listings.json?t=' + Date.now(), { cache: 'no-store' });
     if (res.ok) {
       allListings = await res.json();
     } else {
@@ -257,12 +258,17 @@ async function loadListings() {
 function selectRandomRounds() {
   let seen = getSeenIds();
   let available = allListings.filter(h => !seen.includes(h.id));
+  
+  // Reset seen cache if we ran out of unseen listings or have few remaining
   if (available.length < 5) {
     seen = [];
     available = [...allListings];
   }
-  const shuffled = [...available].sort(() => 0.5 - Math.random());
+  
+  // Pick 5 purely random listings from available pool
+  const shuffled = [...available].sort(() => Math.random() - 0.5);
   activeHomes = shuffled.slice(0, 5);
+  
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
 }
 
