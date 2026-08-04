@@ -125,7 +125,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
   <section class="stats">
     <div><b>6</b><span id="city"></span></div>
     <div><b id="listingCountDisplay">1,000+</b><span id="listing"></span></div>
-    <div><b id="seconds"></b><span id="perRound"></span></div>
+    <div><b id="seconds">60s</b><span id="perRound"></span></div>
   </section>
   <section class="game" id="play">
     <div class="head">
@@ -212,6 +212,79 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 const BIN_ID = '6a724dd4da38895dfeba1777';
 const API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
 
+const DEFAULT_LISTINGS = [
+  {
+    id: "dar_001",
+    ar: "شقة حديثة في المعاريف، الدار البيضاء",
+    en: "Modern Apartment in Maârif, Casablanca",
+    price: 6500,
+    lat: 33.5883,
+    lng: -7.6322,
+    url: "https://mubawab.ma",
+    pics: [
+      "1600607687939-ce8a6c25118c",
+      "1502005229762-ae1b2c820a53",
+      "1560448204-e02f11c3d0e2"
+    ]
+  },
+  {
+    id: "dar_002",
+    ar: "شقة أنيقة بأكدال، الرباط",
+    en: "Elegant Apartment in Agdal, Rabat",
+    price: 7200,
+    lat: 34.0049,
+    lng: -6.8521,
+    url: "https://mubawab.ma",
+    pics: [
+      "1512917774080-9991f1c4c750",
+      "1613490493576-7fde63acd811",
+      "1584622650111-993a426fbf0a"
+    ]
+  },
+  {
+    id: "dar_003",
+    ar: "استوديو عصري بجيليز، مراكش",
+    en: "Modern Studio in Guéliz, Marrakech",
+    price: 4800,
+    lat: 31.6348,
+    lng: -8.0113,
+    url: "https://mubawab.ma",
+    pics: [
+      "1522708323590-d24dbb6b0267",
+      "1502672260266-1c1ef2d93688",
+      "1560185893-a55cbc8c8745"
+    ]
+  },
+  {
+    id: "dar_004",
+    ar: "شقة مع إطلالة على البحر مالاباطا، طنجة",
+    en: "Sea View Apartment in Malabata, Tangier",
+    price: 8500,
+    lat: 35.7776,
+    lng: -5.7781,
+    url: "https://mubawab.ma",
+    pics: [
+      "1567496898669-ee935f5f647a",
+      "1502005229762-ae1b2c820a53",
+      "1600585154340-be6161a56a0c"
+    ]
+  },
+  {
+    id: "dar_005",
+    ar: "شقة عائلية بوسط المدينة، أݣادير",
+    en: "Family Apartment in City Center, Agadir",
+    price: 5200,
+    lat: 30.4278,
+    lng: -9.5981,
+    url: "https://mubawab.ma",
+    pics: [
+      "1545324418-cc1a3fa10c00",
+      "1513694203232-719a280e022f",
+      "1484154218962-a197022b5858"
+    ]
+  }
+];
+
 const T={
   ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'مرجع إعلان',sec:'60 ثانية',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل التحدي',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة غرفتان | المعاريف',hp:'???? د.م. / الشهر'},
   en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'listing references',sec:'60 sec',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'2-bed | Maârif',hp:'???? MAD / month'}
@@ -220,6 +293,7 @@ const T={
 let allListings = [];
 let activeHomes = [];
 let L='ar',r=0,score=0,p=0,z=0,mapInst=null,marker=null,cachedLeaders=[];
+let timerInt = null, timeLeft = 60;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
 const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
@@ -242,12 +316,14 @@ async function loadListings() {
   try {
     const res = await fetch('./listings.json?t=' + Date.now(), { cache: 'no-store' });
     if (res.ok) {
-      allListings = await res.json();
+      const data = await res.json();
+      allListings = (Array.isArray(data) && data.length > 0) ? data : DEFAULT_LISTINGS;
     } else {
-      throw new Error('Could not fetch listings.json');
+      allListings = DEFAULT_LISTINGS;
     }
   } catch (e) {
-    console.warn('Could not load listings file:', e);
+    console.warn('Could not load listings file, using defaults:', e);
+    allListings = DEFAULT_LISTINGS;
   }
   if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length.toLocaleString() + '+';
   selectRandomRounds();
@@ -365,6 +441,24 @@ function move(n) {
   $('count').textContent = `${p + 1} / 3`;
 }
 
+function startTimer() {
+  clearInterval(timerInt);
+  timeLeft = 60;
+  if ($('seconds')) $('seconds').textContent = `${timeLeft}s`;
+  timerInt = setInterval(() => {
+    timeLeft--;
+    if ($('seconds')) $('seconds').textContent = `${timeLeft}s`;
+    if (timeLeft <= 0) {
+      clearInterval(timerInt);
+      submit();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInt);
+}
+
 function render() {
   if (!activeHomes || activeHomes.length === 0) return;
   const h = activeHomes[r];
@@ -389,11 +483,14 @@ function render() {
   move(0);
   $('progress').childNodes[0].nodeValue = `${r + 1} / 05`;
   $('bar').style.width = `${(r + 1) * 20}%`;
+  
+  startTimer();
 }
 
 function submit() {
-  const g = +$('guess').value;
-  if (!g) return $('guess').focus();
+  stopTimer();
+  const val = +$('guess').value;
+  const g = val > 0 ? val : 0;
   const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
   score += pt;
   $('gallery').style.display = 'none';
@@ -409,13 +506,13 @@ function submit() {
 
 function nextRound() {
   if (++r < 5) return render();
+  stopTimer();
   $('reveal').style.display = 'none';
   $('details').style.display = 'none';
   $('final').style.display = 'block';
   $('score').textContent = fmt(score) + ' / 500';
   $('playerRank').textContent = t().rk + ': ' + (score >= 425 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%');
   
-  // Render direct links to the individual listings
   $('links').innerHTML = activeHomes.map((h) => `<a href="${h.url}" target="_blank" rel="noopener noreferrer">${L === 'ar' ? h.ar : h.en} — ${t().so}</a>`).join('');
   
   $('playerName').placeholder = t().nm;
@@ -444,6 +541,10 @@ function setLang(n) {
   render();
   updateLeaderboardUI();
 }
+
+$('guess').addEventListener('keyup', (e) => {
+  if (e.key === 'Enter') submit();
+});
 
 loadListings();
 setLang('ar');
