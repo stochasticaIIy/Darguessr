@@ -240,7 +240,6 @@ function saveSeenIds(ids) {
 
 async function loadListings() {
   try {
-    // Add timestamp cache-busting query parameter to force fetching fresh listings.json
     const res = await fetch('./listings.json?t=' + Date.now(), { cache: 'no-store' });
     if (res.ok) {
       allListings = await res.json();
@@ -248,7 +247,7 @@ async function loadListings() {
       throw new Error('Could not fetch listings.json');
     }
   } catch (e) {
-    console.warn('Fallback to embedded default listings:', e);
+    console.warn('Could not load listings file:', e);
   }
   if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length.toLocaleString() + '+';
   selectRandomRounds();
@@ -259,16 +258,13 @@ function selectRandomRounds() {
   let seen = getSeenIds();
   let available = allListings.filter(h => !seen.includes(h.id));
   
-  // Reset seen cache if we ran out of unseen listings or have few remaining
   if (available.length < 5) {
     seen = [];
     available = [...allListings];
   }
   
-  // Pick 5 purely random listings from available pool
   const shuffled = [...available].sort(() => Math.random() - 0.5);
   activeHomes = shuffled.slice(0, 5);
-  
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
 }
 
@@ -379,7 +375,12 @@ function render() {
   $('location').textContent = L === 'ar' ? h.ar : h.en;
   $('description').textContent = L === 'ar' ? `شقة ممثلة في ${h.ar}. استكشف الحي على الخريطة قبل التخمين.` : `A representative apartment in ${h.en}. Explore the neighborhood before guessing.`;
   $('chips').innerHTML = (L === 'ar' ? ['شقة', 'إيجار شهري', 'درهم'] : ['Apartment', 'Monthly rent', 'MAD']).map(x => `<span class="chip">${x}</span>`).join('');
-  document.querySelectorAll('.slide').forEach((e, i) => e.style.backgroundImage = `url(https://images.unsplash.com/photo-${h.pics[i]}?auto=format&fit=crop&w=1400&q=85)`);
+  
+  document.querySelectorAll('.slide').forEach((e, i) => {
+    const photoUrl = h.pics[i].startsWith('http') ? h.pics[i] : `https://images.unsplash.com/photo-${h.pics[i]}?auto=format&fit=crop&w=1200&q=80`;
+    e.style.backgroundImage = `url('${photoUrl}')`;
+  });
+  
   z = 0;
   placeMap(h);
   $('guess').value = '';
@@ -413,7 +414,10 @@ function nextRound() {
   $('final').style.display = 'block';
   $('score').textContent = fmt(score) + ' / 500';
   $('playerRank').textContent = t().rk + ': ' + (score >= 425 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%');
-  $('links').innerHTML = activeHomes.map((h) => `<a href="https://yakeey.com/fr-ma/${h.path}${h.id}" target="_blank">${L === 'ar' ? h.ar : h.en} — ${t().so}</a>`).join('');
+  
+  // Render direct links to the individual listings
+  $('links').innerHTML = activeHomes.map((h) => `<a href="${h.url}" target="_blank" rel="noopener noreferrer">${L === 'ar' ? h.ar : h.en} — ${t().so}</a>`).join('');
+  
   $('playerName').placeholder = t().nm;
   $('addButton').textContent = t().ad;
 }
