@@ -22,9 +22,9 @@ h1{font-size:clamp(44px,7vw,88px);line-height:1.1;margin:15px 0;letter-spacing:-
 p{color:var(--muted);line-height:1.8}
 .btn{border:0;border-radius:9px;padding:14px 20px;background:var(--ink);color:#fff;font-weight:700;cursor:pointer;font-family:inherit}
 .btn:disabled{opacity:0.6;cursor:not-allowed}
-.hero-card{border:1px solid var(--ink);border-radius:17px;overflow:hidden;background:#fff;box-shadow:9px 9px var(--orange);font-family:'DM Sans'}
+.hero-card{border:1px solid var(--ink);border-radius:17px;overflow:hidden;background:#fff;box-shadow:9px 9px var(--orange)}
 .hero-img{height:190px;background:url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80') center/cover}
-.hero-card div:last-child{padding:19px;font-size:20px;font-weight:700}
+.hero-card div:last-child{padding:19px;font-size:18px;font-weight:700}
 .stats{display:flex;gap:60px;padding:22px 7vw;border-block:1px solid var(--line);background:#fff}
 .stats b{display:block;font-size:24px}
 .stats span{font-size:13px;color:var(--muted)}
@@ -117,8 +117,8 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
     <div class="hero-card">
       <div class="hero-img"></div>
       <div>
-        <span id='heroInfo'>2-bed | Gauthier</span><br>
-        <small id='heroPrice'>???? MAD / month</small>
+        <span id='heroInfo'></span><br>
+        <small id='heroPrice'></small>
       </div>
     </div>
   </section>
@@ -213,8 +213,8 @@ const BIN_ID = '6a724dd4da38895dfeba1777';
 const API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
 
 const T={
-  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'مرجع إعلان',sec:'60 ثانية',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل التحدي',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)'},
-  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'listing references',sec:'60 sec',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)'}
+  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشارك',l:'مرجع إعلان',sec:'60 ثانية',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل التحدي',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة غرفتان | المعاريف',hp:'???? د.م. / الشهر'},
+  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'listing references',sec:'60 sec',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'2-bed | Maârif',hp:'???? MAD / month'}
 };
 
 let allListings = [];
@@ -429,7 +429,7 @@ function setLang(n) {
   document.body.classList.toggle('en', n === 'en');
   $('arBtn').classList.toggle('on', n === 'ar');
   $('enBtn').classList.toggle('on', n === 'en');
-  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', roundTitle: 'e', exportBtn: 'exp' };
+  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', roundTitle: 'e', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
   Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
   render();
   updateLeaderboardUI();
