@@ -59,13 +59,10 @@ p{color:var(--muted);line-height:1.8}
 .map-body{position:relative;flex:1;min-height:530px}
 .map-body #map{width:100%;height:100%;background:var(--cream)}
 .leaflet-control-zoom{display:none!important}
-
-/* Zoom Control Styles */
 .zoom{position:absolute;z-index:1000;top:12px;right:12px;left:auto;display:grid;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12)}
 .zoom button{width:40px;height:40px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
 .zoom button:last-child{border-bottom:0}
 .zoom button:hover{background:rgba(0,0,0,.08)}
-
 .reveal{display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px}
 .reveal.yellow{background:#a66f00}
 .reveal.red{background:#a64141}
@@ -86,12 +83,9 @@ p{color:var(--muted);line-height:1.8}
 .leaders{max-width:900px;margin:40px auto}
 .leaders h3{text-align:center}
 .leader-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-
-/* Leader Styles & BIDI Fix */
 .leader{border:1px solid var(--line);border-radius:10px;background:#fff;padding:14px;display:flex;gap:8px;align-items:center;font-family:'DM Sans'}
 .leader b{margin-right:auto;margin-left:0}
 .leader-name{direction:ltr;unicode-bidi:isolate;display:inline-block}
-
 .footer{padding:25px 7vw;color:var(--muted);font:13px 'DM Sans'}
 body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .hero,.en .head,.en .top{direction:ltr}
@@ -129,8 +123,8 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
     </div>
   </section>
   <section class="stats">
-    <div><b>5</b><span id="city"></span></div>
-    <div><b>6,500+</b><span id="listing"></span></div>
+    <div><b>6</b><span id="city"></span></div>
+    <div><b id="listingCountDisplay">1,000+</b><span id="listing"></span></div>
     <div><b id="seconds"></b><span id="perRound"></span></div>
   </section>
   <section class="game" id="play">
@@ -215,11 +209,6 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-// ==========================================
-// GLOBAL LEADERBOARD CONFIGURATION (JSONBin.io)
-// ==========================================
-// Replace these with your Bin ID and Master Key from jsonbin.io for live cross-device syncing.
-// If left as placeholders, the game automatically falls back to local browser storage.
 const BIN_ID = '6a724dd4da38895dfeba1777';
 const API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
 
@@ -228,22 +217,55 @@ const T={
   en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'listing references',sec:'60 sec',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)'}
 };
 
-const homes=[
-  ['Oasis, Casablanca','أوازيس، الدار البيضاء',8000,-7.638,33.572,'ca204372'],
-  ['Les Princesses, Casablanca','لي برانسيس، الدار البيضاء',7500,-7.630,33.573,'ca204527'],
-  ['Essaada, Marrakech','السعادة، مراكش',7500,-8.034,31.657,'ma203029'],
-  ['Mers Sultan, Casablanca','ميرس سلطان، الدار البيضاء',9800,-7.609,33.572,'ca204262'],
-  ['Riyad, Rabat','الرياض، الرباط',22000,-6.852,33.968,'ra197815']
-];
-const paths=['louer-appartement-casablanca-oasis-','louer-appartement-casablanca-les-princesses-','louer-appartement-marrakech-essaada-','louer-appartement-casablanca-mers-sultan-','louer-appartement-rabat-riyad-'];
-const pics=[['1600607687939-ce8a6c25118c','1600566753086-00f18fb6b3ea','1600585154340-be6161a56a0c'],['1618221195710-dd6b41faaea6','1600607687920-4e2a09cf159d','1600210492486-724fe5c67fb0'],['1600047509807-ba8f99d2cdde','1600607688969-a5bfcd646154','1600573472591-ee6b68d14c68'],['1600607687644-c7171b42498f','1617104678098-de229db51175','1613490493576-7fde63acd811'],['1600210491892-03d54c0aaf87','1600585154526-990dced4db0d','1600607688066-890987f18a86']];
-
+let allListings = [];
+let activeHomes = [];
 let L='ar',r=0,score=0,p=0,z=0,mapInst=null,marker=null,cachedLeaders=[];
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
 const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
 
-// Async Leaderboard Functions (Supports Cloud API + Local Backup)
+function getSeenIds() {
+  try {
+    return JSON.parse(localStorage.getItem('darguessr_seen_ids') || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveSeenIds(ids) {
+  try {
+    localStorage.setItem('darguessr_seen_ids', JSON.stringify(ids));
+  } catch(e) {}
+}
+
+async function loadListings() {
+  try {
+    const res = await fetch('./listings.json');
+    if (res.ok) {
+      allListings = await res.json();
+    } else {
+      throw new Error('Could not fetch listings.json');
+    }
+  } catch (e) {
+    console.warn('Fallback to embedded default listings:', e);
+  }
+  if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length.toLocaleString() + '+';
+  selectRandomRounds();
+  render();
+}
+
+function selectRandomRounds() {
+  let seen = getSeenIds();
+  let available = allListings.filter(h => !seen.includes(h.id));
+  if (available.length < 5) {
+    seen = [];
+    available = [...allListings];
+  }
+  const shuffled = [...available].sort(() => 0.5 - Math.random());
+  activeHomes = shuffled.slice(0, 5);
+  saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
+}
+
 async function getLeaders() {
   if (BIN_ID !== 'YOUR_BIN_ID_HERE' && API_KEY !== 'YOUR_MASTER_KEY_HERE') {
     try {
@@ -255,11 +277,8 @@ async function getLeaders() {
         cachedLeaders = data.record;
         return cachedLeaders;
       }
-    } catch (e) {
-      console.warn('JSONBin fetch failed, falling back to local data:', e);
-    }
+    } catch (e) {}
   }
-  
   try {
     const saved = localStorage.getItem('darguessr_leaders');
     cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
@@ -285,9 +304,7 @@ async function saveLeaders(leaders) {
         },
         body: JSON.stringify(leaders)
       });
-    } catch (e) {
-      console.error('Failed to sync to JSONBin:', e);
-    }
+    } catch (e) {}
   }
 }
 
@@ -312,7 +329,6 @@ function exportLeadersTxt() {
 async function addPlayer() {
   const n = $('playerName').value.trim();
   if (!n) return $('playerName').focus();
-  
   $('playerName').disabled = true;
   $('addButton').disabled = true;
 
@@ -327,12 +343,12 @@ async function addPlayer() {
 
 function placeMap(h) {
   if (!mapInst) {
-    mapInst = window.L.map('map', { zoomControl: false, attributionControl: true }).setView([h[4], h[3]], 14);
+    mapInst = window.L.map('map', { zoomControl: false, attributionControl: true }).setView([h.lat, h.lng], 14);
     window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(mapInst);
-    marker = window.L.circleMarker([h[4], h[3]], { radius: 9, weight: 3, color: '#fff', fillColor: '#ff725e', fillOpacity: 1 }).addTo(mapInst);
+    marker = window.L.circleMarker([h.lat, h.lng], { radius: 9, weight: 3, color: '#fff', fillColor: '#ff725e', fillOpacity: 1 }).addTo(mapInst);
   } else {
-    mapInst.setView([h[4], h[3]], 14);
-    marker.setLatLng([h[4], h[3]]);
+    mapInst.setView([h.lat, h.lng], 14);
+    marker.setLatLng([h.lat, h.lng]);
   }
 }
 
@@ -348,15 +364,16 @@ function move(n) {
 }
 
 function render() {
-  const h = homes[r];
+  if (!activeHomes || activeHomes.length === 0) return;
+  const h = activeHomes[r];
   $('gallery').style.display = 'block';
   $('reveal').style.display = 'none';
   $('final').style.display = 'none';
   $('details').style.display = 'block';
-  $('location').textContent = L === 'ar' ? h[1] : h[0];
-  $('description').textContent = L === 'ar' ? `شقة ممثلة في ${h[1]}. استكشف الحي على الخريطة قبل التخمين.` : `A representative apartment in ${h[0]}. Explore the neighborhood before guessing.`;
+  $('location').textContent = L === 'ar' ? h.ar : h.en;
+  $('description').textContent = L === 'ar' ? `شقة ممثلة في ${h.ar}. استكشف الحي على الخريطة قبل التخمين.` : `A representative apartment in ${h.en}. Explore the neighborhood before guessing.`;
   $('chips').innerHTML = (L === 'ar' ? ['شقة', 'إيجار شهري', 'درهم'] : ['Apartment', 'Monthly rent', 'MAD']).map(x => `<span class="chip">${x}</span>`).join('');
-  document.querySelectorAll('.slide').forEach((e, i) => e.style.backgroundImage = `url(https://images.unsplash.com/photo-${pics[r][i]}?auto=format&fit=crop&w=1400&q=85)`);
+  document.querySelectorAll('.slide').forEach((e, i) => e.style.backgroundImage = `url(https://images.unsplash.com/photo-${h.pics[i]}?auto=format&fit=crop&w=1400&q=85)`);
   z = 0;
   placeMap(h);
   $('guess').value = '';
@@ -370,7 +387,7 @@ function render() {
 function submit() {
   const g = +$('guess').value;
   if (!g) return $('guess').focus();
-  const a = homes[r][2], pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
+  const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
   score += pt;
   $('gallery').style.display = 'none';
   $('reveal').style.display = 'flex';
@@ -390,7 +407,7 @@ function nextRound() {
   $('final').style.display = 'block';
   $('score').textContent = fmt(score) + ' / 500';
   $('playerRank').textContent = t().rk + ': ' + (score >= 425 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%');
-  $('links').innerHTML = homes.map((h, i) => `<a href="https://yakeey.com/fr-ma/${paths[i]}${h[5]}" target="_blank">${L === 'ar' ? h[1] : h[0]} — ${t().so}</a>`).join('');
+  $('links').innerHTML = activeHomes.map((h) => `<a href="https://yakeey.com/fr-ma/${h.path}${h.id}" target="_blank">${L === 'ar' ? h.ar : h.en} — ${t().so}</a>`).join('');
   $('playerName').placeholder = t().nm;
   $('addButton').textContent = t().ad;
 }
@@ -398,6 +415,7 @@ function nextRound() {
 function restart() {
   r = 0;
   score = 0;
+  selectRandomRounds();
   $('playerName').value = '';
   $('playerName').disabled = false;
   $('addButton').disabled = false;
@@ -415,17 +433,9 @@ function setLang(n) {
   Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
   render();
   updateLeaderboardUI();
-  if (document.getElementById('heroInfo')) {
-    if (L === 'ar') {
-      heroInfo.textContent = 'شقة من غرفتي نوم | غوتييه';
-      heroPrice.textContent = '؟؟؟؟ درهم / الشهر';
-    } else {
-      heroInfo.textContent = '2-bed | Gauthier';
-      heroPrice.textContent = '???? MAD / month';
-    }
-  }
 }
 
+loadListings();
 setLang('ar');
 </script>
 </body>
