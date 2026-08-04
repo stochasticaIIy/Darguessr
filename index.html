@@ -325,6 +325,47 @@ async function loadListings() {
     console.warn('Could not load listings file, using defaults:', e);
     allListings = DEFAULT_LISTINGS;
   }
+  
+  // Normalize scraped data format to match app expectations if needed
+  allListings = allListings.map((item, idx) => {
+    // If it's a scraped item from listings.json with title, priceMAD, imageUrl, sourceUrl, city
+    if (item.title && (item.priceMAD !== undefined || item.price !== undefined)) {
+      let numericPrice = item.price;
+      if (!numericPrice && item.priceMAD) {
+        // Extract digits from price string e.g., "6 500 DH" -> 6500
+        numericPrice = parseInt(String(item.priceMAD).replace(/[^\d]/g, ''), 10) || 5000;
+      }
+      
+      // Generate deterministic or fallback coordinates per city if not provided
+      let lat = item.lat || (item.city === 'Casablanca' ? 33.5731 : item.city === 'Rabat' ? 34.0209 : item.city === 'Marrakech' ? 31.6295 : item.city === 'Tanger' ? 35.7595 : 30.4278);
+      let lng = item.lng || (item.city === 'Casablanca' ? -7.5898 : item.city === 'Rabat' ? -6.8416 : item.city === 'Marrakech' ? -8.0088 : item.city === 'Tanger' ? -5.8340 : -9.5981);
+      
+      // Offset slightly using id/index hash to distribute markers
+      lat += (idx % 10 - 5) * 0.008;
+      lng += ((idx * 7) % 10 - 5) * 0.008;
+
+      let imgUrl = item.imageUrl || '';
+      let pics = [imgUrl, imgUrl, imgUrl].filter(Boolean);
+      if (pics.length === 0) {
+        pics = ["1600607687939-ce8a6c25118c", "1502005229762-ae1b2c820a53", "1560448204-e02f11c3d0e2"];
+      } else if (pics.length === 1) {
+        pics = [pics[0], pics[0], pics[0]];
+      }
+
+      return {
+        id: item.id || `dar_${idx}`,
+        ar: item.title,
+        en: item.title,
+        price: numericPrice,
+        lat: lat,
+        lng: lng,
+        url: item.sourceUrl || "https://www.mubawab.ma",
+        pics: pics
+      };
+    }
+    return item;
+  });
+
   if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length.toLocaleString() + '+';
   selectRandomRounds();
   render();
@@ -467,12 +508,15 @@ function render() {
   $('final').style.display = 'none';
   $('details').style.display = 'block';
   $('location').textContent = L === 'ar' ? h.ar : h.en;
-  $('description').textContent = L === 'ar' ? `شقة ممثلة في ${h.ar}. استكشف الحي على الخريطة قبل التخمين.` : `A representative apartment in ${h.en}. Explore the neighborhood before guessing.`;
-  $('chips').innerHTML = (L === 'ar' ? ['شقة', 'إيجار شهري', 'درهم'] : ['Apartment', 'Monthly rent', 'MAD']).map(x => `<span class="chip">${x}</span>`).join('');
+  $('description').textContent = L === 'ar' ? `إعلان عقاري حقيقي في المغرب. استكشف الحي على الخريطة قبل التخمين.` : `Real real estate listing in Morocco. Explore the neighborhood on the map before guessing.`;
+  $('chips').innerHTML = (L === 'ar' ? ['إعلان حقيقي', 'إيجار شهري', 'درهم'] : ['Real Listing', 'Monthly rent', 'MAD']).map(x => `<span class="chip">${x}</span>`).join('');
   
   document.querySelectorAll('.slide').forEach((e, i) => {
-    const photoUrl = h.pics[i].startsWith('http') ? h.pics[i] : `https://images.unsplash.com/photo-${h.pics[i]}?auto=format&fit=crop&w=1200&q=80`;
+    const rawPic = h.pics[i] || h.pics[0];
+    const photoUrl = rawPic.startsWith('http') ? rawPic : `https://images.unsplash.com/photo-${rawPic}?auto=format&fit=crop&w=1200&q=80`;
     e.style.backgroundImage = `url('${photoUrl}')`;
+    e.style.backgroundSize = 'cover';
+    e.style.backgroundPosition = 'center';
   });
   
   z = 0;
