@@ -138,14 +138,10 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
     <div class="grid">
       <div class="round">
         <div class="gallery" id="gallery">
-          <div class="track" id="track">
-            <div class="slide"></div>
-            <div class="slide"></div>
-            <div class="slide"></div>
-          </div>
+          <div class="track" id="track"></div>
           <button class="arrow prev" onclick="move(-1)">‹</button>
           <button class="arrow next" onclick="move(1)">›</button>
-          <span class="count" id="count">1 / 3</span>
+          <span class="count" id="count">1 / 1</span>
         </div>
         <div class="reveal" id="reveal">
           <div>
@@ -221,7 +217,7 @@ const FALLBACK_LISTINGS = [
     lat: 33.5883,
     lng: -7.6322,
     url: "https://mubawab.ma",
-    pics: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80", "https://images.unsplash.com/photo-1502005229762-ae1b2c820a53?auto=format&fit=crop&w=1200&q=80", "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80"]
+    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80", "https://images.unsplash.com/photo-1502005229762-ae1b2c820a53?auto=format&fit=crop&w=1200&q=80"]
   }
 ];
 
@@ -259,7 +255,7 @@ async function loadListings() {
     allListings = FALLBACK_LISTINGS;
   }
 
-  // Normalize scraped data format and handle multi-image arrays safely
+  // Normalize scraped data to handle dynamic image arrays
   allListings = allListings.map((item, idx) => {
     let numericPrice = item.price;
     if (!numericPrice && item.priceMAD) {
@@ -268,23 +264,16 @@ async function loadListings() {
     let lat = item.lat || 33.5731;
     let lng = item.lng || -7.5898;
 
-    // Handle incoming images array from python script
     let pics = [];
     if (Array.isArray(item.images) && item.images.length > 0) {
-      pics = [...item.images];
+      pics = item.images;
+    } else if (Array.isArray(item.pics) && item.pics.length > 0) {
+      pics = item.pics;
     } else if (item.imageUrl) {
       pics = [item.imageUrl];
+    } else {
+      pics = ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80"];
     }
-
-    // Ensure we have exactly 3 pictures for the slider
-    while (pics.length < 3) {
-      if (pics.length > 0) {
-        pics.push(pics[pics.length - 1]); // duplicate last available picture
-      } else {
-        pics.push("https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80");
-      }
-    }
-    pics = pics.slice(0, 3); // cap at 3
 
     return {
       id: item.id || `dar_${idx}`,
@@ -376,9 +365,11 @@ function zoom(n) {
 }
 
 function move(n) {
-  p = (p + n + 3) % 3;
+  const h = activeHomes[r];
+  const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
+  p = (p + n + total) % total;
   $('track').style.transform = `translateX(-${p * 100}%)`;
-  $('count').textContent = `${p + 1} / 3`;
+  $('count').textContent = `${p + 1} / ${total}`;
 }
 
 function startTimer() {
@@ -408,12 +399,16 @@ function render() {
   $('description').textContent = L === 'ar' ? `إعلان عقاري حقيقي في المغرب. استكشف الحي على الخريطة قبل التخمين.` : `Real real estate listing in Morocco. Explore the neighborhood on the map before guessing.`;
   $('chips').innerHTML = (L === 'ar' ? ['إعلان حقيقي', 'إيجار شهري', 'درهم'] : ['Real Listing', 'Monthly rent', 'MAD']).map(x => `<span class="chip">${x}</span>`).join('');
   
-  document.querySelectorAll('.slide').forEach((e, i) => {
-    const photoUrl = h.pics[i] || h.pics[0];
-    e.style.backgroundImage = `url('${photoUrl}')`;
-    e.style.backgroundSize = 'cover';
-    e.style.backgroundPosition = 'center';
-  });
+  // Dynamically render all scraped images for this listing
+  const track = $('track');
+  track.innerHTML = h.pics.map(pic => {
+    const photoUrl = pic.startsWith('http') ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
+    return `<div class="slide" style="background-image: url('${photoUrl}'); background-size: cover; background-position: center;"></div>`;
+  }).join('');
+
+  // Show or hide arrows if there's only 1 picture
+  const hasMultiple = h.pics.length > 1;
+  document.querySelectorAll('.gallery .arrow').forEach(el => el.style.display = hasMultiple ? 'block' : 'none');
   
   z = 0;
   placeMap(h);
