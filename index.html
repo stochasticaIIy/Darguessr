@@ -124,7 +124,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
   </section>
   <section class="stats">
     <div><b>6</b><span id="city"></span></div>
-    <div><b id="listingCountDisplay">1,000+</b><span id="listing"></span></div>
+    <div><b id="listingCountDisplay">0</b><span id="listing"></span></div>
     <div><b id="seconds">60s</b><span id="perRound"></span></div>
   </section>
   <section class="game" id="play">
@@ -207,12 +207,12 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 </main>
 <footer class="footer">© 2026 DarGuessr</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 const BIN_ID = '6a724dd4da38895dfeba1777';
 const API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
 
-const DEFAULT_LISTINGS = [
+const FALLBACK_LISTINGS = [
   {
     id: "dar_001",
     ar: "شقة حديثة في المعاريف، الدار البيضاء",
@@ -221,74 +221,9 @@ const DEFAULT_LISTINGS = [
     lat: 33.5883,
     lng: -7.6322,
     url: "https://mubawab.ma",
-    pics: [
-      "1600607687939-ce8a6c25118c",
-      "1502005229762-ae1b2c820a53",
-      "1560448204-e02f11c3d0e2"
-    ]
-  },
-  {
-    id: "dar_002",
-    ar: "شقة أنيقة بأكدال، الرباط",
-    en: "Elegant Apartment in Agdal, Rabat",
-    price: 7200,
-    lat: 34.0049,
-    lng: -6.8521,
-    url: "https://mubawab.ma",
-    pics: [
-      "1512917774080-9991f1c4c750",
-      "1613490493576-7fde63acd811",
-      "1584622650111-993a426fbf0a"
-    ]
-  },
-  {
-    id: "dar_003",
-    ar: "استوديو عصري بجيليز، مراكش",
-    en: "Modern Studio in Guéliz, Marrakech",
-    price: 4800,
-    lat: 31.6348,
-    lng: -8.0113,
-    url: "https://mubawab.ma",
-    pics: [
-      "1522708323590-d24dbb6b0267",
-      "1502672260266-1c1ef2d93688",
-      "1560185893-a55cbc8c8745"
-    ]
-  },
-  {
-    id: "dar_004",
-    ar: "شقة مع إطلالة على البحر مالاباطا، طنجة",
-    en: "Sea View Apartment in Malabata, Tangier",
-    price: 8500,
-    lat: 35.7776,
-    lng: -5.7781,
-    url: "https://mubawab.ma",
-    pics: [
-      "1567496898669-ee935f5f647a",
-      "1502005229762-ae1b2c820a53",
-      "1600585154340-be6161a56a0c"
-    ]
-  },
-  {
-    id: "dar_005",
-    ar: "شقة عائلية بوسط المدينة، أݣادير",
-    en: "Family Apartment in City Center, Agadir",
-    price: 5200,
-    lat: 30.4278,
-    lng: -9.5981,
-    url: "https://mubawab.ma",
-    pics: [
-      "1545324418-cc1a3fa10c00",
-      "1513694203232-719a280e022f",
-      "1484154218962-a197022b5858"
-    ]
+    pics: ["1600607687939-ce8a6c25118c", "1502005229762-ae1b2c820a53", "1560448204-e02f11c3d0e2"]
   }
 ];
-
-const T={
-  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'مرجع إعلان',sec:'60 ثانية',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل التحدي',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة غرفتان | المعاريف',hp:'???? د.م. / الشهر'},
-  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'listing references',sec:'60 sec',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'2-bed | Maârif',hp:'???? MAD / month'}
-};
 
 let allListings = [];
 let activeHomes = [];
@@ -296,20 +231,18 @@ let L='ar',r=0,score=0,p=0,z=0,mapInst=null,marker=null,cachedLeaders=[];
 let timerInt = null, timeLeft = 60;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
+const T={
+  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'60 ثانية',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
+  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'60 sec',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
+};
+
 const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
 
 function getSeenIds() {
-  try {
-    return JSON.parse(localStorage.getItem('darguessr_seen_ids') || '[]');
-  } catch(e) {
-    return [];
-  }
+  try { return JSON.parse(localStorage.getItem('darguessr_seen_ids') || '[]'); } catch(e) { return []; }
 }
-
 function saveSeenIds(ids) {
-  try {
-    localStorage.setItem('darguessr_seen_ids', JSON.stringify(ids));
-  } catch(e) {}
+  try { localStorage.setItem('darguessr_seen_ids', JSON.stringify(ids)); } catch(e) {}
 }
 
 async function loadListings() {
@@ -317,30 +250,24 @@ async function loadListings() {
     const res = await fetch('./listings.json?t=' + Date.now(), { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
-      allListings = (Array.isArray(data) && data.length > 0) ? data : DEFAULT_LISTINGS;
+      allListings = (Array.isArray(data) && data.length > 0) ? data : FALLBACK_LISTINGS;
     } else {
-      allListings = DEFAULT_LISTINGS;
+      allListings = FALLBACK_LISTINGS;
     }
   } catch (e) {
-    console.warn('Could not load listings file, using defaults:', e);
-    allListings = DEFAULT_LISTINGS;
+    console.warn('Could not load listings.json via fetch (make sure you are running a local server like Live Server or python -m http.server):', e);
+    allListings = FALLBACK_LISTINGS;
   }
-  
-  // Normalize scraped data format to match app expectations if needed
+
+  // Normalize scraped data format from Python script to match game schema
   allListings = allListings.map((item, idx) => {
-    // If it's a scraped item from listings.json with title, priceMAD, imageUrl, sourceUrl, city
     if (item.title && (item.priceMAD !== undefined || item.price !== undefined)) {
       let numericPrice = item.price;
       if (!numericPrice && item.priceMAD) {
-        // Extract digits from price string e.g., "6 500 DH" -> 6500
         numericPrice = parseInt(String(item.priceMAD).replace(/[^\d]/g, ''), 10) || 5000;
       }
-      
-      // Generate deterministic or fallback coordinates per city if not provided
-      let lat = item.lat || (item.city === 'Casablanca' ? 33.5731 : item.city === 'Rabat' ? 34.0209 : item.city === 'Marrakech' ? 31.6295 : item.city === 'Tanger' ? 35.7595 : 30.4278);
-      let lng = item.lng || (item.city === 'Casablanca' ? -7.5898 : item.city === 'Rabat' ? -6.8416 : item.city === 'Marrakech' ? -8.0088 : item.city === 'Tanger' ? -5.8340 : -9.5981);
-      
-      // Offset slightly using id/index hash to distribute markers
+      let lat = item.lat || 33.5731;
+      let lng = item.lng || -7.5898;
       lat += (idx % 10 - 5) * 0.008;
       lng += ((idx * 7) % 10 - 5) * 0.008;
 
@@ -366,7 +293,7 @@ async function loadListings() {
     return item;
   });
 
-  if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length.toLocaleString() + '+';
+  if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length + '+';
   selectRandomRounds();
   render();
 }
@@ -374,30 +301,13 @@ async function loadListings() {
 function selectRandomRounds() {
   let seen = getSeenIds();
   let available = allListings.filter(h => !seen.includes(h.id));
-  
-  if (available.length < 5) {
-    seen = [];
-    available = [...allListings];
-  }
-  
+  if (available.length < 5) { seen = []; available = [...allListings]; }
   const shuffled = [...available].sort(() => Math.random() - 0.5);
   activeHomes = shuffled.slice(0, 5);
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
 }
 
 async function getLeaders() {
-  if (BIN_ID !== 'YOUR_BIN_ID_HERE' && API_KEY !== 'YOUR_MASTER_KEY_HERE') {
-    try {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-        headers: { 'X-Master-Key': API_KEY }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        cachedLeaders = data.record;
-        return cachedLeaders;
-      }
-    } catch (e) {}
-  }
   try {
     const saved = localStorage.getItem('darguessr_leaders');
     cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
@@ -409,22 +319,7 @@ async function getLeaders() {
 
 async function saveLeaders(leaders) {
   cachedLeaders = leaders;
-  try {
-    localStorage.setItem('darguessr_leaders', JSON.stringify(leaders));
-  } catch (e) {}
-
-  if (BIN_ID !== 'YOUR_BIN_ID_HERE' && API_KEY !== 'YOUR_MASTER_KEY_HERE') {
-    try {
-      await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': API_KEY
-        },
-        body: JSON.stringify(leaders)
-      });
-    } catch (e) {}
-  }
+  try { localStorage.setItem('darguessr_leaders', JSON.stringify(leaders)); } catch (e) {}
 }
 
 async function updateLeaderboardUI() {
@@ -450,12 +345,10 @@ async function addPlayer() {
   if (!n) return $('playerName').focus();
   $('playerName').disabled = true;
   $('addButton').disabled = true;
-
   let list = await getLeaders();
   list.push([n, score]);
   list.sort((a, b) => b[1] - a[1]);
   list = list.slice(0, 10);
-  
   await saveLeaders(list);
   await updateLeaderboardUI();
 }
@@ -468,6 +361,7 @@ function placeMap(h) {
   } else {
     mapInst.setView([h.lat, h.lng], 14);
     marker.setLatLng([h.lat, h.lng]);
+    setTimeout(() => mapInst.invalidateSize(), 150);
   }
 }
 
@@ -496,9 +390,7 @@ function startTimer() {
   }, 1000);
 }
 
-function stopTimer() {
-  clearInterval(timerInt);
-}
+function stopTimer() { clearInterval(timerInt); }
 
 function render() {
   if (!activeHomes || activeHomes.length === 0) return;
@@ -556,9 +448,7 @@ function nextRound() {
   $('final').style.display = 'block';
   $('score').textContent = fmt(score) + ' / 500';
   $('playerRank').textContent = t().rk + ': ' + (score >= 425 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%');
-  
   $('links').innerHTML = activeHomes.map((h) => `<a href="${h.url}" target="_blank" rel="noopener noreferrer">${L === 'ar' ? h.ar : h.en} — ${t().so}</a>`).join('');
-  
   $('playerName').placeholder = t().nm;
   $('addButton').textContent = t().ad;
 }
@@ -590,8 +480,10 @@ $('guess').addEventListener('keyup', (e) => {
   if (e.key === 'Enter') submit();
 });
 
+// Initialize
 loadListings();
 setLang('ar');
+updateLeaderboardUI();
 </script>
 </body>
 </html>
