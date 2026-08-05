@@ -68,7 +68,11 @@ p{color:var(--muted);line-height:1.8}
 /* FULLSCREEN MODAL */
 .fs-modal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px}
 .fs-modal img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
-.fs-close{position:absolute;top:20px;left:20px;background:#fff;border:0;border-radius:50%;width:45px;height:45px;font-size:24px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.fs-close{position:absolute;top:20px;left:20px;background:#fff;border:0;border-radius:50%;width:45px;height:45px;font-size:24px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--ink);z-index:3001}
+.fs-arrow{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border:0;border-radius:50%;background:#fff;font-size:28px;cursor:pointer;z-index:3001;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.fs-prev{right:25px}
+.fs-next{left:25px}
+.fs-count{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);padding:6px 14px;border-radius:15px;background:#000a;font:14px 'DM Sans';color:#fff;z-index:3001}
 
 /* SEAMLESSLY INTEGRATED TEXT DETAILS SECTION BELOW */
 .details{padding:22px;width:100%;background:var(--ink);border-top:1px solid #49625c}
@@ -117,6 +121,8 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
 .en .fs-close{left:auto;right:20px}
+.en .fs-prev{right:auto;left:25px}
+.en .fs-next{left:auto;right:25px}
 @media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -150,7 +156,6 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
     <div><b id="seconds">3:00</b><span id="perRound"></span></div>
   </section>
   <section class="game" id="play">
-    <!-- CITY FILTER PILLS -->
     <div class="filters" id="cityFilters">
       <button class="filter-pill active" data-city="all" onclick="setCityFilter('all')">كل المدن / All Cities</button>
       <button class="filter-pill" data-city="Casablanca" onclick="setCityFilter('Casablanca')">الدار البيضاء / Casablanca</button>
@@ -170,8 +175,8 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <div class="round">
         <div class="gallery" id="gallery">
           <div class="track" id="track"></div>
-          <button class="arrow prev" onclick="move(-1); soundClick()">‹</button>
-          <button class="arrow next" onclick="move(1); soundClick()">›</button>
+          <button class="arrow prev" onclick="move(-1)">‹</button>
+          <button class="arrow next" onclick="move(1)">›</button>
           <span class="count" id="count">1 / 1</span>
           <div class="photo-zoom">
             <button onclick="zoomPhoto(1); soundClick()">+</button>
@@ -238,7 +243,10 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 <!-- FULLSCREEN IMAGE MODAL -->
 <div class="fs-modal" id="fsModal">
   <button class="fs-close" onclick="closeFullscreen()">✕</button>
+  <button class="fs-arrow fs-prev" onclick="fsMove(-1)">‹</button>
+  <button class="fs-arrow fs-next" onclick="fsMove(1)">›</button>
   <img id="fsImg" src="" alt="Fullscreen view">
+  <span class="fs-count" id="fsCount">1 / 1</span>
 </div>
 
 <footer class="footer">© 2026 DarGuessr</footer>
@@ -277,7 +285,6 @@ const T={
 
 const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
 
-// --- AUDIO & HAPTIC SYSTEM (Option 5) ---
 let audioCtx = null;
 function initAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -312,19 +319,28 @@ function vibrate(pattern) {
   }
 }
 
-// --- FULLSCREEN GALLERY MODAL (Option 3) ---
 function openFullscreen() {
-  const h = activeHomes[r];
-  if (!h || !h.pics || h.pics.length === 0) return;
-  const pic = h.pics[p];
-  const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1600&q=80`;
-  $('fsImg').src = photoUrl;
+  updateFsImage();
   $('fsModal').style.display = 'flex';
   soundClick();
 }
 function closeFullscreen() {
   $('fsModal').style.display = 'none';
   soundClick();
+}
+function updateFsImage() {
+  const h = activeHomes[r];
+  if (!h || !h.pics || h.pics.length === 0) return;
+  const pic = h.pics[p];
+  const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1600&q=80`;
+  $('fsImg').src = photoUrl;
+  $('fsCount').textContent = `${p + 1} / ${h.pics.length}`;
+  const hasMultiple = h.pics.length > 1;
+  document.querySelectorAll('.fs-arrow').forEach(el => el.style.display = hasMultiple ? 'flex' : 'none');
+  $('fsCount').style.display = hasMultiple ? 'block' : 'none';
+}
+function fsMove(n) {
+  move(n);
 }
 
 function getSeenIds() {
@@ -414,7 +430,6 @@ async function loadListings() {
   render();
 }
 
-// --- CITY FILTER MODE (Option 4) ---
 function setCityFilter(city) {
   selectedCity = city;
   document.querySelectorAll('.filter-pill').forEach(btn => {
@@ -427,7 +442,7 @@ function setCityFilter(city) {
 function selectRandomRounds() {
   let seen = getSeenIds();
   let pool = selectedCity === 'all' ? allListings : allListings.filter(h => h.city.toLowerCase() === selectedCity.toLowerCase());
-  if (pool.length === 0) pool = allListings; // fallback if city filter has no listings
+  if (pool.length === 0) pool = allListings;
   
   let available = pool.filter(h => !seen.includes(h.id));
   if (available.length < 5) { available = [...pool]; }
@@ -530,9 +545,11 @@ function move(n) {
   $('track').style.transform = `translateX(-${p * 100}%)`;
   $('count').textContent = `${p + 1} / ${total}`;
   resetPhotoTransform();
+  if ($('fsModal').style.display === 'flex') {
+    updateFsImage();
+  }
 }
 
-// Drag/Pan Event Listeners for Zoomed Photos
 const galleryEl = $('gallery');
 
 galleryEl.addEventListener('mousedown', (e) => {
@@ -701,11 +718,6 @@ function setLang(n) {
   $('enBtn').classList.toggle('on', n === 'en');
   const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
   Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
-  
-  if ($('filterAll')) {
-    $('filterAll').textContent = n === 'ar' ? 'كل المدن / All Cities' : 'All Cities / كل المدن';
-  }
-
   render();
   updateLeaderboardUI();
 }
@@ -714,7 +726,6 @@ $('guess').addEventListener('keyup', (e) => {
   if (e.key === 'Enter') submit();
 });
 
-// Initialize
 loadListings();
 setLang('ar');
 updateLeaderboardUI();
