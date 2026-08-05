@@ -487,13 +487,36 @@ function setCityFilter(city) {
 
 function selectRandomRounds() {
   let seen = getSeenIds();
-  let pool = selectedCity === 'all' ? allListings : allListings.filter(h => h.city.toLowerCase() === selectedCity.toLowerCase());
-  if (pool.length === 0) pool = allListings;
+  let pool = allListings;
+  
+  if (selectedCity !== 'all') {
+    const target = selectedCity.toLowerCase();
+    pool = allListings.filter(h => {
+      const c = (h.city || '').toLowerCase();
+      if (target === 'tangier') {
+        return c.includes('tangier') || c.includes('tanger') || c.includes('طنجة');
+      }
+      if (target === 'casablanca') {
+        return c.includes('casablanca') || c.includes('الدار') || c.includes('casa');
+      }
+      if (target === 'marrakech') {
+        return c.includes('marrakech') || c.includes('مراكش');
+      }
+      if (target === 'rabat') {
+        return c.includes('rabat') || c.includes('الرباط');
+      }
+      return c.includes(target);
+    });
+  }
+
+  if (pool.length === 0) {
+    pool = allListings;
+  }
   
   let available = pool.filter(h => !seen.includes(h.id));
-  if (available.length < 5) { available = [...pool]; }
+  if (available.length === 0) { available = [...pool]; }
   const shuffled = [...available].sort(() => Math.random() - 0.5);
-  activeHomes = shuffled.slice(0, 5);
+  activeHomes = shuffled.slice(0, Math.min(5, shuffled.length));
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
 }
 
