@@ -55,8 +55,8 @@ p{color:var(--muted);line-height:1.8}
 .slide-inner{width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;transform-origin:center;will-change:transform}
 
 .arrow{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
-.prev{left:16px;right:auto}
-.next{right:16px;left:auto}
+.prev{right:16px}
+.next{left:16px}
 .count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans';z-index:3}
 
 /* PHOTO ZOOM & MAP ZOOM CONTROLS */
@@ -71,8 +71,8 @@ p{color:var(--muted);line-height:1.8}
 .fs-modal img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
 .fs-close{position:absolute;top:20px;left:20px;background:#fff;border:0;border-radius:50%;width:45px;height:45px;font-size:24px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--ink);z-index:3001}
 .fs-arrow{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border:0;border-radius:50%;background:#fff;font-size:28px;cursor:pointer;z-index:3001;display:flex;align-items:center;justify-content:center;color:var(--ink)}
-.fs-prev{left:25px;right:auto}
-.fs-next{right:25px;left:auto}
+.fs-prev{right:25px}
+.fs-next{left:25px}
 .fs-count{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);padding:6px 14px;border-radius:15px;background:#000a;font:14px 'DM Sans';color:#fff;z-index:3001}
 
 /* SEAMLESSLY INTEGRATED TEXT DETAILS SECTION BELOW */
@@ -135,9 +135,16 @@ body.dark .input input, body.dark .name-input{background:#13201d;color:var(--ink
 
 body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .hero,.en .head,.en .top{direction:ltr}
+.en .prev{left:16px;right:auto}
+.en .next{right:16px;left:auto}
+.en .count{right:15px;left:auto}
+.en .zoom{left:12px;right:auto}
+.en .photo-zoom{right:12px;left:auto}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
 .en .fs-close{left:auto;right:20px}
+.en .fs-prev{right:auto;left:25px}
+.en .fs-next{left:auto;right:25px}
 @media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -269,10 +276,6 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
-// JSONBIN CONFIGURATION - YOUR ACTUAL CREDENTIALS MUST GO HERE
-const JSONBIN_BIN_ID = '6a724dd4da38895dfeba1777';
-const JSONBIN_MASTER_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
-
 const FALLBACK_LISTINGS = [
   {
     id: "dar_001",
@@ -395,7 +398,6 @@ function saveSeenIds(ids) {
 }
 
 function isInsideOcean(lat, lng) {
-  if (lat >= 30.0 && lat <= 30.7) return lng < -9.57;
   if (lat >= 35.0 && lat <= 36.5) return lng < -5.9;
   if (lat >= 33.8 && lat < 35.0) return lng < -6.85;
   if (lat >= 33.0 && lat < 33.8) return lng < -7.65;
@@ -485,55 +487,17 @@ function setCityFilter(city) {
 
 function selectRandomRounds() {
   let seen = getSeenIds();
-  let pool = allListings;
-  
-  if (selectedCity !== 'all') {
-    const target = selectedCity.toLowerCase();
-    pool = allListings.filter(h => {
-      const c = (h.city || '').toLowerCase();
-      if (target === 'tangier') {
-        return c.includes('tangier') || c.includes('tanger') || c.includes('طنجة');
-      }
-      if (target === 'casablanca') {
-        return c.includes('casablanca') || c.includes('الدار') || c.includes('casa');
-      }
-      if (target === 'marrakech') {
-        return c.includes('marrakech') || c.includes('مراكش');
-      }
-      if (target === 'rabat') {
-        return c.includes('rabat') || c.includes('الرباط');
-      }
-      return c.includes(target);
-    });
-  }
-
-  if (pool.length === 0) {
-    pool = allListings;
-  }
+  let pool = selectedCity === 'all' ? allListings : allListings.filter(h => h.city.toLowerCase() === selectedCity.toLowerCase());
+  if (pool.length === 0) pool = allListings;
   
   let available = pool.filter(h => !seen.includes(h.id));
-  if (available.length === 0) { available = [...pool]; }
+  if (available.length < 5) { available = [...pool]; }
   const shuffled = [...available].sort(() => Math.random() - 0.5);
-  activeHomes = shuffled.slice(0, Math.min(5, shuffled.length));
+  activeHomes = shuffled.slice(0, 5);
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
 }
 
-// JSONBIN LEADERS FETCH & SAVE FUNCTIONS
 async function getLeaders() {
-  try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-      headers: {
-        'X-Master-Key': JSONBIN_MASTER_KEY
-      }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      cachedLeaders = data.record || DEFAULT_LEADERS;
-      return cachedLeaders;
-    }
-  } catch (e) {
-    console.error('Error fetching from jsonbin', e);
-  }
   try {
     const saved = localStorage.getItem('darguessr_leaders');
     cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
@@ -545,18 +509,6 @@ async function getLeaders() {
 
 async function saveLeaders(leaders) {
   cachedLeaders = leaders;
-  try {
-    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': JSONBIN_MASTER_KEY
-      },
-      body: JSON.stringify(leaders)
-    });
-  } catch (e) {
-    console.error('Error saving to jsonbin', e);
-  }
   try { localStorage.setItem('darguessr_leaders', JSON.stringify(leaders)); } catch (e) {}
 }
 
@@ -756,125 +708,73 @@ function render() {
   p = 0;
   move(0);
   $('progress').childNodes[0].nodeValue = `${r + 1} / 05`;
-  $('bar').style.width = `${((r + 1) / 5) * 100}%`;
+  $('bar').style.width = `${(r + 1) * 20}%`;
+  
   startTimer();
 }
 
 function submit() {
   stopTimer();
-  const rawVal = $('guess').value.trim();
-  if (rawVal === '') return $('guess').focus();
-  const guessVal = parseInt(rawVal, 10);
-  if (isNaN(guessVal)) return $('guess').focus();
-
-  const h = activeHomes[r];
-  const actualVal = h.price;
-  const diff = Math.abs(guessVal - actualVal);
-  const pctError = diff / actualVal;
-  
-  let roundPts = 0;
-  if (pctError <= 0.05) roundPts = 100;
-  else if (pctError <= 0.15) roundPts = 75;
-  else if (pctError <= 0.30) roundPts = 40;
-  else if (pctError <= 0.50) roundPts = 15;
-  else roundPts = 0;
-
-  score += roundPts;
   soundGuess();
-
+  const val = +$('guess').value;
+  const g = val > 0 ? val : 0;
+  const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
+  score += pt;
   $('gallery').style.display = 'none';
-  $('details').style.display = 'none';
-  const rev = $('reveal');
-  rev.style.display = 'flex';
-  rev.className = 'reveal ' + (roundPts >= 75 ? 'yellow' : roundPts > 0 ? '' : 'red');
-
-  $('feedback').textContent = roundPts >= 100 ? t().gr : roundPts >= 40 ? t().gd : t().kp;
-  $('accuracy').textContent = `+${roundPts} pts`;
-  $('yourGuess').textContent = fmt(guessVal) + ' MAD';
-  $('yourLabel').textContent = t().yg;
-  $('actual').textContent = fmt(actualVal) + ' MAD';
-  $('actualLabel').textContent = t().ac;
-  $('points').textContent = roundPts;
-  $('pointsLabel').textContent = t().pt;
-  $('nextBtn').textContent = r === 4 ? (L === 'ar' ? 'عرض النتيجة النهائية' : 'View Final Score') : t().n;
+  $('reveal').style.display = 'flex';
+  $('reveal').className = 'reveal ' + (pt >= 85 ? '' : pt >= 55 ? 'yellow' : 'red');
+  $('feedback').textContent = pt >= 85 ? t().gr : pt >= 55 ? t().gd : t().kp;
+  $('accuracy').textContent = fmt(pt) + '%';
+  $('yourGuess').textContent = fmt(g) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
+  $('actual').textContent = fmt(a) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
+  $('points').textContent = '+' + fmt(pt);
+  $('nextBtn').textContent = r === 4 ? (L === 'ar' ? 'عرض النتائج' : 'See results') : t().n;
 }
 
 function nextRound() {
-  r++;
-  if (r < 5) {
-    render();
-  } else {
-    showFinal();
-  }
-}
-
-function showFinal() {
+  if (++r < 5) return render();
   stopTimer();
-  $('gallery').style.display = 'none';
-  $('details').style.display = 'none';
+  soundFinal(score);
   $('reveal').style.display = 'none';
+  $('details').style.display = 'none';
   $('final').style.display = 'block';
-
-  $('complete').textContent = t().co;
-  $('scoreTitle').textContent = t().st;
-  $('score').textContent = fmt(score) + ' pts';
-  
-  let rankText = t().rk + ': #1';
-  if (score < 200) rankText = t().rk + ': #8';
-  else if (score < 350) rankText = t().rk + ': #4';
-  $('playerRank').textContent = rankText;
-
-  const h = activeHomes[0] || {};
-  $('links').innerHTML = `<a href="${h.url || 'https://www.mubawab.ma'}" target="_blank">${t().so}</a>`;
-  $('playerName').value = '';
-  $('playerName').disabled = false;
-  $('addButton').disabled = false;
+  $('score').textContent = fmt(score) + ' / 500';
+  $('playerRank').textContent = t().rk + ': ' + (score >= 425 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%');
+  $('links').innerHTML = activeHomes.map((h) => `<a href="${h.url}" target="_blank" rel="noopener noreferrer">${h.title} — ${t().so}</a>`).join('');
   $('playerName').placeholder = t().nm;
   $('addButton').textContent = t().ad;
-  $('again').textContent = t().ag;
-
-  soundFinal(score);
 }
 
 function restart() {
-  stopTimer();
   r = 0;
   score = 0;
   selectRandomRounds();
+  $('playerName').value = '';
+  $('playerName').disabled = false;
+  $('addButton').disabled = false;
   render();
 }
 
-function setLang(lang) {
-  L = lang;
-  document.body.classList.toggle('en', L === 'en');
-  $('arBtn').classList.toggle('on', L === 'ar');
-  $('enBtn').classList.toggle('on', L === 'en');
-
-  const loc = t();
-  $('eyebrow').textContent = loc.e;
-  $('title').textContent = loc.t;
-  $('intro').textContent = loc.i;
-  $('start').textContent = loc.s;
-  $('city').textContent = loc.c;
-  $('listing').textContent = loc.l;
-  $('perRound').textContent = loc.pr;
-  $('gameTitle').textContent = loc.gt;
-  $('gameSub').textContent = loc.gs;
-  $('mapTitle').textContent = loc.mt;
-  $('mapSub').textContent = loc.ms;
-  $('leadersTitle').textContent = loc.ld;
-  $('guessBtn').textContent = loc.lk;
-  $('exportBtn').textContent = loc.exp;
-  $('heroInfo').textContent = loc.hi;
-  $('heroPrice').textContent = loc.hp;
-  if ($('guess')) $('guess').placeholder = loc.g;
+function setLang(n) {
+  L = n;
+  document.documentElement.lang = n;
+  document.body.dir = n === 'ar' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('en', n === 'en');
+  $('arBtn').classList.toggle('on', n === 'ar');
+  $('enBtn').classList.toggle('on', n === 'en');
+  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
+  Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
+  render();
+  updateLeaderboardUI();
 }
 
-window.addEventListener('DOMContentLoaded', async () => {
-  setLang('ar');
-  await loadListings();
-  await updateLeaderboardUI();
+$('guess').addEventListener('keyup', (e) => {
+  if (e.key === 'Enter') submit();
 });
+
+loadListings();
+setLang('ar');
+updateLeaderboardUI();
 </script>
 </body>
 </html>
