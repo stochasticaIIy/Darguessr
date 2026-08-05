@@ -39,7 +39,7 @@ p{color:var(--muted);line-height:1.8}
 .round,.map{border-radius:17px;overflow:hidden}
 .round{background:var(--ink);color:#fff;display:flex;flex-direction:column}
 
-/* GALLERY & FULL-FRAME COVER IMAGES */
+/* STRETCHED TO FIT FRAME WITH NO CROPPING */
 .gallery{height:65vh;min-height:500px;position:relative;overflow:hidden;width:100%;background:#0b1715}
 .reveal{height:65vh;min-height:500px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px;width:100%}
 
@@ -52,11 +52,10 @@ p{color:var(--muted);line-height:1.8}
   background-color:#0b1715;
 }
 .slide-img{
-  position:absolute;
-  inset:0;
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  display:block;
   z-index:1;
 }
 
@@ -466,7 +465,7 @@ function render() {
     const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
     return `
       <div class="slide">
-        <div class="slide-img" style="background-image: url('${photoUrl}')"></div>
+        <img class="slide-img" src="${photoUrl}" alt="Listing photo">
       </div>
     `;
   }).join('');
