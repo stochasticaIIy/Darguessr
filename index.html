@@ -298,6 +298,13 @@ async function loadListings() {
       if (pics.length === 0 && item.imageUrl) {
         pics = [item.imageUrl];
       }
+      
+      pics = pics.map(pic => {
+        if (!pic) return '';
+        if (pic.startsWith('//')) return 'https:' + pic;
+        return pic;
+      }).filter(pic => pic.startsWith('http') || pic.startsWith('data:'));
+
       if (pics.length === 0) {
         pics = ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80"];
       }
@@ -404,7 +411,6 @@ function move(n) {
   const h = activeHomes[r];
   const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
   p = (p + n + total) % total;
-  // Reverted translation direction back to positive shift
   $('track').style.transform = `translateX(${p * 100}%)`;
   $('count').textContent = `${p + 1} / ${total}`;
 }
@@ -456,8 +462,7 @@ function render() {
   
   const track = $('track');
   track.innerHTML = h.pics.map(pic => {
-    const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
-    return `<div class="slide" style="background-image: url('${photoUrl}'); background-size: cover; background-position: center;"></div>`;
+    return `<div class="slide" style="background-image: url('${pic}'); background-size: cover; background-position: center;"></div>`;
   }).join('');
 
   const totalPics = h.pics.length;
@@ -523,7 +528,7 @@ function setLang(n) {
   document.body.classList.toggle('en', n === 'en');
   $('arBtn').classList.toggle('on', n === 'ar');
   $('enBtn').classList.toggle('on', n === 'en');
-  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', roundTitle: 'e', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
+  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', roundTitle: 'hi', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
   Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
   render();
   updateLeaderboardUI();
