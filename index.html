@@ -248,6 +248,17 @@ function saveSeenIds(ids) {
   try { localStorage.setItem('darguessr_seen_ids', JSON.stringify(ids)); } catch(e) {}
 }
 
+// Function to detect if coordinates fall inside the Atlantic Ocean west of Morocco
+function isInsideOcean(lat, lng) {
+  if (lat >= 35.0 && lat <= 36.5) return lng < -5.9; // Tangier / North region
+  if (lat >= 33.8 && lat < 35.0) return lng < -6.85; // Rabat / Kenitra region
+  if (lat >= 33.0 && lat < 33.8) return lng < -7.65; // Casablanca region
+  if (lat >= 31.5 && lat < 33.0) return lng < -9.30; // El Jadida / Safi region
+  if (lat >= 29.5 && lat < 31.5) return lng < -9.65; // Agadir region
+  if (lat >= 20.0 && lat < 29.5) return lng < -13.3; // Southern provinces
+  return false;
+}
+
 async function loadListings() {
   try {
     const res = await fetch('./listings.json?t=' + Date.now(), { cache: 'no-store' });
@@ -261,39 +272,59 @@ async function loadListings() {
     allListings = FALLBACK_LISTINGS;
   }
 
-  allListings = allListings.map((item, idx) => {
-    let numericPrice = item.price;
-    if (!numericPrice && item.priceMAD) {
-      numericPrice = parseInt(String(item.priceMAD).replace(/[^\d]/g, ''), 10) || 5000;
-    }
-    let lat = item.lat || 33.5731;
-    let lng = item.lng || -7.5898;
+  allListings = allListings
+    .filter(item => {
+      let lat = item.lat || 33.5731;
+      let lng = item.lng || -7.5898;
+      // Skip listings with coordinates inside the Atlantic Ocean
+      return !isInsideOcean(lat, lng);
+    })
+    .map((item, idx) => {
+      let numericPrice = item.price;
+      if (!numericPrice && item.priceMAD) {
+        numericPrice = parseInt(String(item.priceMAD).replace(/[^\d]/g, ''), 10) || 5000;
+      }
+      let lat = item.lat || 33.5731;
+      let lng = item.lng || -7.5898;
 
-    let pics = [];
-    if (Array.isArray(item.images) && item.images.length > 0) {
-      pics = item.images;
-    } else if (item.imageUrl) {
-      pics = [item.imageUrl];
-    } else {
-      pics = ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80"];
-    }
+      // Robust image parser supporting arrays, JSON strings, or comma lists
+      let pics = [];
+      if (Array.isArray(item.images) && item.images.length > 0) {
+        pics = item.images.filter(img => typeof img === 'string' && img.trim() !== '');
+      } else if (typeof item.images === 'string' && item.images.trim() !== '') {
+        try {
+          pics = JSON.parse(item.images);
+        } catch(e) {
+          pics = item.images.split(',').map(s => s.trim()).filter(Boolean);
+        }
+      }
+      if (pics.length === 0 && item.imageUrl) {
+        pics = [item.imageUrl];
+      }
+      if (pics.length === 0) {
+        pics = ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80"];
+      }
 
-    return {
-      id: item.id || `dar_${idx}`,
-      title: item.title || 'إعلان عقاري في المغرب',
-      city: item.city || 'Casablanca',
-      type: item.type || 'Appartement',
-      area: item.area || '—',
-      bedrooms: item.bedrooms !== undefined ? item.bedrooms : '—',
-      bathrooms: item.bathrooms !== undefined ? item.bathrooms : '—',
-      priceMAD: item.priceMAD || String(numericPrice),
-      price: numericPrice,
-      lat: lat,
-      lng: lng,
-      url: item.sourceUrl || "https://www.mubawab.ma",
-      pics: pics
-    };
-  });
+      return {
+        id: item.id || `dar_${idx}`,
+        title: item.title || 'إعلان عقاري في المغرب',
+        city: item.city || 'Casablanca',
+        type: item.type || 'Appartement',
+        area: item.area || '—',
+        bedrooms: item.bedrooms !== undefined ? item.bedrooms : '—',
+        bathrooms: item.bathrooms !== undefined ? item.bathrooms : '—',
+        priceMAD: item.priceMAD || String(numericPrice),
+        price: numericPrice,
+        lat: lat,
+        lng: lng,
+        url: item.sourceUrl || "https://www.mubawab.ma",
+        pics: pics
+      };
+    });
+
+  if (allListings.length === 0) {
+    allListings = FALLBACK_LISTINGS;
+  }
 
   if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length + '+';
   selectRandomRounds();
@@ -417,23 +448,24 @@ function render() {
   const bedLabel = L === 'ar' ? 'غرف النوم' : 'Beds';
   const bathLabel = L === 'ar' ? 'الحمامات' : 'Baths';
   
-  // Excluded price from the chips to preserve the game challenge
+  // Price chip omitted to protect game challenge
   $('chips').innerHTML = [
     `📍 ${h.city}`,
     `🏠 ${h.type}`,
-    h.area !== '—' ? `📐 ${h.area} m²` : '',
-    h.bedrooms !== '—' ? `🛏️ ${h.bedrooms} ${bedLabel}` : '',
-    h.bathrooms !== '—' ? `🛁 ${h.bathrooms} ${bathLabel}` : '',
+    (h.area && h.area !== '—') ? `📐 ${h.area} m²` : '',
+    (h.bedrooms && h.bedrooms !== '—') ? `🛏️ ${h.bedrooms} ${bedLabel}` : '',
+    (h.bathrooms && h.bathrooms !== '—') ? `🛁 ${h.bathrooms} ${bathLabel}` : '',
     L === 'ar' ? 'إعلان حقيقي' : 'Real Listing'
   ].filter(Boolean).map(x => `<span class="chip">${x}</span>`).join('');
   
   const track = $('track');
   track.innerHTML = h.pics.map(pic => {
-    const photoUrl = pic.startsWith('http') ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
+    const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
     return `<div class="slide" style="background-image: url('${photoUrl}'); background-size: cover; background-position: center;"></div>`;
   }).join('');
 
-  const hasMultiple = h.pics.length > 1;
+  const totalPics = h.pics.length;
+  const hasMultiple = totalPics > 1;
   document.querySelectorAll('.gallery .arrow').forEach(el => el.style.display = hasMultiple ? 'block' : 'none');
   
   z = 0;
