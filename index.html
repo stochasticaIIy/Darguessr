@@ -269,9 +269,9 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
-// JSONBIN CONFIGURATION - REPLACE WITH YOUR ACTUAL BIN ID AND MASTER KEY
-const JSONBIN_BIN_ID = 'YOUR_BIN_ID_HERE';
-const JSONBIN_MASTER_KEY = 'YOUR_MASTER_KEY_HERE';
+// JSONBIN CONFIGURATION - YOUR ACTUAL CREDENTIALS MUST GO HERE
+const JSONBIN_BIN_ID = '6a724dd4da38895dfeba1777';
+const JSONBIN_MASTER_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
 
 const FALLBACK_LISTINGS = [
   {
@@ -518,24 +518,22 @@ function selectRandomRounds() {
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
 }
 
-// FIXED LEADERS LOGIC TO FETCH/SAVE DIRECTLY FROM JSONBIN.IO
+// JSONBIN LEADERS FETCH & SAVE FUNCTIONS
 async function getLeaders() {
   try {
-    const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
       headers: {
         'X-Master-Key': JSONBIN_MASTER_KEY
       }
     });
-    if (response.ok) {
-      const data = await response.json();
-      // jsonbin wraps the actual payload inside a 'record' property
+    if (res.ok) {
+      const data = await res.json();
       cachedLeaders = data.record || DEFAULT_LEADERS;
       return cachedLeaders;
     }
   } catch (e) {
-    console.error('Failed to fetch from jsonbin, falling back to local storage', e);
+    console.error('Error fetching from jsonbin', e);
   }
-  
   try {
     const saved = localStorage.getItem('darguessr_leaders');
     cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
@@ -548,7 +546,6 @@ async function getLeaders() {
 async function saveLeaders(leaders) {
   cachedLeaders = leaders;
   try {
-    // Save to remote JSONBin
     await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
       method: 'PUT',
       headers: {
@@ -558,10 +555,8 @@ async function saveLeaders(leaders) {
       body: JSON.stringify(leaders)
     });
   } catch (e) {
-    console.error('Failed to save to jsonbin', e);
+    console.error('Error saving to jsonbin', e);
   }
-  
-  // Backup to localStorage
   try { localStorage.setItem('darguessr_leaders', JSON.stringify(leaders)); } catch (e) {}
 }
 
@@ -794,7 +789,6 @@ function submit() {
   rev.className = 'reveal ' + (roundPts >= 75 ? 'yellow' : roundPts > 0 ? '' : 'red');
 
   $('feedback').textContent = roundPts >= 100 ? t().gr : roundPts >= 40 ? t().gd : t().kp;
-  $('accuracy.textContent') = `+${roundPts} pts`;
   $('accuracy').textContent = `+${roundPts} pts`;
   $('yourGuess').textContent = fmt(guessVal) + ' MAD';
   $('yourLabel').textContent = t().yg;
