@@ -328,11 +328,10 @@ function playTone(freq, type, duration, vol = 0.1) {
     osc.stop(audioCtx.currentTime + duration);
   } catch(e) {}
 }
-function soundChime() { 
-  playTone(523.25, 'triangle', 0.15, 0.08);
-  setTimeout(() => playTone(659.25, 'triangle', 0.15, 0.08), 100);
-  setTimeout(() => playTone(783.99, 'triangle', 0.25, 0.1), 200);
-  vibrate([50, 50, 100]);
+function soundGuess() {
+  playTone(587.33, 'triangle', 0.12, 0.08);
+  setTimeout(() => playTone(880, 'sine', 0.18, 0.1), 100);
+  vibrate([40, 40, 60]);
 }
 function soundFinal(totalScore) {
   if (totalScore >= 350) {
@@ -716,6 +715,7 @@ function render() {
 
 function submit() {
   stopTimer();
+  soundGuess();
   const val = +$('guess').value;
   const g = val > 0 ? val : 0;
   const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
