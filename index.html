@@ -144,8 +144,8 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <div class="round">
         <div class="gallery" id="gallery">
           <div class="track" id="track"></div>
-          <button class="arrow prev" onclick="stepSlide(-1)">‹</button>
-          <button class="arrow next" onclick="stepSlide(1)">›</button>
+          <button class="arrow prev" onclick="move(-1)">‹</button>
+          <button class="arrow next" onclick="move(1)">›</button>
           <span class="count" id="count">1 / 1</span>
         </div>
         <div class="reveal" id="reveal">
@@ -370,12 +370,9 @@ function move(n) {
   const h = activeHomes[r];
   const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
   p = (p + n + total) % total;
-  $('track').style.transform = `translateX(-${p * 100}%)`;
+  const dirMultiplier = L === 'ar' ? 1 : -1;
+  $('track').style.transform = `translateX(${p * 100 * dirMultiplier}%)`;
   $('count').textContent = `${p + 1} / ${total}`;
-}
-
-function stepSlide(dir) {
-  move(L === 'ar' ? -dir : dir);
 }
 
 function formatTimerDisplay(seconds) {
