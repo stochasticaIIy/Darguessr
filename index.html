@@ -39,7 +39,7 @@ p{color:var(--muted);line-height:1.8}
 .round,.map{border-radius:17px;overflow:hidden}
 .round{background:var(--ink);color:#fff;display:flex;flex-direction:column}
 
-/* GALLERY & BLURRED BACKDROP FILL TO PREVENT HARSH BLACK BARS WHILE KEEPING IMAGES UNCROPPED */
+/* GALLERY & SHARP UNCROPPED IMAGES WITH BLURRED BACKDROP FILL */
 .gallery{height:65vh;min-height:500px;position:relative;overflow:hidden;width:100%;background:#0b1715}
 .reveal{height:65vh;min-height:500px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px;width:100%}
 
@@ -50,25 +50,26 @@ p{color:var(--muted);line-height:1.8}
   position:relative;
   overflow:hidden;
   background-color:#0b1715;
-  background-image:var(--bg-url);
+}
+.slide-blur{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  filter:blur(24px) brightness(0.45);
+  transform:scale(1.2);
+  z-index:0;
+}
+.slide-img{
+  position:absolute;
+  inset:0;
   background-size:contain;
   background-position:center;
   background-repeat:no-repeat;
+  z-index:1;
 }
-.slide::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  background-image:var(--bg-url);
-  background-size:cover;
-  background-position:center;
-  filter:blur(22px) brightness(0.5);
-  transform:scale(1.15);
-  z-index:0;
-}
-.slide > *{position:relative;z-index:1}
 
-.arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
+.arrow{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
 .prev{right:16px}
 .next{left:16px}
 .count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans';z-index:3}
@@ -472,7 +473,12 @@ function render() {
   const track = $('track');
   track.innerHTML = h.pics.map(pic => {
     const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
-    return `<div class="slide" style="--bg-url: url('${photoUrl}');"></div>`;
+    return `
+      <div class="slide">
+        <div class="slide-blur" style="background-image: url('${photoUrl}')"></div>
+        <div class="slide-img" style="background-image: url('${photoUrl}')"></div>
+      </div>
+    `;
   }).join('');
 
   const totalPics = h.pics.length;
