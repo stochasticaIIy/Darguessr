@@ -269,74 +269,6 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
-// JSONBIN CONFIGURATION
-const JSONBIN_BIN_ID = '6a724dd4da38895dfeba1777';
-const JSONBIN_MASTER_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
-
-const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
-let cachedLeaders = [];
-
-async function getLeaders() {
-  try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-      headers: {
-        'X-Master-Key': JSONBIN_MASTER_KEY
-      }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      cachedLeaders = data.record || DEFAULT_LEADERS;
-      return cachedLeaders;
-    }
-  } catch (e) {
-    console.error('Error fetching from jsonbin', e);
-  }
-  try {
-    const saved = localStorage.getItem('darguessr_leaders');
-    cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
-  } catch (e) {
-    cachedLeaders = DEFAULT_LEADERS;
-  }
-  return cachedLeaders;
-}
-
-async function saveLeaders(leaders) {
-  cachedLeaders = leaders;
-  try {
-    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': JSONBIN_MASTER_KEY
-      },
-      body: JSON.stringify(leaders)
-    });
-  } catch (e) {
-    console.error('Error saving to jsonbin', e);
-  }
-  try { localStorage.setItem('darguessr_leaders', JSON.stringify(leaders)); } catch (e) {}
-}
-
-async function updateLeaderboardUI() {
-  const list = await getLeaders();
-  $('leaderGrid').innerHTML = list.map((x, i) => 
-    `<div class="leader">${String(i + 1).padStart(2, '0')} · <span class="leader-name" dir="ltr">${x[0]}</span> <b>${fmt(x[1])}</b></div>`
-  ).join('');
-}
-
-async function addPlayer() {
-  const n = $('playerName').value.trim();
-  if (!n) return $('playerName').focus();
-  $('playerName').disabled = true;
-  $('addButton').disabled = true;
-  let list = await getLeaders();
-  list.push([n, score]);
-  list.sort((a, b) => b[1] - a[1]);
-  list = list.slice(0, 10);
-  await saveLeaders(list);
-  await updateLeaderboardUI();
-}
-
 const FALLBACK_LISTINGS = [
   {
     id: "dar_001",
@@ -358,7 +290,7 @@ const FALLBACK_LISTINGS = [
 let allListings = [];
 let activeHomes = [];
 let selectedCity = 'all';
-let L='ar',r=0,score=0,p=0,z=0,photoZoom=1,panX=0,panY=0,isDragging=false,startX=0,startY=0,mapInst=null,marker=null;
+let L='ar',r=0,score=0,p=0,z=0,photoZoom=1,panX=0,panY=0,isDragging=false,startX=0,startY=0,mapInst=null,marker=null,cachedLeaders=[];
 let timerInt = null, timeLeft = 180;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
@@ -366,6 +298,8 @@ const T={
   ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'3:00',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:' النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
   en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'3:00',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
 };
+
+const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
 
 let audioCtx = null;
 function initAudio() {
@@ -448,23 +382,6 @@ function updateFsImage() {
 function fsMove(n) {
   move(n);
 }
-
-// KEYBOARD NAVIGATION RESTORED HERE
-window.addEventListener('keydown', (e) => {
-  if ($('fsModal').style.display === 'flex') {
-    if (e.key === 'ArrowLeft') fsMove(-1);
-    if (e.key === 'ArrowRight') fsMove(1);
-    if (e.key === 'Escape') closeFullscreen();
-    return;
-  }
-  if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-
-  if (e.key === 'ArrowLeft') {
-    move(-1);
-  } else if (e.key === 'ArrowRight') {
-    move(1);
-  }
-});
 
 function getSeenIds() {
   try { return JSON.parse(localStorage.getItem('darguessr_seen_ids') || '[]'); } catch(e) { return []; }
@@ -597,6 +514,28 @@ function selectRandomRounds() {
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
 }
 
+async function getLeaders() {
+  try {
+    const saved = localStorage.getItem('darguessr_leaders');
+    cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
+  } catch (e) {
+    cachedLeaders = DEFAULT_LEADERS;
+  }
+  return cachedLeaders;
+}
+
+async function saveLeaders(leaders) {
+  cachedLeaders = leaders;
+  try { localStorage.setItem('darguessr_leaders', JSON.stringify(leaders)); } catch (e) {}
+}
+
+async function updateLeaderboardUI() {
+  const list = await getLeaders();
+  $('leaderGrid').innerHTML = list.map((x, i) => 
+    `<div class="leader">${String(i + 1).padStart(2, '0')} · <span class="leader-name" dir="ltr">${x[0]}</span> <b>${fmt(x[1])}</b></div>`
+  ).join('');
+}
+
 function exportLeadersTxt() {
   const list = cachedLeaders.length ? cachedLeaders : DEFAULT_LEADERS;
   const textContent = list.map((x, i) => `${String(i + 1).padStart(2, '0')}. ${x[0]} - ${x[1]} pts`).join('\r\n');
@@ -606,6 +545,19 @@ function exportLeadersTxt() {
   a.download = 'darguessr_rankings.txt';
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+async function addPlayer() {
+  const n = $('playerName').value.trim();
+  if (!n) return $('playerName').focus();
+  $('playerName').disabled = true;
+  $('addButton').disabled = true;
+  let list = await getLeaders();
+  list.push([n, score]);
+  list.sort((a, b) => b[1] - a[1]);
+  list = list.slice(0, 10);
+  await saveLeaders(list);
+  await updateLeaderboardUI();
 }
 
 function placeMap(h) {
@@ -780,115 +732,89 @@ function render() {
 
 function submit() {
   stopTimer();
-  const rawVal = $('guess').value.trim();
-  if (rawVal === '') return $('guess').focus();
-  const guessVal = parseInt(rawVal, 10);
-  if (isNaN(guessVal)) return $('guess').focus();
-
-  const h = activeHomes[r];
-  const actualVal = h.price;
-  const diff = Math.abs(guessVal - actualVal);
-  const ratio = diff / actualVal;
-  
-  const accuracyPct = Math.max(0, Math.round((1 - ratio) * 100));
-  const roundScore = Math.max(0, Math.round(1000 * (1 - ratio)));
-  score += roundScore;
-
   soundGuess();
-
+  const val = +$('guess').value;
+  const g = val > 0 ? val : 0;
+  const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
+  score += pt;
   $('gallery').style.display = 'none';
-  $('details').style.display = 'none';
-  const rev = $('reveal');
-  rev.style.display = 'flex';
-  rev.className = 'reveal ' + (accuracyPct >= 80 ? 'yellow' : accuracyPct > 40 ? '' : 'red');
-
-  $('feedback').textContent = accuracyPct >= 90 ? t().gr : accuracyPct >= 50 ? t().gd : t().kp;
-  $('accuracy').textContent = accuracyPct + '%';
-  $('yourGuess').textContent = fmt(guessVal) + ' MAD';
-  $('yourLabel').textContent = t().yg;
-  $('actual').textContent = fmt(actualVal) + ' MAD';
-  $('actualLabel').textContent = t().ac;
-  $('points').textContent = roundScore;
-  $('pointsLabel').textContent = t().pt;
-  $('nextBtn').textContent = r === 4 ? (L === 'ar' ? 'عرض النتيجة النهائية' : 'View Final Score') : t().n;
+  $('reveal').style.display = 'flex';
+  $('reveal').className = 'reveal ' + (pt >= 85 ? '' : pt >= 55 ? 'yellow' : 'red');
+  $('feedback').textContent = pt >= 85 ? t().gr : pt >= 55 ? t().gd : t().kp;
+  $('accuracy').textContent = fmt(pt) + '%';
+  $('yourGuess').textContent = fmt(g) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
+  $('actual').textContent = fmt(a) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
+  $('points').textContent = '+' + fmt(pt);
+  $('nextBtn').textContent = r === 4 ? (L === 'ar' ? 'عرض النتائج' : 'See results') : t().n;
 }
 
 function nextRound() {
-  r++;
-  if (r < 5) {
-    render();
-  } else {
-    showFinal();
-  }
-}
-
-function showFinal() {
+  if (++r < 5) return render();
   stopTimer();
-  $('gallery').style.display = 'none';
-  $('details').style.display = 'none';
+  soundFinal(score);
   $('reveal').style.display = 'none';
+  $('details').style.display = 'none';
   $('final').style.display = 'block';
-
-  $('complete').textContent = t().co;
-  $('scoreTitle').textContent = t().st;
-  $('score').textContent = fmt(score) + ' pts';
-  
-  let rankText = t().rk + ': #1';
-  if (score < 2000) rankText = t().rk + ': #8';
-  else if (score < 3500) rankText = t().rk + ': #4';
-  $('playerRank').textContent = rankText;
-
-  const h = activeHomes[0] || {};
-  $('links').innerHTML = `<a href="${h.url || 'https://www.mubawab.ma'}" target="_blank">${t().so}</a>`;
-  $('playerName').value = '';
-  $('playerName').disabled = false;
-  $('addButton').disabled = false;
+  $('score').textContent = fmt(score) + ' / 500';
+  $('playerRank').textContent = t().rk + ': ' + (score >= 425 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%');
+  $('links').innerHTML = activeHomes.map((h) => `<a href="${h.url}" target="_blank" rel="noopener noreferrer">${h.title} — ${t().so}</a>`).join('');
   $('playerName').placeholder = t().nm;
   $('addButton').textContent = t().ad;
-  $('again').textContent = t().ag;
-
-  soundFinal(score);
 }
 
 function restart() {
-  stopTimer();
   r = 0;
   score = 0;
   selectRandomRounds();
+  $('playerName').value = '';
+  $('playerName').disabled = false;
+  $('addButton').disabled = false;
   render();
 }
 
-function setLang(lang) {
-  L = lang;
-  document.body.classList.toggle('en', L === 'en');
-  $('arBtn').classList.toggle('on', L === 'ar');
-  $('enBtn').classList.toggle('on', L === 'en');
-
-  const loc = t();
-  $('eyebrow').textContent = loc.e;
-  $('title').textContent = loc.t;
-  $('intro').textContent = loc.i;
-  $('start').textContent = loc.s;
-  $('city').textContent = loc.c;
-  $('listing').textContent = loc.l;
-  $('perRound').textContent = loc.pr;
-  $('gameTitle').textContent = loc.gt;
-  $('gameSub').textContent = loc.gs;
-  $('mapTitle').textContent = loc.mt;
-  $('mapSub').textContent = loc.ms;
-  $('leadersTitle').textContent = loc.ld;
-  $('guessBtn').textContent = loc.lk;
-  $('exportBtn').textContent = loc.exp;
-  $('heroInfo').textContent = loc.hi;
-  $('heroPrice').textContent = loc.hp;
-  if ($('guess')) $('guess').placeholder = loc.g;
+function setLang(n) {
+  L = n;
+  document.documentElement.lang = n;
+  document.body.dir = n === 'ar' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('en', n === 'en');
+  $('arBtn').classList.toggle('on', n === 'ar');
+  $('enBtn').classList.toggle('on', n === 'en');
+  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
+  Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
+  render();
+  updateLeaderboardUI();
 }
 
-window.addEventListener('DOMContentLoaded', async () => {
-  setLang('ar');
-  await loadListings();
-  await updateLeaderboardUI();
+// KEYBOARD NAVIGATION (Right arrow for next, Left arrow for previous)
+window.addEventListener('keydown', (e) => {
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
+  if (e.key === 'Escape') {
+    if ($('fsModal').style.display === 'flex') {
+      closeFullscreen();
+      e.preventDefault();
+    }
+  }
+
+  if (isInput) return;
+
+  if (e.key === 'ArrowRight') {
+    move(1);
+    e.preventDefault();
+  } else if (e.key === 'ArrowLeft') {
+    move(-1);
+    e.preventDefault();
+  }
 });
+
+$('guess').addEventListener('keyup', (e) => {
+  if (e.key === 'Enter') submit();
+});
+
+loadListings();
+setLang('ar');
+updateLeaderboardUI();
 </script>
 </body>
 </html>
