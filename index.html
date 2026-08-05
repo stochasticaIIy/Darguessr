@@ -144,7 +144,9 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <div class="round">
         <div class="gallery" id="gallery">
           <div class="track" id="track"></div>
+          <!-- Right button triggers move(-1) to go to the picture before -->
           <button class="arrow prev" onclick="move(-1)">‹</button>
+          <!-- Left button triggers move(1) to go to the picture after -->
           <button class="arrow next" onclick="move(1)">›</button>
           <span class="count" id="count">1 / 1</span>
         </div>
@@ -404,8 +406,7 @@ function move(n) {
   const h = activeHomes[r];
   const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
   p = (p + n + total) % total;
-  // Reverted translation direction back to negative shift
-  $('track').style.transform = `translateX(-${p * 100}%)`;
+  $('track').style.transform = `translateX(${p * 100}%)`;
   $('count').textContent = `${p + 1} / ${total}`;
 }
 
