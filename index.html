@@ -404,7 +404,7 @@ function move(n) {
   const h = activeHomes[r];
   const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
   p = (p + n + total) % total;
-  // Reverted slider direction back to negative translation
+  // Reverted translation direction back to negative shift
   $('track').style.transform = `translateX(-${p * 100}%)`;
   $('count').textContent = `${p + 1} / ${total}`;
 }
