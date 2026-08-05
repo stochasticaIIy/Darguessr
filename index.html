@@ -298,18 +298,6 @@ async function loadListings() {
       if (pics.length === 0 && item.imageUrl) {
         pics = [item.imageUrl];
       }
-
-      // Robustly normalize image URLs whether they are absolute URLs, data URIs, or Unsplash photo IDs
-      pics = pics.map(pic => {
-        if (typeof pic !== 'string') return '';
-        pic = pic.trim();
-        if (!pic) return '';
-        if (pic.startsWith('http') || pic.startsWith('data:')) {
-          return pic;
-        }
-        return `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
-      }).filter(Boolean);
-
       if (pics.length === 0) {
         pics = ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80"];
       }
@@ -416,6 +404,7 @@ function move(n) {
   const h = activeHomes[r];
   const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
   p = (p + n + total) % total;
+  // Reverted translation direction back to positive shift
   $('track').style.transform = `translateX(${p * 100}%)`;
   $('count').textContent = `${p + 1} / ${total}`;
 }
@@ -467,7 +456,8 @@ function render() {
   
   const track = $('track');
   track.innerHTML = h.pics.map(pic => {
-    return `<div class="slide" style="background-image: url('${pic}'); background-size: cover; background-position: center;"></div>`;
+    const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
+    return `<div class="slide" style="background-image: url('${photoUrl}'); background-size: cover; background-position: center;"></div>`;
   }).join('');
 
   const totalPics = h.pics.length;
