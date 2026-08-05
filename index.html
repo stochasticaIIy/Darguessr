@@ -55,8 +55,8 @@ p{color:var(--muted);line-height:1.8}
 .slide-inner{width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;transform-origin:center;will-change:transform}
 
 .arrow{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
-.prev{right:16px}
-.next{left:16px}
+.prev{left:16px;right:auto}
+.next{right:16px;left:auto}
 .count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans';z-index:3}
 
 /* PHOTO ZOOM & MAP ZOOM CONTROLS */
@@ -71,8 +71,8 @@ p{color:var(--muted);line-height:1.8}
 .fs-modal img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
 .fs-close{position:absolute;top:20px;left:20px;background:#fff;border:0;border-radius:50%;width:45px;height:45px;font-size:24px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--ink);z-index:3001}
 .fs-arrow{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border:0;border-radius:50%;background:#fff;font-size:28px;cursor:pointer;z-index:3001;display:flex;align-items:center;justify-content:center;color:var(--ink)}
-.fs-prev{right:25px}
-.fs-next{left:25px}
+.fs-prev{left:25px;right:auto}
+.fs-next{right:25px;left:auto}
 .fs-count{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);padding:6px 14px;border-radius:15px;background:#000a;font:14px 'DM Sans';color:#fff;z-index:3001}
 
 /* SEAMLESSLY INTEGRATED TEXT DETAILS SECTION BELOW */
@@ -135,16 +135,9 @@ body.dark .input input, body.dark .name-input{background:#13201d;color:var(--ink
 
 body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .hero,.en .head,.en .top{direction:ltr}
-.en .prev{left:16px;right:auto}
-.en .next{right:16px;left:auto}
-.en .count{right:15px;left:auto}
-.en .zoom{left:12px;right:auto}
-.en .photo-zoom{right:12px;left:auto}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
 .en .fs-close{left:auto;right:20px}
-.en .fs-prev{right:auto;left:25px}
-.en .fs-next{left:auto;right:25px}
 @media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -398,6 +391,7 @@ function saveSeenIds(ids) {
 }
 
 function isInsideOcean(lat, lng) {
+  if (lat >= 30.0 && lat <= 30.7) return lng < -9.57;
   if (lat >= 35.0 && lat <= 36.5) return lng < -5.9;
   if (lat >= 33.8 && lat < 35.0) return lng < -6.85;
   if (lat >= 33.0 && lat < 33.8) return lng < -7.65;
@@ -487,13 +481,36 @@ function setCityFilter(city) {
 
 function selectRandomRounds() {
   let seen = getSeenIds();
-  let pool = selectedCity === 'all' ? allListings : allListings.filter(h => h.city.toLowerCase() === selectedCity.toLowerCase());
-  if (pool.length === 0) pool = allListings;
+  let pool = allListings;
+  
+  if (selectedCity !== 'all') {
+    const target = selectedCity.toLowerCase();
+    pool = allListings.filter(h => {
+      const c = (h.city || '').toLowerCase();
+      if (target === 'tangier') {
+        return c.includes('tangier') || c.includes('tanger') || c.includes('طنجة');
+      }
+      if (target === 'casablanca') {
+        return c.includes('casablanca') || c.includes('الدار') || c.includes('casa');
+      }
+      if (target === 'marrakech') {
+        return c.includes('marrakech') || c.includes('مراكش');
+      }
+      if (target === 'rabat') {
+        return c.includes('rabat') || c.includes('الرباط');
+      }
+      return c.includes(target);
+    });
+  }
+
+  if (pool.length === 0) {
+    pool = allListings;
+  }
   
   let available = pool.filter(h => !seen.includes(h.id));
-  if (available.length < 5) { available = [...pool]; }
+  if (available.length === 0) { available = [...pool]; }
   const shuffled = [...available].sort(() => Math.random() - 0.5);
-  activeHomes = shuffled.slice(0, 5);
+  activeHomes = shuffled.slice(0, Math.min(5, shuffled.length));
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
 }
 
@@ -767,6 +784,29 @@ function setLang(n) {
   render();
   updateLeaderboardUI();
 }
+
+// KEYBOARD NAVIGATION (Right arrow for next, Left arrow for previous)
+window.addEventListener('keydown', (e) => {
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
+  if (e.key === 'Escape') {
+    if ($('fsModal').style.display === 'flex') {
+      closeFullscreen();
+      e.preventDefault();
+    }
+  }
+
+  if (isInput) return;
+
+  if (e.key === 'ArrowRight') {
+    move(1);
+    e.preventDefault();
+  } else if (e.key === 'ArrowLeft') {
+    move(-1);
+    e.preventDefault();
+  }
+});
 
 $('guess').addEventListener('keyup', (e) => {
   if (e.key === 'Enter') submit();
