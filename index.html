@@ -39,17 +39,25 @@ p{color:var(--muted);line-height:1.8}
 .round,.map{border-radius:17px;overflow:hidden}
 .round{background:var(--ink);color:#fff;display:flex;flex-direction:column}
 
-/* GALLERY & REVEAL WITH CONTAIN BACKGROUND TO PREVENT CROPPING */
+/* GALLERY & REVEAL WITH CONTAIN BACKGROUND & ZOOM SUPPORT */
 .gallery{height:65vh;min-height:500px;position:relative;overflow:hidden;width:100%;background:#0b1715}
 .reveal{height:65vh;min-height:500px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px;width:100%}
 
 .track{height:100%;display:flex;direction:ltr;transition:.35s}
-.slide{min-width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;background-color:#0b1715}
+.slide{min-width:100%;height:100%;position:relative;overflow:hidden;background-color:#0b1715}
+.slide-inner{width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;transform-origin:center;transition:transform .2s ease}
 
-.arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
+.arrow{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
 .prev{right:16px}
 .next{left:16px}
 .count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans';z-index:3}
+
+/* PHOTO ZOOM & MAP ZOOM CONTROLS */
+.zoom{position:absolute;z-index:1000;top:12px;right:12px;left:auto;display:grid;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.photo-zoom{position:absolute;z-index:3;top:12px;left:12px;right:auto;display:grid;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.zoom button, .photo-zoom button{width:40px;height:40px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.zoom button:last-child, .photo-zoom button:last-child{border-bottom:0}
+.zoom button:hover, .photo-zoom button:hover{background:rgba(0,0,0,.08)}
 
 /* SEAMLESSLY INTEGRATED TEXT DETAILS SECTION BELOW */
 .details{padding:22px;width:100%;background:var(--ink);border-top:1px solid #49625c}
@@ -65,10 +73,6 @@ p{color:var(--muted);line-height:1.8}
 .map-body{position:relative;flex:1;min-height:530px}
 .map-body #map{width:100%;height:100%;background:var(--cream)}
 .leaflet-control-zoom{display:none!important}
-.zoom{position:absolute;z-index:1000;top:12px;right:12px;left:auto;display:grid;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12)}
-.zoom button{width:40px;height:40px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
-.zoom button:last-child{border-bottom:0}
-.zoom button:hover{background:rgba(0,0,0,.08)}
 .reveal.yellow{background:#a66f00}
 .reveal.red{background:#a64141}
 .reveal h3{font:700 52px 'DM Sans';margin:9px}
@@ -98,6 +102,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .next{right:16px;left:auto}
 .en .count{right:15px;left:auto}
 .en .zoom{left:12px;right:auto}
+.en .photo-zoom{right:12px;left:auto}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
 @media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
@@ -147,6 +152,10 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
           <button class="arrow prev" onclick="move(-1)">‹</button>
           <button class="arrow next" onclick="move(1)">›</button>
           <span class="count" id="count">1 / 1</span>
+          <div class="photo-zoom">
+            <button onclick="zoomPhoto(1)">+</button>
+            <button onclick="zoomPhoto(-1)">−</button>
+          </div>
         </div>
         <div class="reveal" id="reveal">
           <div>
@@ -227,7 +236,7 @@ const FALLBACK_LISTINGS = [
 
 let allListings = [];
 let activeHomes = [];
-let L='ar',r=0,score=0,p=0,z=0,mapInst=null,marker=null,cachedLeaders=[];
+let L='ar',r=0,score=0,p=0,z=0,photoZoom=1,mapInst=null,marker=null,cachedLeaders=[];
 let timerInt = null, timeLeft = 180;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
@@ -397,12 +406,25 @@ function zoom(n) {
   if (mapInst) mapInst.setZoom(14 + z);
 }
 
+function zoomPhoto(n) {
+  photoZoom = Math.max(1, Math.min(3, photoZoom + (n * 0.5)));
+  updatePhotoZoomScale();
+}
+
+function updatePhotoZoomScale() {
+  document.querySelectorAll('.slide-inner').forEach(el => {
+    el.style.transform = `scale(${photoZoom})`;
+  });
+}
+
 function move(n) {
   const h = activeHomes[r];
   const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
   p = (p + n + total) % total;
   $('track').style.transform = `translateX(-${p * 100}%)`;
   $('count').textContent = `${p + 1} / ${total}`;
+  photoZoom = 1;
+  updatePhotoZoomScale();
 }
 
 function formatTimerDisplay(seconds) {
@@ -450,7 +472,7 @@ function render() {
   const track = $('track');
   track.innerHTML = h.pics.map(pic => {
     const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
-    return `<div class="slide" style="background-image: url('${photoUrl}');"></div>`;
+    return `<div class="slide"><div class="slide-inner" style="background-image: url('${photoUrl}');"></div></div>`;
   }).join('');
 
   const totalPics = h.pics.length;
@@ -458,6 +480,7 @@ function render() {
   document.querySelectorAll('.gallery .arrow').forEach(el => el.style.display = hasMultiple ? 'block' : 'none');
   
   z = 0;
+  photoZoom = 1;
   placeMap(h);
   $('guess').value = '';
   $('guess').placeholder = t().g;
