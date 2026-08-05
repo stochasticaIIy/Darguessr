@@ -248,14 +248,13 @@ function saveSeenIds(ids) {
   try { localStorage.setItem('darguessr_seen_ids', JSON.stringify(ids)); } catch(e) {}
 }
 
-// Function to detect if coordinates fall inside the Atlantic Ocean west of Morocco
 function isInsideOcean(lat, lng) {
-  if (lat >= 35.0 && lat <= 36.5) return lng < -5.9; // Tangier / North region
-  if (lat >= 33.8 && lat < 35.0) return lng < -6.85; // Rabat / Kenitra region
-  if (lat >= 33.0 && lat < 33.8) return lng < -7.65; // Casablanca region
-  if (lat >= 31.5 && lat < 33.0) return lng < -9.30; // El Jadida / Safi region
-  if (lat >= 29.5 && lat < 31.5) return lng < -9.65; // Agadir region
-  if (lat >= 20.0 && lat < 29.5) return lng < -13.3; // Southern provinces
+  if (lat >= 35.0 && lat <= 36.5) return lng < -5.9;
+  if (lat >= 33.8 && lat < 35.0) return lng < -6.85;
+  if (lat >= 33.0 && lat < 33.8) return lng < -7.65;
+  if (lat >= 31.5 && lat < 33.0) return lng < -9.30;
+  if (lat >= 29.5 && lat < 31.5) return lng < -9.65;
+  if (lat >= 20.0 && lat < 29.5) return lng < -13.3;
   return false;
 }
 
@@ -276,7 +275,6 @@ async function loadListings() {
     .filter(item => {
       let lat = item.lat || 33.5731;
       let lng = item.lng || -7.5898;
-      // Skip listings with coordinates inside the Atlantic Ocean
       return !isInsideOcean(lat, lng);
     })
     .map((item, idx) => {
@@ -287,7 +285,6 @@ async function loadListings() {
       let lat = item.lat || 33.5731;
       let lng = item.lng || -7.5898;
 
-      // Robust image parser supporting arrays, JSON strings, or comma lists
       let pics = [];
       if (Array.isArray(item.images) && item.images.length > 0) {
         pics = item.images.filter(img => typeof img === 'string' && img.trim() !== '');
@@ -407,8 +404,8 @@ function move(n) {
   const h = activeHomes[r];
   const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
   p = (p + n + total) % total;
-  const dirMultiplier = L === 'ar' ? 1 : -1;
-  $('track').style.transform = `translateX(${p * 100 * dirMultiplier}%)`;
+  // Fixed translation direction so slides shift left correctly
+  $('track').style.transform = `translateX(-${p * 100}%)`;
   $('count').textContent = `${p + 1} / ${total}`;
 }
 
@@ -448,7 +445,6 @@ function render() {
   const bedLabel = L === 'ar' ? 'غرف النوم' : 'Beds';
   const bathLabel = L === 'ar' ? 'الحمامات' : 'Baths';
   
-  // Price chip omitted to protect game challenge
   $('chips').innerHTML = [
     `📍 ${h.city}`,
     `🏠 ${h.type}`,
