@@ -791,6 +791,29 @@ function setLang(n) {
   updateLeaderboardUI();
 }
 
+// KEYBOARD NAVIGATION (Arrow keys for sliding, ESC for closing fullscreen)
+window.addEventListener('keydown', (e) => {
+  const activeEl = document.activeElement;
+  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
+  if (e.key === 'Escape') {
+    if ($('fsModal').style.display === 'flex') {
+      closeFullscreen();
+      e.preventDefault();
+    }
+  }
+
+  if (isInput) return;
+
+  if (e.key === 'ArrowRight') {
+    move(L === 'ar' ? -1 : 1);
+    e.preventDefault();
+  } else if (e.key === 'ArrowLeft') {
+    move(L === 'ar' ? 1 : -1);
+    e.preventDefault();
+  }
+});
+
 $('guess').addEventListener('keyup', (e) => {
   if (e.key === 'Enter') submit();
 });
