@@ -39,18 +39,18 @@ p{color:var(--muted);line-height:1.8}
 .round,.map{border-radius:17px;overflow:hidden}
 .round{background:var(--ink);color:#fff;display:flex;flex-direction:column}
 
-/* TALLER, VERTICALLY EXTENDED GALLERY & REVEAL WITH IDENTICAL WIDTH */
+/* GALLERY & SLIDER CONTROLS */
 .gallery{height:62vh;min-height:480px;position:relative;overflow:hidden;width:100%}
 .reveal{height:62vh;min-height:480px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px;width:100%}
 
 .track{height:100%;display:flex;direction:ltr;transition:.35s}
 .slide{min-width:100%;height:100%;background:center/cover}
-.arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
-.prev{right:16px}
-.next{left:16px}
+.gallery-btn{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;color:var(--ink);font-size:23px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.right-btn{right:16px;left:auto}
+.left-btn{left:16px;right:auto}
 .count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans'}
 
-/* SEAMLESSLY INTEGRATED TEXT DETAILS SECTION BELOW */
+/* DETAILS SECTION */
 .details{padding:22px;width:100%;background:var(--ink);border-top:1px solid #49625c}
 .details h3{font-size:22px;margin:8px 0;line-height:1.4}
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
@@ -94,10 +94,6 @@ p{color:var(--muted);line-height:1.8}
 .footer{padding:25px 7vw;color:var(--muted);font:13px 'DM Sans'}
 body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .hero,.en .head,.en .top{direction:ltr}
-.en .prev{left:16px;right:auto}
-.en .next{right:16px;left:auto}
-.en .count{right:15px;left:auto}
-.en .zoom{left:12px;right:auto}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
 @media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:400px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
@@ -144,10 +140,10 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <div class="round">
         <div class="gallery" id="gallery">
           <div class="track" id="track"></div>
-          <!-- Right button triggers move(-1) to go to the picture before -->
-          <button class="arrow prev" onclick="move(-1)">‹</button>
-          <!-- Left button triggers move(1) to go to the picture after -->
-          <button class="arrow next" onclick="move(1)">›</button>
+          <!-- RIGHT BUTTON: Moves to the picture before -->
+          <button class="gallery-btn right-btn" onclick="move(-1)">‹</button>
+          <!-- LEFT BUTTON: Moves to the picture after -->
+          <button class="gallery-btn left-btn" onclick="move(1)">›</button>
           <span class="count" id="count">1 / 1</span>
         </div>
         <div class="reveal" id="reveal">
@@ -406,7 +402,7 @@ function move(n) {
   const h = activeHomes[r];
   const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
   p = (p + n + total) % total;
-  $('track').style.transform = `translateX(${p * 100}%)`;
+  $('track').style.transform = `translateX(-${p * 100}%)`;
   $('count').textContent = `${p + 1} / ${total}`;
 }
 
@@ -463,7 +459,7 @@ function render() {
 
   const totalPics = h.pics.length;
   const hasMultiple = totalPics > 1;
-  document.querySelectorAll('.gallery .arrow').forEach(el => el.style.display = hasMultiple ? 'block' : 'none');
+  document.querySelectorAll('.gallery-btn').forEach(el => el.style.display = hasMultiple ? 'flex' : 'none');
   
   z = 0;
   placeMap(h);
