@@ -39,21 +39,23 @@ p{color:var(--muted);line-height:1.8}
 .round,.map{border-radius:17px;overflow:hidden}
 .round{background:var(--ink);color:#fff;display:flex;flex-direction:column}
 
-/* TALLER, VERTICALLY EXTENDED GALLERY & REVEAL WITH IDENTICAL WIDTH */
-.gallery{height:72vh;min-height:560px;position:relative;overflow:hidden;width:100%;background:#000}
-.reveal{height:72vh;min-height:560px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px;width:100%}
+/* GALLERY & REVEAL WITH BLURRED BACKDROP TO FIT IMAGES WITHOUT CROPPING */
+.gallery{height:65vh;min-height:500px;position:relative;overflow:hidden;width:100%;background:#0b1715}
+.reveal{height:65vh;min-height:500px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px;width:100%}
 
 .track{height:100%;display:flex;direction:ltr;transition:.35s}
-.slide{min-width:100%;background-size:contain;background-repeat:no-repeat;background-position:center;background-color:#000}
+.slide{min-width:100%;height:100%;position:relative;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;overflow:hidden}
+.slide::before{content:'';position:absolute;inset:0;background-image:inherit;background-size:cover;background-position:center;filter:blur(25px);opacity:0.45;transform:scale(1.1)}
+.slide img{position:relative;max-width:100%;max-height:100%;object-fit:contain;z-index:1}
+
 .arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
 .prev{right:16px}
 .next{left:16px}
-.count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans'}
+.count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans';z-index:3}
 
 /* SEAMLESSLY INTEGRATED TEXT DETAILS SECTION BELOW */
 .details{padding:22px;width:100%;background:var(--ink);border-top:1px solid #49625c}
-.details h3{font-size:22px;margin:8px 0;line-height:1.4}
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 12px}
 .chip{border:1px solid #55736b;border-radius:7px;padding:5px 8px;font-size:12px}
 .input{padding-top:14px;border-top:1px solid #49625c;display:flex;gap:9px}
 .input input,.name-input{border:0;border-radius:8px;padding:13px;font:700 14px 'DM Sans';width:210px}
@@ -100,7 +102,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .zoom{left:12px;right:auto}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
-@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:450px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
+@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -173,8 +175,6 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
           <button class="btn" id="again" onclick="restart()"></button>
         </div>
         <div class="details" id="details">
-          <div class="eyebrow" id="roundTitle"></div>
-          <h3 id="location"></h3>
           <div class="chips" id="chips"></div>
           <div class="input">
             <input id="guess" type="number">
@@ -437,8 +437,6 @@ function render() {
   $('final').style.display = 'none';
   $('details').style.display = 'block';
   
-  $('location').textContent = `${h.city} — ${h.type}`;
-  
   const bedLabel = L === 'ar' ? 'غرف النوم' : 'Beds';
   const bathLabel = L === 'ar' ? 'الحمامات' : 'Baths';
   
@@ -454,7 +452,7 @@ function render() {
   const track = $('track');
   track.innerHTML = h.pics.map(pic => {
     const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
-    return `<div class="slide" style="background-image: url('${photoUrl}');"></div>`;
+    return `<div class="slide" style="background-image: url('${photoUrl}');"><img src="${photoUrl}" alt="Listing image"></div>`;
   }).join('');
 
   const totalPics = h.pics.length;
@@ -520,7 +518,7 @@ function setLang(n) {
   document.body.classList.toggle('en', n === 'en');
   $('arBtn').classList.toggle('on', n === 'ar');
   $('enBtn').classList.toggle('on', n === 'en');
-  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', roundTitle: 'e', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
+  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
   Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
   render();
   updateLeaderboardUI();
