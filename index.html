@@ -116,6 +116,13 @@ p{color:var(--muted);line-height:1.8}
 /* DARK MODE OVERRIDES */
 body.dark{--ink:#f7f4ea;--cream:#0d1513;--lime:#dfff74;--orange:#ff725e;--line:#223531;--muted:#9aa8a4}
 body.dark .top, body.dark .stats, body.dark .hero-card, body.dark .filter-pill, body.dark .map, body.dark .leader{background:#13201d;color:var(--ink);border-color:var(--line)}
+body.dark .round{background:#13201d;color:var(--ink);border-color:var(--line)}
+body.dark .details{background:#13201d;border-top:1px solid var(--line)}
+body.dark .chip{border-color:var(--line);background:#1b2d29;color:var(--ink)}
+body.dark .btn{background:var(--lime);color:#132a26}
+body.dark .btn.guess{background:var(--lime);color:#132a26}
+body.dark .next-btn{background:#f7f4ea;color:#132a26}
+body.dark .brand:before{background:var(--lime);color:#132a26}
 body.dark .lang button{background:#1b2d29;color:var(--ink)}
 body.dark .lang .on{background:var(--lime);color:var(--ink)}
 body.dark .filter-pill.active{background:var(--lime);color:var(--ink);border-color:var(--lime)}
@@ -326,6 +333,20 @@ function soundChime() {
   setTimeout(() => playTone(659.25, 'triangle', 0.15, 0.08), 100);
   setTimeout(() => playTone(783.99, 'triangle', 0.25, 0.1), 200);
   vibrate([50, 50, 100]);
+}
+function soundFinal(totalScore) {
+  if (totalScore >= 350) {
+    playTone(523.25, 'triangle', 0.2, 0.1);
+    setTimeout(() => playTone(659.25, 'triangle', 0.2, 0.1), 120);
+    setTimeout(() => playTone(783.99, 'triangle', 0.2, 0.1), 240);
+    setTimeout(() => playTone(1046.50, 'sine', 0.4, 0.12), 360);
+    vibrate([100, 50, 100, 50, 200]);
+  } else {
+    playTone(440, 'sine', 0.3, 0.08);
+    setTimeout(() => playTone(349.23, 'sine', 0.3, 0.08), 150);
+    setTimeout(() => playTone(293.66, 'sine', 0.5, 0.08), 300);
+    vibrate([80, 80, 150]);
+  }
 }
 function soundTick() { playTone(800, 'sine', 0.04, 0.02); vibrate(20); }
 function vibrate(pattern) {
@@ -699,7 +720,6 @@ function submit() {
   const g = val > 0 ? val : 0;
   const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
   score += pt;
-  soundChime();
   $('gallery').style.display = 'none';
   $('reveal').style.display = 'flex';
   $('reveal').className = 'reveal ' + (pt >= 85 ? '' : pt >= 55 ? 'yellow' : 'red');
@@ -714,7 +734,7 @@ function submit() {
 function nextRound() {
   if (++r < 5) return render();
   stopTimer();
-  soundChime();
+  soundFinal(score);
   $('reveal').style.display = 'none';
   $('details').style.display = 'none';
   $('final').style.display = 'block';
