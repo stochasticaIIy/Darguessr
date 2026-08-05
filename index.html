@@ -29,6 +29,12 @@ p{color:var(--muted);line-height:1.8}
 .stats b{display:block;font-size:24px}
 .stats span{font-size:13px;color:var(--muted)}
 .game{padding:68px 7vw 35px}
+
+/* CITY FILTERS */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.filter-pill{background:#fff;border:1px solid var(--line);border-radius:20px;padding:8px 16px;font:600 13px 'DM Sans';cursor:pointer;transition:all .2s;color:var(--ink)}
+.filter-pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
 .head{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}
 .head h2{margin:0;font-size:37px}
 .head p{margin:6px 0}
@@ -55,9 +61,14 @@ p{color:var(--muted);line-height:1.8}
 /* PHOTO ZOOM & MAP ZOOM CONTROLS */
 .zoom{position:absolute;z-index:1000;top:12px;right:12px;left:auto;display:grid;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12)}
 .photo-zoom{position:absolute;z-index:3;top:12px;left:12px;right:auto;display:grid;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12)}
-.zoom button, .photo-zoom button{width:40px;height:40px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.zoom button, .photo-zoom button{width:40px;height:40px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
 .zoom button:last-child, .photo-zoom button:last-child{border-bottom:0}
 .zoom button:hover, .photo-zoom button:hover{background:rgba(0,0,0,.08)}
+
+/* FULLSCREEN MODAL */
+.fs-modal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px}
+.fs-modal img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.fs-close{position:absolute;top:20px;left:20px;background:#fff;border:0;border-radius:50%;width:45px;height:45px;font-size:24px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--ink)}
 
 /* SEAMLESSLY INTEGRATED TEXT DETAILS SECTION BELOW */
 .details{padding:22px;width:100%;background:var(--ink);border-top:1px solid #49625c}
@@ -105,6 +116,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .photo-zoom{right:12px;left:auto}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
+.en .fs-close{left:auto;right:20px}
 @media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -122,7 +134,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <div class="eyebrow" id="eyebrow"></div>
       <h1 id="title"></h1>
       <p id="intro"></p>
-      <a href="#play"><button class="btn" id="start"></button></a>
+      <a href="#play"><button class="btn" id="start" onclick="soundClick()"></button></a>
     </div>
     <div class="hero-card">
       <div class="hero-img"></div>
@@ -138,6 +150,15 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
     <div><b id="seconds">3:00</b><span id="perRound"></span></div>
   </section>
   <section class="game" id="play">
+    <!-- CITY FILTER PILLS -->
+    <div class="filters" id="cityFilters">
+      <button class="filter-pill active" data-city="all" onclick="setCityFilter('all')">كل المدن / All Cities</button>
+      <button class="filter-pill" data-city="Casablanca" onclick="setCityFilter('Casablanca')">الدار البيضاء / Casablanca</button>
+      <button class="filter-pill" data-city="Marrakech" onclick="setCityFilter('Marrakech')">مراكش / Marrakech</button>
+      <button class="filter-pill" data-city="Rabat" onclick="setCityFilter('Rabat')">الرباط / Rabat</button>
+      <button class="filter-pill" data-city="Tangier" onclick="setCityFilter('Tangier')">طنجة / Tangier</button>
+    </div>
+
     <div class="head">
       <div>
         <h2 id="gameTitle"></h2>
@@ -149,12 +170,13 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <div class="round">
         <div class="gallery" id="gallery">
           <div class="track" id="track"></div>
-          <button class="arrow prev" onclick="move(-1)">‹</button>
-          <button class="arrow next" onclick="move(1)">›</button>
+          <button class="arrow prev" onclick="move(-1); soundClick()">‹</button>
+          <button class="arrow next" onclick="move(1); soundClick()">›</button>
           <span class="count" id="count">1 / 1</span>
           <div class="photo-zoom">
-            <button onclick="zoomPhoto(1)">+</button>
-            <button onclick="zoomPhoto(-1)">−</button>
+            <button onclick="zoomPhoto(1); soundClick()">+</button>
+            <button onclick="zoomPhoto(-1); soundClick()">−</button>
+            <button onclick="openFullscreen()">⤢</button>
           </div>
         </div>
         <div class="reveal" id="reveal">
@@ -166,7 +188,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
               <div class="reveal-stat"><b id="actual"></b><small id="actualLabel"></small></div>
               <div class="reveal-stat"><b id="points"></b><small id="pointsLabel"></small></div>
             </div>
-            <button class="btn next-btn" id="nextBtn" onclick="nextRound()"></button>
+            <button class="btn next-btn" id="nextBtn" onclick="nextRound(); soundClick()"></button>
           </div>
         </div>
         <div class="final" id="final">
@@ -177,9 +199,9 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
           <div class="links" id="links"></div>
           <div class="add-name">
             <input class="name-input" id="playerName">
-            <button class="btn" id="addButton" onclick="addPlayer()"></button>
+            <button class="btn" id="addButton" onclick="addPlayer(); soundClick()"></button>
           </div>
-          <button class="btn" id="again" onclick="restart()"></button>
+          <button class="btn" id="again" onclick="restart(); soundClick()"></button>
         </div>
         <div class="details" id="details">
           <div class="chips" id="chips"></div>
@@ -197,8 +219,8 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
         <div class="map-body">
           <div id="map"></div>
           <div class="zoom">
-            <button onclick="zoom(1)">+</button>
-            <button onclick="zoom(-1)">−</button>
+            <button onclick="zoom(1); soundClick()">+</button>
+            <button onclick="zoom(-1); soundClick()">−</button>
           </div>
         </div>
       </aside>
@@ -207,11 +229,18 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <h3 id="leadersTitle"></h3>
       <div class="leader-grid" id="leaderGrid"></div>
       <div style="text-align:center;margin-top:16px">
-        <button class="btn" id="exportBtn" onclick="exportLeadersTxt()" style="background:transparent;color:var(--muted);border:1px solid var(--line);padding:8px 14px;font-size:12px"></button>
+        <button class="btn" id="exportBtn" onclick="exportLeadersTxt(); soundClick()" style="background:transparent;color:var(--muted);border:1px solid var(--line);padding:8px 14px;font-size:12px"></button>
       </div>
     </div>
   </section>
 </main>
+
+<!-- FULLSCREEN IMAGE MODAL -->
+<div class="fs-modal" id="fsModal">
+  <button class="fs-close" onclick="closeFullscreen()">✕</button>
+  <img id="fsImg" src="" alt="Fullscreen view">
+</div>
+
 <footer class="footer">© 2026 DarGuessr</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
@@ -236,6 +265,7 @@ const FALLBACK_LISTINGS = [
 
 let allListings = [];
 let activeHomes = [];
+let selectedCity = 'all';
 let L='ar',r=0,score=0,p=0,z=0,photoZoom=1,panX=0,panY=0,isDragging=false,startX=0,startY=0,mapInst=null,marker=null,cachedLeaders=[];
 let timerInt = null, timeLeft = 180;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
@@ -246,6 +276,56 @@ const T={
 };
 
 const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
+
+// --- AUDIO & HAPTIC SYSTEM (Option 5) ---
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+function playTone(freq, type, duration, vol = 0.1) {
+  try {
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
+}
+function soundClick() { playTone(440, 'sine', 0.08, 0.04); vibrate(30); }
+function soundChime() { 
+  playTone(523.25, 'triangle', 0.15, 0.08);
+  setTimeout(() => playTone(659.25, 'triangle', 0.15, 0.08), 100);
+  setTimeout(() => playTone(783.99, 'triangle', 0.25, 0.1), 200);
+  vibrate([50, 50, 100]);
+}
+function soundTick() { playTone(800, 'sine', 0.04, 0.02); vibrate(20); }
+function vibrate(pattern) {
+  if (navigator.vibrate) {
+    try { navigator.vibrate(pattern); } catch(e) {}
+  }
+}
+
+// --- FULLSCREEN GALLERY MODAL (Option 3) ---
+function openFullscreen() {
+  const h = activeHomes[r];
+  if (!h || !h.pics || h.pics.length === 0) return;
+  const pic = h.pics[p];
+  const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1600&q=80`;
+  $('fsImg').src = photoUrl;
+  $('fsModal').style.display = 'flex';
+  soundClick();
+}
+function closeFullscreen() {
+  $('fsModal').style.display = 'none';
+  soundClick();
+}
 
 function getSeenIds() {
   try { return JSON.parse(localStorage.getItem('darguessr_seen_ids') || '[]'); } catch(e) { return []; }
@@ -334,10 +414,23 @@ async function loadListings() {
   render();
 }
 
+// --- CITY FILTER MODE (Option 4) ---
+function setCityFilter(city) {
+  selectedCity = city;
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-city') === city);
+  });
+  soundClick();
+  restart();
+}
+
 function selectRandomRounds() {
   let seen = getSeenIds();
-  let available = allListings.filter(h => !seen.includes(h.id));
-  if (available.length < 5) { seen = []; available = [...allListings]; }
+  let pool = selectedCity === 'all' ? allListings : allListings.filter(h => h.city.toLowerCase() === selectedCity.toLowerCase());
+  if (pool.length === 0) pool = allListings; // fallback if city filter has no listings
+  
+  let available = pool.filter(h => !seen.includes(h.id));
+  if (available.length < 5) { available = [...pool]; }
   const shuffled = [...available].sort(() => Math.random() - 0.5);
   activeHomes = shuffled.slice(0, 5);
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
@@ -465,7 +558,6 @@ window.addEventListener('mouseup', () => {
   }
 });
 
-// Touch support for mobile panning
 galleryEl.addEventListener('touchstart', (e) => {
   if (photoZoom <= 1) return;
   if (e.touches.length === 1) {
@@ -503,6 +595,9 @@ function startTimer() {
   timerInt = setInterval(() => {
     timeLeft--;
     if ($('seconds')) $('seconds').textContent = formatTimerDisplay(timeLeft);
+    if (timeLeft <= 10 && timeLeft > 0) {
+      soundTick();
+    }
     if (timeLeft <= 0) {
       clearInterval(timerInt);
       submit();
@@ -561,6 +656,7 @@ function submit() {
   const g = val > 0 ? val : 0;
   const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
   score += pt;
+  soundChime();
   $('gallery').style.display = 'none';
   $('reveal').style.display = 'flex';
   $('reveal').className = 'reveal ' + (pt >= 85 ? '' : pt >= 55 ? 'yellow' : 'red');
@@ -575,6 +671,7 @@ function submit() {
 function nextRound() {
   if (++r < 5) return render();
   stopTimer();
+  soundChime();
   $('reveal').style.display = 'none';
   $('details').style.display = 'none';
   $('final').style.display = 'block';
@@ -604,6 +701,11 @@ function setLang(n) {
   $('enBtn').classList.toggle('on', n === 'en');
   const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
   Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
+  
+  if ($('filterAll')) {
+    $('filterAll').textContent = n === 'ar' ? 'كل المدن / All Cities' : 'All Cities / كل المدن';
+  }
+
   render();
   updateLeaderboardUI();
 }
