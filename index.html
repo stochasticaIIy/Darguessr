@@ -216,6 +216,9 @@ const FALLBACK_LISTINGS = [
     title: "شقة حديثة للإيجار في المعاريف",
     city: "Casablanca",
     type: "Appartement",
+    area: "120",
+    bedrooms: 3,
+    bathrooms: 2,
     priceMAD: "6,500",
     price: 6500,
     lat: 33.5883,
@@ -232,7 +235,7 @@ let timerInt = null, timeLeft = 180;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
 const T={
-  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'3:00',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
+  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'3:00',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:' النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
   en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'3:00',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
 };
 
@@ -280,6 +283,9 @@ async function loadListings() {
       title: item.title || 'إعلان عقاري في المغرب',
       city: item.city || 'Casablanca',
       type: item.type || 'Appartement',
+      area: item.area || '—',
+      bedrooms: item.bedrooms !== undefined ? item.bedrooms : '—',
+      bathrooms: item.bathrooms !== undefined ? item.bathrooms : '—',
       priceMAD: item.priceMAD || String(numericPrice),
       price: numericPrice,
       lat: lat,
@@ -408,12 +414,18 @@ function render() {
   $('location').textContent = `${h.city} — ${h.type}`;
   $('description').innerHTML = `<strong>${h.title}</strong>`;
   
+  const bedLabel = L === 'ar' ? 'غرف النوم' : 'Beds';
+  const bathLabel = L === 'ar' ? 'الحمامات' : 'Baths';
+  
+  // Excluded price from the chips to preserve the game challenge
   $('chips').innerHTML = [
     `📍 ${h.city}`,
     `🏠 ${h.type}`,
-    `💰 ${h.priceMAD} MAD`,
+    h.area !== '—' ? `📐 ${h.area} m²` : '',
+    h.bedrooms !== '—' ? `🛏️ ${h.bedrooms} ${bedLabel}` : '',
+    h.bathrooms !== '—' ? `🛁 ${h.bathrooms} ${bathLabel}` : '',
     L === 'ar' ? 'إعلان حقيقي' : 'Real Listing'
-  ].map(x => `<span class="chip">${x}</span>`).join('');
+  ].filter(Boolean).map(x => `<span class="chip">${x}</span>`).join('');
   
   const track = $('track');
   track.innerHTML = h.pics.map(pic => {
