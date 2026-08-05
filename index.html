@@ -37,11 +37,11 @@ p{color:var(--muted);line-height:1.8}
 .bar i{display:block;height:100%;background:var(--orange);border-radius:6px}
 .grid{display:grid;grid-template-columns:7fr 3fr;gap:22px}
 .round,.map{border-radius:17px;overflow:hidden}
-.round{background:var(--ink);color:#fff}
+.round{background:var(--ink);color:#fff;display:flex;flex-direction:column}
 
-/* GALLERY MADE SIGNIFICANTLY LARGER / DOMINANT */
-.gallery{height:55vh;min-height:420px;position:relative;overflow:hidden}
-.reveal{height:55vh;min-height:420px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px}
+/* TALLER, VERTICALLY EXTENDED GALLERY & REVEAL WITH IDENTICAL WIDTH */
+.gallery{height:62vh;min-height:480px;position:relative;overflow:hidden;width:100%}
+.reveal{height:62vh;min-height:480px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px;width:100%}
 
 .track{height:100%;display:flex;direction:ltr;transition:.35s}
 .slide{min-width:100%;background:center/cover}
@@ -49,7 +49,9 @@ p{color:var(--muted);line-height:1.8}
 .prev{right:16px}
 .next{left:16px}
 .count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans'}
-.details{padding:22px;max-height:35vh;overflow-y:auto}
+
+/* SEAMLESSLY INTEGRATED TEXT DETAILS SECTION BELOW */
+.details{padding:22px;width:100%;background:var(--ink);border-top:1px solid #49625c}
 .details h3{font-size:22px;margin:8px 0;line-height:1.4}
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
 .chip{border:1px solid #55736b;border-radius:7px;padding:5px 8px;font-size:12px}
@@ -98,7 +100,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .zoom{left:12px;right:auto}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
-@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:350px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
+@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:400px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -380,7 +382,7 @@ function formatTimerDisplay(seconds) {
 
 function startTimer() {
   clearInterval(timerInt);
-  timeLeft = 180; // 3 minutes per round
+  timeLeft = 180;
   if ($('seconds')) $('seconds').textContent = formatTimerDisplay(timeLeft);
   timerInt = setInterval(() => {
     timeLeft--;
@@ -403,8 +405,6 @@ function render() {
   $('details').style.display = 'block';
   
   $('location').textContent = `${h.city} — ${h.type}`;
-  
-  // Real listing characteristics from Mubawab
   $('description').innerHTML = `<strong>${h.title}</strong>`;
   
   $('chips').innerHTML = [
