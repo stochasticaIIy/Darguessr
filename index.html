@@ -38,18 +38,22 @@ p{color:var(--muted);line-height:1.8}
 .grid{display:grid;grid-template-columns:7fr 3fr;gap:22px}
 .round,.map{border-radius:17px;overflow:hidden}
 .round{background:var(--ink);color:#fff}
-.gallery,.reveal{height:380px;position:relative;overflow:hidden}
+
+/* GALLERY MADE SIGNIFICANTLY LARGER / DOMINANT */
+.gallery{height:55vh;min-height:420px;position:relative;overflow:hidden}
+.reveal{height:55vh;min-height:420px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px}
+
 .track{height:100%;display:flex;direction:ltr;transition:.35s}
 .slide{min-width:100%;background:center/cover}
 .arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
 .prev{right:16px}
 .next{left:16px}
 .count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans'}
-.details{padding:25px}
-.details h3{font-size:28px;margin:12px 0}
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0}
-.chip{border:1px solid #55736b;border-radius:7px;padding:6px 9px;font-size:12px}
-.input{padding-top:20px;border-top:1px solid #49625c;display:flex;gap:9px}
+.details{padding:22px;max-height:35vh;overflow-y:auto}
+.details h3{font-size:22px;margin:8px 0;line-height:1.4}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.chip{border:1px solid #55736b;border-radius:7px;padding:5px 8px;font-size:12px}
+.input{padding-top:14px;border-top:1px solid #49625c;display:flex;gap:9px}
 .input input,.name-input{border:0;border-radius:8px;padding:13px;font:700 14px 'DM Sans';width:210px}
 .guess{background:var(--lime);color:var(--ink)}
 .map{border:1px solid var(--line);background:#fff;display:flex;flex-direction:column}
@@ -63,13 +67,12 @@ p{color:var(--muted);line-height:1.8}
 .zoom button{width:40px;height:40px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
 .zoom button:last-child{border-bottom:0}
 .zoom button:hover{background:rgba(0,0,0,.08)}
-.reveal{display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px}
 .reveal.yellow{background:#a66f00}
 .reveal.red{background:#a64141}
-.reveal h3{font:700 62px 'DM Sans';margin:9px}
-.reveal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
-.reveal-stat{border:1px solid #ffffff70;border-radius:8px;padding:12px}
-.reveal-stat b{display:block;font:700 18px 'DM Sans'}
+.reveal h3{font:700 52px 'DM Sans';margin:9px}
+.reveal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.reveal-stat{border:1px solid #ffffff70;border-radius:8px;padding:10px}
+.reveal-stat b{display:block;font:700 16px 'DM Sans'}
 .reveal-stat small{font-size:11px}
 .next-btn{background:#fff;color:var(--ink)}
 .final{display:none;padding:38px;text-align:center}
@@ -95,7 +98,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .zoom{left:12px;right:auto}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
-@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:300px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
+@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:350px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -123,9 +126,9 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
     </div>
   </section>
   <section class="stats">
-    <div><b>6</b><span id="city"></span></div>
+    <div><b>10</b><span id="city"></span></div>
     <div><b id="listingCountDisplay">0</b><span id="listing"></span></div>
-    <div><b id="seconds">60s</b><span id="perRound"></span></div>
+    <div><b id="seconds">3:00</b><span id="perRound"></span></div>
   </section>
   <section class="game" id="play">
     <div class="head">
@@ -205,18 +208,17 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
-const BIN_ID = '6a724dd4da38895dfeba1777';
-const API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
-
 const FALLBACK_LISTINGS = [
   {
     id: "dar_001",
-    ar: "شقة حديثة في المعاريف، الدار البيضاء",
-    en: "Modern Apartment in Maârif, Casablanca",
+    title: "شقة حديثة للإيجار في المعاريف",
+    city: "Casablanca",
+    type: "Appartement",
+    priceMAD: "6,500",
     price: 6500,
     lat: 33.5883,
     lng: -7.6322,
-    url: "https://mubawab.ma",
+    sourceUrl: "https://mubawab.ma",
     images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80", "https://images.unsplash.com/photo-1502005229762-ae1b2c820a53?auto=format&fit=crop&w=1200&q=80"]
   }
 ];
@@ -224,12 +226,12 @@ const FALLBACK_LISTINGS = [
 let allListings = [];
 let activeHomes = [];
 let L='ar',r=0,score=0,p=0,z=0,mapInst=null,marker=null,cachedLeaders=[];
-let timerInt = null, timeLeft = 60;
+let timerInt = null, timeLeft = 180;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
 const T={
-  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'60 ثانية',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
-  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'60 sec',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
+  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'3:00',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:'النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
+  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'3:00',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
 };
 
 const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
@@ -251,11 +253,9 @@ async function loadListings() {
       allListings = FALLBACK_LISTINGS;
     }
   } catch (e) {
-    console.warn('Could not load listings.json via fetch:', e);
     allListings = FALLBACK_LISTINGS;
   }
 
-  // Normalize scraped data to handle dynamic image arrays
   allListings = allListings.map((item, idx) => {
     let numericPrice = item.price;
     if (!numericPrice && item.priceMAD) {
@@ -267,8 +267,6 @@ async function loadListings() {
     let pics = [];
     if (Array.isArray(item.images) && item.images.length > 0) {
       pics = item.images;
-    } else if (Array.isArray(item.pics) && item.pics.length > 0) {
-      pics = item.pics;
     } else if (item.imageUrl) {
       pics = [item.imageUrl];
     } else {
@@ -277,12 +275,14 @@ async function loadListings() {
 
     return {
       id: item.id || `dar_${idx}`,
-      ar: item.title || item.ar || 'شقة في المغرب',
-      en: item.title || item.en || 'Apartment in Morocco',
+      title: item.title || 'إعلان عقاري في المغرب',
+      city: item.city || 'Casablanca',
+      type: item.type || 'Appartement',
+      priceMAD: item.priceMAD || String(numericPrice),
       price: numericPrice,
       lat: lat,
       lng: lng,
-      url: item.sourceUrl || item.url || "https://www.mubawab.ma",
+      url: item.sourceUrl || "https://www.mubawab.ma",
       pics: pics
     };
   });
@@ -372,13 +372,19 @@ function move(n) {
   $('count').textContent = `${p + 1} / ${total}`;
 }
 
+function formatTimerDisplay(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
 function startTimer() {
   clearInterval(timerInt);
-  timeLeft = 60;
-  if ($('seconds')) $('seconds').textContent = `${timeLeft}s`;
+  timeLeft = 180; // 3 minutes per round
+  if ($('seconds')) $('seconds').textContent = formatTimerDisplay(timeLeft);
   timerInt = setInterval(() => {
     timeLeft--;
-    if ($('seconds')) $('seconds').textContent = `${timeLeft}s`;
+    if ($('seconds')) $('seconds').textContent = formatTimerDisplay(timeLeft);
     if (timeLeft <= 0) {
       clearInterval(timerInt);
       submit();
@@ -395,18 +401,25 @@ function render() {
   $('reveal').style.display = 'none';
   $('final').style.display = 'none';
   $('details').style.display = 'block';
-  $('location').textContent = L === 'ar' ? h.ar : h.en;
-  $('description').textContent = L === 'ar' ? `إعلان عقاري حقيقي في المغرب. استكشف الحي على الخريطة قبل التخمين.` : `Real real estate listing in Morocco. Explore the neighborhood on the map before guessing.`;
-  $('chips').innerHTML = (L === 'ar' ? ['إعلان حقيقي', 'إيجار شهري', 'درهم'] : ['Real Listing', 'Monthly rent', 'MAD']).map(x => `<span class="chip">${x}</span>`).join('');
   
-  // Dynamically render all scraped images for this listing
+  $('location').textContent = `${h.city} — ${h.type}`;
+  
+  // Real listing characteristics from Mubawab
+  $('description').innerHTML = `<strong>${h.title}</strong>`;
+  
+  $('chips').innerHTML = [
+    `📍 ${h.city}`,
+    `🏠 ${h.type}`,
+    `💰 ${h.priceMAD} MAD`,
+    L === 'ar' ? 'إعلان حقيقي' : 'Real Listing'
+  ].map(x => `<span class="chip">${x}</span>`).join('');
+  
   const track = $('track');
   track.innerHTML = h.pics.map(pic => {
     const photoUrl = pic.startsWith('http') ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
     return `<div class="slide" style="background-image: url('${photoUrl}'); background-size: cover; background-position: center;"></div>`;
   }).join('');
 
-  // Show or hide arrows if there's only 1 picture
   const hasMultiple = h.pics.length > 1;
   document.querySelectorAll('.gallery .arrow').forEach(el => el.style.display = hasMultiple ? 'block' : 'none');
   
@@ -447,7 +460,7 @@ function nextRound() {
   $('final').style.display = 'block';
   $('score').textContent = fmt(score) + ' / 500';
   $('playerRank').textContent = t().rk + ': ' + (score >= 425 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%');
-  $('links').innerHTML = activeHomes.map((h) => `<a href="${h.url}" target="_blank" rel="noopener noreferrer">${L === 'ar' ? h.ar : h.en} — ${t().so}</a>`).join('');
+  $('links').innerHTML = activeHomes.map((h) => `<a href="${h.url}" target="_blank" rel="noopener noreferrer">${h.title} — ${t().so}</a>`).join('');
   $('playerName').placeholder = t().nm;
   $('addButton').textContent = t().ad;
 }
