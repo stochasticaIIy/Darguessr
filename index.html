@@ -295,7 +295,7 @@ let allListings = [];
 let activeHomes = [];
 let selectedCity = 'all';
 let L='ar',r=0,score=0,p=0,z=0,photoZoom=1,panX=0,panY=0,isDragging=false,startX=0,startY=0,mapInst=null,marker=null,cachedLeaders=[];
-let timerInt = null, timeLeft = 180;
+let timerInt = null, timeLeft = 300;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
 const T={
@@ -767,7 +767,7 @@ function formatTimerDisplay(seconds) {
 
 function startTimer() {
   clearInterval(timerInt);
-  timeLeft = 180;
+  timeLeft = 300;
   if ($('seconds')) $('seconds').textContent = formatTimerDisplay(timeLeft);
   timerInt = setInterval(() => {
     timeLeft--;
