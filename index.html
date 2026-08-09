@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -313,7 +314,7 @@ const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4
 const JSONBIN_BIN_ID = '6a724dd4da38895dfeba1777';
 const JSONBIN_API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
 const JSONBIN_BASE = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-const JSONBIN_ENABLED = JSONBIN_BIN_ID && JSONBIN_BIN_ID !== '6a724dd4da38895dfeba1777';
+const JSONBIN_ENABLED = JSONBIN_BIN_ID && JSONBIN_BIN_ID !== 'PASTE_YOUR_BIN_ID_HERE';
 
 let audioCtx = null;
 function initAudio() {
@@ -528,6 +529,32 @@ function selectRandomRounds() {
   saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
 }
 
+// jsonbin.io accepts either a Master Key (header X-Master-Key) or a scoped
+// Access Key (header X-Access-Key) - they are NOT interchangeable on the same
+// header. Since we can't tell which kind of key was pasted in, try Master Key
+// first and, if that's rejected, retry once as an Access Key. Any failure is
+// logged to the console with the real HTTP status/body so it's diagnosable -
+// open DevTools > Console (and Network, filtering for "jsonbin") to see it.
+async function jsonbinRequest(url, options = {}) {
+  const baseHeaders = { ...(options.headers || {}) };
+  const headerVariants = [
+    { 'X-Master-Key': JSONBIN_API_KEY },
+    { 'X-Access-Key': JSONBIN_API_KEY }
+  ];
+  let lastErr;
+  for (const authHeader of headerVariants) {
+    try {
+      const res = await fetch(url, { ...options, headers: { ...baseHeaders, ...authHeader } });
+      if (res.ok) return res;
+      const bodyText = await res.text().catch(() => '');
+      lastErr = new Error(`jsonbin.io ${res.status} ${res.statusText} using ${Object.keys(authHeader)[0]} — ${bodyText}`);
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr;
+}
+
 async function getLeaders() {
   if (!JSONBIN_ENABLED) {
     try {
@@ -539,19 +566,15 @@ async function getLeaders() {
     return cachedLeaders;
   }
   try {
-    const res = await fetch(`${JSONBIN_BASE}/latest`, {
-      headers: {
-        'X-Master-Key': JSONBIN_API_KEY,
-        'X-Bin-Meta': 'false'
-      },
+    const res = await jsonbinRequest(`${JSONBIN_BASE}/latest`, {
+      headers: { 'X-Bin-Meta': 'false' },
       cache: 'no-store'
     });
-    if (!res.ok) throw new Error('jsonbin read failed: ' + res.status);
     const data = await res.json();
     cachedLeaders = (Array.isArray(data) && data.length > 0) ? data : DEFAULT_LEADERS;
     try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(cachedLeaders)); } catch (e) {}
   } catch (e) {
-    console.error('Could not reach jsonbin.io, showing last known / default leaderboard.', e);
+    console.error('[DarGuessr/jsonbin] Could not read the leaderboard, showing last known / default instead:', e.message || e);
     try {
       const saved = localStorage.getItem('darguessr_leaders_cache');
       cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
@@ -566,15 +589,16 @@ async function saveLeaders(leaders) {
   cachedLeaders = leaders;
   try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(leaders)); } catch (e) {}
   if (!JSONBIN_ENABLED) return;
-  const res = await fetch(JSONBIN_BASE, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Master-Key': JSONBIN_API_KEY
-    },
-    body: JSON.stringify(leaders)
-  });
-  if (!res.ok) throw new Error('jsonbin write failed: ' + res.status);
+  try {
+    await jsonbinRequest(JSONBIN_BASE, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(leaders)
+    });
+  } catch (e) {
+    console.error('[DarGuessr/jsonbin] Could not write the leaderboard:', e.message || e);
+    throw e;
+  }
 }
 
 async function updateLeaderboardUI() {
