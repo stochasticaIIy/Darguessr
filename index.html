@@ -178,6 +178,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <button class="filter-pill" data-city="Casablanca" onclick="setCityFilter('Casablanca')">الدار البيضاء / Casablanca</button>
       <button class="filter-pill" data-city="Marrakech" onclick="setCityFilter('Marrakech')">مراكش / Marrakech</button>
       <button class="filter-pill" data-city="Rabat" onclick="setCityFilter('Rabat')">الرباط / Rabat</button>
+      <button class="filter-pill" data-city="Oujda" onclick="setCityFilter('Oujda')">وجدة / Oujda</button>
       <button class="filter-pill" data-city="Tangier" onclick="setCityFilter('Tangier')">طنجة / Tangier</button>
     </div>
 
@@ -513,6 +514,9 @@ function selectRandomRounds() {
       }
       if (target === 'rabat') {
         return c.includes('rabat') || c.includes('الرباط');
+      }
+       if (target === 'oujda') {
+        return c.includes('oujda') || c.includes('وجدة');
       }
       return c.includes(target);
     });
