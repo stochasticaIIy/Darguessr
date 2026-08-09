@@ -301,6 +301,20 @@ const T={
 
 const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
 
+/* ---- JSONBIN.IO CONFIG ----
+   Fill these in with your own bin:
+   1. Log in to jsonbin.io -> open your bin -> copy the Bin ID from the URL (or the bin's Info panel).
+   2. Go to jsonbin.io -> API Keys and copy a key. Prefer creating a scoped Access Key with only
+      "Bins: Read" + "Bins: Update" permissions for this one bin, rather than your account's
+      X-Master-Key - since this key sits in client-side code, anyone can view-source the page and
+      read it, and a scoped key limits what they could do with it.
+   3. Paste the Bin ID and key below. Leave JSONBIN_BIN_ID empty to fall back to local-only scores.
+*/
+const JSONBIN_BIN_ID = '6a724dd4da38895dfeba1777';
+const JSONBIN_API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
+const JSONBIN_BASE = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+const JSONBIN_ENABLED = JSONBIN_BIN_ID && JSONBIN_BIN_ID !== '6a724dd4da38895dfeba1777';
+
 let audioCtx = null;
 function initAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -515,21 +529,56 @@ function selectRandomRounds() {
 }
 
 async function getLeaders() {
+  if (!JSONBIN_ENABLED) {
+    try {
+      const saved = localStorage.getItem('darguessr_leaders_cache');
+      cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
+    } catch (e) {
+      cachedLeaders = DEFAULT_LEADERS;
+    }
+    return cachedLeaders;
+  }
   try {
-    const saved = localStorage.getItem('darguessr_leaders');
-    cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
+    const res = await fetch(`${JSONBIN_BASE}/latest`, {
+      headers: {
+        'X-Master-Key': JSONBIN_API_KEY,
+        'X-Bin-Meta': 'false'
+      },
+      cache: 'no-store'
+    });
+    if (!res.ok) throw new Error('jsonbin read failed: ' + res.status);
+    const data = await res.json();
+    cachedLeaders = (Array.isArray(data) && data.length > 0) ? data : DEFAULT_LEADERS;
+    try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(cachedLeaders)); } catch (e) {}
   } catch (e) {
-    cachedLeaders = DEFAULT_LEADERS;
+    console.error('Could not reach jsonbin.io, showing last known / default leaderboard.', e);
+    try {
+      const saved = localStorage.getItem('darguessr_leaders_cache');
+      cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
+    } catch (e2) {
+      cachedLeaders = DEFAULT_LEADERS;
+    }
   }
   return cachedLeaders;
 }
 
 async function saveLeaders(leaders) {
   cachedLeaders = leaders;
-  try { localStorage.setItem('darguessr_leaders', JSON.stringify(leaders)); } catch (e) {}
+  try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(leaders)); } catch (e) {}
+  if (!JSONBIN_ENABLED) return;
+  const res = await fetch(JSONBIN_BASE, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': JSONBIN_API_KEY
+    },
+    body: JSON.stringify(leaders)
+  });
+  if (!res.ok) throw new Error('jsonbin write failed: ' + res.status);
 }
 
 async function updateLeaderboardUI() {
+  $('leaderGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-family:'DM Sans'">${L === 'ar' ? '...جارٍ التحميل' : 'Loading...'}</div>`;
   const list = await getLeaders();
   $('leaderGrid').innerHTML = list.map((x, i) => 
     `<div class="leader">${String(i + 1).padStart(2, '0')} · <span class="leader-name" dir="ltr">${x[0]}</span> <b>${fmt(x[1])}</b></div>`
@@ -552,12 +601,24 @@ async function addPlayer() {
   if (!n) return $('playerName').focus();
   $('playerName').disabled = true;
   $('addButton').disabled = true;
-  let list = await getLeaders();
-  list.push([n, score]);
-  list.sort((a, b) => b[1] - a[1]);
-  list = list.slice(0, 10);
-  await saveLeaders(list);
-  await updateLeaderboardUI();
+  const originalLabel = $('addButton').textContent;
+  $('addButton').textContent = L === 'ar' ? '...جارٍ الحفظ' : 'Saving...';
+  try {
+    let list = await getLeaders(); // re-fetch the shared list right before writing, so we merge with
+                                    // whatever other players have already added instead of overwriting them
+    list.push([n, score]);
+    list.sort((a, b) => b[1] - a[1]);
+    list = list.slice(0, 10);
+    await saveLeaders(list);
+    await updateLeaderboardUI();
+    $('addButton').textContent = originalLabel;
+  } catch (e) {
+    console.error(e);
+    alert(L === 'ar' ? 'تعذّر حفظ نتيجتك في الترتيب، تحقق من اتصالك وحاول مرة أخرى.' : "Couldn't save your score to the leaderboard - check your connection and try again.");
+    $('playerName').disabled = false;
+    $('addButton').disabled = false;
+    $('addButton').textContent = originalLabel;
+  }
 }
 
 function placeMap(h) {
@@ -814,7 +875,6 @@ $('guess').addEventListener('keyup', (e) => {
 
 loadListings();
 setLang('ar');
-updateLeaderboardUI();
 </script>
 </body>
 </html>
