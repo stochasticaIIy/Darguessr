@@ -32,10 +32,53 @@ p{color:var(--muted);line-height:1.8}
 .game{padding:68px 7vw 35px}
 
 /* CITY SELECTOR */
-.city-select-wrap{margin-bottom:20px}
-.city-select{background:#fff;border:1px solid var(--line);border-radius:20px;padding:9px 16px;font:600 13px 'DM Sans';cursor:pointer;color:var(--ink);outline:none;transition:border-color .2s;min-width:240px}
-.city-select:hover{border-color:var(--ink)}
-.city-select:focus{border-color:var(--orange)}
+.city-select-wrap{
+  margin-bottom:22px;
+  display:flex;
+  justify-content:center
+}
+.city-select{
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:999px;
+  padding:12px 48px 12px 22px;
+  font:600 14px 'DM Sans','Noto Kufi Arabic',sans-serif;
+  cursor:pointer;
+  color:var(--ink);
+  outline:none;
+  transition:all .22s cubic-bezier(.2,.7,.3,1);
+  min-width:280px;
+  text-align:center;
+  box-shadow:0 1px 0 rgba(0,0,0,.04), 0 6px 20px -12px rgba(19,42,38,.18);
+  position:relative;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  background-position:
+    calc(100% - 22px) 52%,
+    calc(100% - 14px) 52%;
+  background-size:8px 8px, 8px 8px;
+  background-repeat:no-repeat
+}
+.city-select:hover{
+  border-color:var(--ink);
+  transform:translateY(-1px);
+  box-shadow:0 2px 0 rgba(0,0,0,.04), 0 12px 28px -14px rgba(19,42,38,.3)
+}
+.city-select:focus{
+  border-color:var(--orange);
+  box-shadow:0 0 0 4px rgba(255,114,94,.12), 0 2px 0 rgba(0,0,0,.04), 0 12px 28px -14px rgba(255,114,94,.35)
+}
+.city-select option{
+  background:#fff;
+  color:var(--ink);
+  font:600 13px 'DM Sans','Noto Kufi Arabic',sans-serif;
+  text-align:center;
+  padding:6px 10px
+}
 
 .head{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}
 .head h2{margin:0;font-size:37px}
@@ -116,7 +159,11 @@ p{color:var(--muted);line-height:1.8}
 
 /* DARK MODE OVERRIDES */
 body.dark{--ink:#f7f4ea;--cream:#0d1513;--lime:#dfff74;--orange:#ff725e;--line:#223531;--muted:#9aa8a4}
-body.dark .top, body.dark .stats, body.dark .hero-card, body.dark .city-select, body.dark .map, body.dark .leader{background:#13201d;color:var(--ink);border-color:var(--line)}
+body.dark .top, body.dark .stats, body.dark .hero-card, body.dark .map, body.dark .leader{background:#13201d;color:var(--ink);border-color:var(--line)}
+body.dark .city-select{background:#13201d;color:var(--ink);border-color:var(--line);box-shadow:0 1px 0 rgba(0,0,0,.25),0 6px 20px -12px rgba(0,0,0,.6);background-image:linear-gradient(45deg, transparent 50%, var(--lime) 50%),linear-gradient(135deg, var(--lime) 50%, transparent 50%)}
+body.dark .city-select:hover{border-color:var(--lime)}
+body.dark .city-select:focus{border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,114,94,.15),0 2px 0 rgba(0,0,0,.2),0 12px 28px -14px rgba(255,114,94,.3)}
+body.dark .city-select option{background:#13201d;color:var(--ink)}
 body.dark .round{background:#13201d;color:var(--ink);border-color:var(--line)}
 body.dark .details{background:#13201d;border-top:1px solid var(--line)}
 body.dark .chip{border-color:var(--line);background:#1b2d29;color:var(--ink)}
@@ -177,7 +224,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
   <section class="game" id="play">
     <div class="city-select-wrap">
       <select id="citySelect" class="city-select" onchange="setCityFilter(this.value)">
-        <option value="all">كل المدن / All Cities</option>
+        <option value="all">📍 كل المدن / All Cities</option>
         <option value="Casablanca">الدار البيضاء / Casablanca</option>
         <option value="Rabat">الرباط / Rabat</option>
         <option value="Marrakech">مراكش / Marrakech</option>
