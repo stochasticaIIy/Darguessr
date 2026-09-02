@@ -170,9 +170,9 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
     </div>
   </section>
   <section class="stats">
-    <div><b>10</b><span id="city"></span></div>
+    <div><b id="cityCountDisplay">0</b><span id="city"></span></div>
     <div><b id="listingCountDisplay">0</b><span id="listing"></span></div>
-    <div><b id="seconds">50:00</b><span id="perRound"></span></div>
+    <div><b id="seconds">0:50</b><span id="perRound"></span></div>
   </section>
   <section class="game" id="play">
     <div class="city-select-wrap">
@@ -242,7 +242,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
         <div class="details" id="details">
           <div class="chips" id="chips"></div>
           <div class="input">
-            <input id="guess" type="number">
+            <input id="guess" type="number" min="1" step="1">
             <button class="btn guess" id="guessBtn" onclick="submit()"></button>
           </div>
         </div>
@@ -302,6 +302,9 @@ const FALLBACK_LISTINGS = [
   }
 ];
 
+const MAX_ROUNDS = 5;
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80";
+
 let allListings = [];
 let activeHomes = [];
 let selectedCity = 'all';
@@ -328,7 +331,87 @@ const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4
 const JSONBIN_BIN_ID = '6a724dd4da38895dfeba1777';
 const JSONBIN_API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
 const JSONBIN_BASE = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-const JSONBIN_ENABLED = JSONBIN_BIN_ID && JSONBIN_BIN_ID !== 'PASTE_YOUR_BIN_ID_HERE';
+const JSONBIN_ENABLED = JSONBIN_BIN_ID && JSONBIN_BIN_ID !== '6a724dd4da38895dfeba1777';
+
+function shuffleArray(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function normalizeText(value, fallback = '') {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+function normalizeHttpUrl(value, fallback = 'https://www.mubawab.ma') {
+  const candidate = normalizeText(value);
+  if (!candidate) return fallback;
+  try {
+    const parsed = new URL(candidate, window.location.href);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.href;
+    }
+  } catch (e) {}
+  return fallback;
+}
+
+function normalizeImageUrl(value) {
+  const candidate = normalizeText(value);
+  if (!candidate) return FALLBACK_IMAGE;
+  if (candidate.startsWith('data:image/')) return candidate;
+  return normalizeHttpUrl(candidate, FALLBACK_IMAGE);
+}
+
+function cssEscapeUrl(url) {
+  return normalizeImageUrl(url).replace(/"/g, '%22').replace(/'/g, '%27');
+}
+
+function totalRounds() {
+  return Math.max(1, activeHomes.length || 0);
+}
+
+function roundTitle() {
+  const count = totalRounds();
+  return L === 'ar'
+    ? `تحدي من ${fmt(count)} جولات`
+    : `${fmt(count)}-round challenge`;
+}
+
+function buildChip(text) {
+  const chip = document.createElement('span');
+  chip.className = 'chip';
+  chip.textContent = text;
+  return chip;
+}
+
+function renderListingLinks(listings) {
+  const linksEl = $('links');
+  linksEl.replaceChildren();
+  listings.forEach((h) => {
+    const link = document.createElement('a');
+    link.href = normalizeHttpUrl(h.url);
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = `${normalizeText(h.title, L === 'ar' ? 'إعلان عقاري' : 'Listing')} — ${t().so}`;
+    linksEl.appendChild(link);
+  });
+}
+
+function renderGallery(trackEl, pics) {
+  trackEl.replaceChildren();
+  pics.forEach((pic) => {
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    const inner = document.createElement('div');
+    inner.className = 'slide-inner';
+    inner.style.backgroundImage = `url("${cssEscapeUrl(pic)}")`;
+    slide.appendChild(inner);
+    trackEl.appendChild(slide);
+  });
+}
 
 let audioCtx = null;
 function initAudio() {
@@ -355,8 +438,8 @@ function soundGuess() {
   setTimeout(() => playTone(880, 'sine', 0.18, 0.1), 100);
   vibrate([40, 40, 60]);
 }
-function soundFinal(totalScore) {
-  if (totalScore >= 350) {
+function soundFinal(totalScore, maxScore = MAX_ROUNDS * 100) {
+  if (totalScore >= maxScore * 0.7) {
     playTone(523.25, 'triangle', 0.2, 0.1);
     setTimeout(() => playTone(659.25, 'triangle', 0.2, 0.1), 120);
     setTimeout(() => playTone(783.99, 'triangle', 0.2, 0.1), 240);
@@ -401,8 +484,7 @@ function updateFsImage() {
   const h = activeHomes[r];
   if (!h || !h.pics || h.pics.length === 0) return;
   const pic = h.pics[p];
-  const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1600&q=80`;
-  $('fsImg').src = photoUrl;
+  $('fsImg').src = normalizeImageUrl(pic);
   $('fsCount').textContent = `${p + 1} / ${h.pics.length}`;
   const hasMultiple = h.pics.length > 1;
   document.querySelectorAll('.fs-arrow').forEach(el => el.style.display = hasMultiple ? 'flex' : 'none');
@@ -455,23 +537,23 @@ async function loadListings() {
         pics = [item.imageUrl];
       }
       if (pics.length === 0) {
-        pics = ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80"];
+        pics = [FALLBACK_IMAGE];
       }
 
       return {
         id: item.id || `dar_${idx}`,
-        title: item.title || 'إعلان عقاري في المغرب',
-        city: item.city || 'Casablanca',
-        type: item.type || 'Appartement',
-        area: item.area || '—',
+        title: normalizeText(item.title, 'إعلان عقاري في المغرب'),
+        city: normalizeText(item.city, 'Casablanca'),
+        type: normalizeText(item.type, 'Appartement'),
+        area: normalizeText(item.area, '—'),
         bedrooms: item.bedrooms !== undefined ? item.bedrooms : '—',
         bathrooms: item.bathrooms !== undefined ? item.bathrooms : '—',
         priceMAD: item.priceMAD || String(numericPrice),
         price: numericPrice,
         lat: lat,
         lng: lng,
-        url: item.sourceUrl || "https://www.mubawab.ma",
-        pics: pics
+        url: normalizeHttpUrl(item.sourceUrl || "https://www.mubawab.ma"),
+        pics: pics.map(normalizeImageUrl)
       };
     });
 
@@ -480,8 +562,27 @@ async function loadListings() {
   }
 
   if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length + '+';
+  const uniqueCities = new Set(allListings.map(h => (h.city || '').trim()).filter(Boolean));
+  if($('cityCountDisplay')) $('cityCountDisplay').textContent = uniqueCities.size;
+
+  // Populate hero section with a real random listing
+  if (allListings.length > 0) {
+    const hero = allListings[Math.floor(Math.random() * allListings.length)];
+    const heroImgEl = document.querySelector('.hero-img');
+    if (heroImgEl && hero.pics && hero.pics[0]) {
+      heroImgEl.style.backgroundImage = `url("${cssEscapeUrl(hero.pics[0])}")`;
+    }
+    const heroInfo = $('heroInfo');
+    if (heroInfo) {
+      heroInfo.innerHTML = `${hero.title || ''} <br><small>${hero.city || ''} · ${hero.type || ''} · ${hero.area ? hero.area + ' m²' : ''}</small>`;
+    }
+    const heroPrice = $('heroPrice');
+    if (heroPrice) {
+      heroPrice.textContent = `${hero.priceMAD || hero.price || '????'} د.م. / الشهر`;
+    }
+  }
+
   selectRandomRounds();
-  render();
 }
 
 function setCityFilter(city) {
@@ -504,9 +605,17 @@ function selectRandomRounds() {
   
   let available = pool.filter(h => !seen.includes(h.id));
   if (available.length === 0) { available = [...pool]; }
-  const shuffled = [...available].sort(() => Math.random() - 0.5);
-  activeHomes = shuffled.slice(0, Math.min(5, shuffled.length));
-  saveSeenIds([...seen, ...activeHomes.map(h => h.id)]);
+
+  const targetRounds = Math.min(MAX_ROUNDS, pool.length);
+  const selected = shuffleArray(available).slice(0, targetRounds);
+  if (selected.length < targetRounds) {
+    const usedIds = new Set(selected.map(h => h.id));
+    const topUp = shuffleArray(pool.filter(h => !usedIds.has(h.id))).slice(0, targetRounds - selected.length);
+    selected.push(...topUp);
+  }
+
+  activeHomes = selected;
+  saveSeenIds([...new Set([...seen, ...activeHomes.map(h => h.id)])]);
 }
 
 // jsonbin.io accepts either a Master Key (header X-Master-Key) or a scoped
@@ -582,11 +691,34 @@ async function saveLeaders(leaders) {
 }
 
 async function updateLeaderboardUI() {
-  $('leaderGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-family:'DM Sans'">${L === 'ar' ? '...جارٍ التحميل' : 'Loading...'}</div>`;
+  const leaderGrid = $('leaderGrid');
+  const loading = document.createElement('div');
+  loading.style.gridColumn = '1 / -1';
+  loading.style.textAlign = 'center';
+  loading.style.color = 'var(--muted)';
+  loading.style.fontFamily = "'DM Sans'";
+  loading.textContent = L === 'ar' ? '...جارٍ التحميل' : 'Loading...';
+  leaderGrid.replaceChildren(loading);
+
   const list = await getLeaders();
-  $('leaderGrid').innerHTML = list.map((x, i) => 
-    `<div class="leader">${String(i + 1).padStart(2, '0')} · <span class="leader-name" dir="ltr">${x[0]}</span> <b>${fmt(x[1])}</b></div>`
-  ).join('');
+  leaderGrid.replaceChildren();
+  list.forEach((x, i) => {
+    const row = document.createElement('div');
+    row.className = 'leader';
+    row.append(`${String(i + 1).padStart(2, '0')} · `);
+
+    const name = document.createElement('span');
+    name.className = 'leader-name';
+    name.dir = 'ltr';
+    name.textContent = String(x[0] ?? '');
+
+    const points = document.createElement('b');
+    points.textContent = fmt(Number(x[1]) || 0);
+
+    row.appendChild(name);
+    row.appendChild(points);
+    leaderGrid.appendChild(row);
+  });
 }
 
 function exportLeadersTxt() {
@@ -755,6 +887,7 @@ function stopTimer() { clearInterval(timerInt); }
 function render() {
   if (!activeHomes || activeHomes.length === 0) return;
   const h = activeHomes[r];
+  if (!h) return nextRound();
   $('gallery').style.display = 'block';
   $('reveal').style.display = 'none';
   $('final').style.display = 'none';
@@ -762,21 +895,18 @@ function render() {
   
   const bedLabel = L === 'ar' ? 'غرف النوم' : 'Beds';
   const bathLabel = L === 'ar' ? 'الحمامات' : 'Baths';
-  
-  $('chips').innerHTML = [
+  const chips = [
     `📍 ${h.city}`,
     `🏠 ${h.type}`,
     (h.area && h.area !== '—') ? `📐 ${h.area} m²` : '',
     (h.bedrooms && h.bedrooms !== '—') ? `🛏️ ${h.bedrooms} ${bedLabel}` : '',
     (h.bathrooms && h.bathrooms !== '—') ? `🛁 ${h.bathrooms} ${bathLabel}` : '',
     L === 'ar' ? 'إعلان حقيقي' : 'Real Listing'
-  ].filter(Boolean).map(x => `<span class="chip">${x}</span>`).join('');
+  ].filter(Boolean);
+  $('chips').replaceChildren(...chips.map(buildChip));
   
   const track = $('track');
-  track.innerHTML = h.pics.map(pic => {
-    const photoUrl = (pic.startsWith('http') || pic.startsWith('data:')) ? pic : `https://images.unsplash.com/photo-${pic}?auto=format&fit=crop&w=1200&q=80`;
-    return `<div class="slide"><div class="slide-inner" style="background-image: url('${photoUrl}');"></div></div>`;
-  }).join('');
+  renderGallery(track, h.pics);
 
   const totalPics = h.pics.length;
   const hasMultiple = totalPics > 1;
@@ -789,8 +919,10 @@ function render() {
   $('guess').placeholder = t().g;
   p = 0;
   move(0);
-  $('progress').childNodes[0].nodeValue = `${r + 1} / 05`;
-  $('bar').style.width = `${(r + 1) * 20}%`;
+  $('gameTitle').textContent = roundTitle();
+  const rounds = totalRounds();
+  $('progress').childNodes[0].nodeValue = `${r + 1} / ${String(rounds).padStart(2, '0')}`;
+  $('bar').style.width = `${((r + 1) / rounds) * 100}%`;
   
   startTimer();
 }
@@ -798,6 +930,7 @@ function render() {
 function submit() {
   stopTimer();
   soundGuess();
+  if (!activeHomes[r]) return;
   const val = +$('guess').value;
   const g = val > 0 ? val : 0;
   const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
@@ -810,19 +943,21 @@ function submit() {
   $('yourGuess').textContent = fmt(g) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
   $('actual').textContent = fmt(a) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
   $('points').textContent = '+' + fmt(pt);
-  $('nextBtn').textContent = r === 4 ? (L === 'ar' ? 'عرض النتائج' : 'See results') : t().n;
+  $('nextBtn').textContent = r === totalRounds() - 1 ? (L === 'ar' ? 'عرض النتائج' : 'See results') : t().n;
 }
 
 function nextRound() {
-  if (++r < 5) return render();
+  if (++r < totalRounds()) return render();
   stopTimer();
-  soundFinal(score);
+  const maxScore = totalRounds() * 100;
+  soundFinal(score, maxScore);
   $('reveal').style.display = 'none';
   $('details').style.display = 'none';
   $('final').style.display = 'block';
-  $('score').textContent = fmt(score) + ' / 500';
-  $('playerRank').textContent = t().rk + ': ' + (score >= 425 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%');
-  $('links').innerHTML = activeHomes.map((h) => `<a href="${h.url}" target="_blank" rel="noopener noreferrer">${h.title} — ${t().so}</a>`).join('');
+  $('score').textContent = fmt(score) + ` / ${maxScore}`;
+  const scoreRatio = maxScore > 0 ? score / maxScore : 0;
+  $('playerRank').textContent = t().rk + ': ' + (scoreRatio >= 0.85 ? 'Top 2%' : scoreRatio >= 0.6 ? 'Top 12%' : 'Top 35%');
+  renderListingLinks(activeHomes);
   $('playerName').placeholder = t().nm;
   $('addButton').textContent = t().ad;
 }
@@ -840,6 +975,7 @@ function restart() {
 function setLang(n) {
   L = n;
   document.documentElement.lang = n;
+  document.documentElement.dir = n === 'ar' ? 'rtl' : 'ltr';
   document.body.dir = n === 'ar' ? 'rtl' : 'ltr';
   document.body.classList.toggle('en', n === 'en');
   $('arBtn').classList.toggle('on', n === 'ar');
@@ -877,8 +1013,9 @@ $('guess').addEventListener('keyup', (e) => {
   if (e.key === 'Enter') submit();
 });
 
-loadListings();
 setLang('ar');
+loadListings();
+updateLeaderboardUI();
 </script>
 </body>
 </html>
