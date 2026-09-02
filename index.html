@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -32,10 +31,11 @@ p{color:var(--muted);line-height:1.8}
 .stats span{font-size:13px;color:var(--muted)}
 .game{padding:68px 7vw 35px}
 
-/* CITY FILTERS */
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.filter-pill{background:#fff;border:1px solid var(--line);border-radius:20px;padding:8px 16px;font:600 13px 'DM Sans';cursor:pointer;transition:all .2s;color:var(--ink)}
-.filter-pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* CITY SELECTOR */
+.city-select-wrap{margin-bottom:20px}
+.city-select{background:#fff;border:1px solid var(--line);border-radius:20px;padding:9px 16px;font:600 13px 'DM Sans';cursor:pointer;color:var(--ink);outline:none;transition:border-color .2s;min-width:240px}
+.city-select:hover{border-color:var(--ink)}
+.city-select:focus{border-color:var(--orange)}
 
 .head{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}
 .head h2{margin:0;font-size:37px}
@@ -116,7 +116,7 @@ p{color:var(--muted);line-height:1.8}
 
 /* DARK MODE OVERRIDES */
 body.dark{--ink:#f7f4ea;--cream:#0d1513;--lime:#dfff74;--orange:#ff725e;--line:#223531;--muted:#9aa8a4}
-body.dark .top, body.dark .stats, body.dark .hero-card, body.dark .filter-pill, body.dark .map, body.dark .leader{background:#13201d;color:var(--ink);border-color:var(--line)}
+body.dark .top, body.dark .stats, body.dark .hero-card, body.dark .city-select, body.dark .map, body.dark .leader{background:#13201d;color:var(--ink);border-color:var(--line)}
 body.dark .round{background:#13201d;color:var(--ink);border-color:var(--line)}
 body.dark .details{background:#13201d;border-top:1px solid var(--line)}
 body.dark .chip{border-color:var(--line);background:#1b2d29;color:var(--ink)}
@@ -126,7 +126,6 @@ body.dark .next-btn{background:#f7f4ea;color:#132a26}
 body.dark .brand:before{background:var(--lime);color:#132a26}
 body.dark .lang button{background:#1b2d29;color:var(--ink)}
 body.dark .lang .on{background:var(--lime);color:var(--ink)}
-body.dark .filter-pill.active{background:var(--lime);color:var(--ink);border-color:var(--lime)}
 body.dark .map-body #map{background:#0d1513}
 body.dark .zoom, body.dark .photo-zoom{background:rgba(19, 32, 29, 0.85);border-color:var(--line)}
 body.dark .zoom button, body.dark .photo-zoom button{color:var(--ink);border-color:var(--line)}
@@ -141,6 +140,9 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .fs-close{left:auto;right:20px}
 @media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
 </style>
+  <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
 <header class="top">
@@ -170,17 +172,27 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
   <section class="stats">
     <div><b>10</b><span id="city"></span></div>
     <div><b id="listingCountDisplay">0</b><span id="listing"></span></div>
-    <div><b id="seconds">3:00</b><span id="perRound"></span></div>
+    <div><b id="seconds">50:00</b><span id="perRound"></span></div>
   </section>
   <section class="game" id="play">
-    <div class="filters" id="cityFilters">
-      <button class="filter-pill active" data-city="all" onclick="setCityFilter('all')">كل المدن / All Cities</button>
-      <button class="filter-pill" data-city="Casablanca" onclick="setCityFilter('Casablanca')">الدار البيضاء / Casablanca</button>
-      <button class="filter-pill" data-city="Marrakech" onclick="setCityFilter('Marrakech')">مراكش / Marrakech</button>
-      <button class="filter-pill" data-city="Rabat" onclick="setCityFilter('Rabat')">الرباط / Rabat</button>
-      <button class="filter-pill" data-city="Oujda" onclick="setCityFilter('Oujda')">وجدة / Oujda</button>
-      <button class="filter-pill" data-city="Fès" onclick="setCityFilter('Fès')">فاس / Fès</button>
-      <button class="filter-pill" data-city="Tangier" onclick="setCityFilter('Tangier')">طنجة / Tangier</button>
+    <div class="city-select-wrap">
+      <select id="citySelect" class="city-select" onchange="setCityFilter(this.value)">
+        <option value="all">كل المدن / All Cities</option>
+        <option value="Casablanca">الدار البيضاء / Casablanca</option>
+        <option value="Rabat">الرباط / Rabat</option>
+        <option value="Marrakech">مراكش / Marrakech</option>
+        <option value="Tanger">طنجة / Tanger</option>
+        <option value="Agadir">أكادير / Agadir</option>
+        <option value="Fès">فاس / Fès</option>
+        <option value="Salé">سلا / Salé</option>
+        <option value="Oujda">وجدة / Oujda</option>
+        <option value="Kénitra">القنيطرة / Kénitra</option>
+        <option value="Laâyoune">العيون / Laâyoune</option>
+        <option value="Dakhla">الداخلة / Dakhla</option>
+        <option value="Meknès">مكناس / Meknès</option>
+        <option value="Bouskoura">بوسكورة / Bouskoura</option>
+        <option value="Berkane">بركان / Berkane</option>
+      </select>
     </div>
 
     <div class="head">
@@ -298,8 +310,8 @@ let timerInt = null, timeLeft = 3000;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
 const T={
-  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'3:00',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:' النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
-  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'3:00',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
+  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'50:00',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:' النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
+  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'50:00',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
 };
 
 const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
@@ -407,39 +419,6 @@ function saveSeenIds(ids) {
   try { localStorage.setItem('darguessr_seen_ids', JSON.stringify(ids)); } catch(e) {}
 }
 
-function isInsideOcean(lat, lng) {
-  // Atlantic coast: within each latitude band, anything west of the cutoff
-  // longitude has crossed the coastline into the ocean.
-  //
-  // NOTE: this used to also have a narrower (30.0, 30.7, -9.57) band layered
-  // on top of the wider one below. That narrower band's cutoff was too far
-  // east and, because it was checked first, it wrongly flagged Agadir's own
-  // real city-center coordinate (30.4278, -9.5981) as water - and every
-  // jittered point around it too, so Agadir listings would have been dropped
-  // 100% of the time. Removed it; the wider band already covers that
-  // latitude range with a cutoff that correctly treats Agadir as land.
-  const atlanticBands = [
-    [35.0, 36.5, -5.9],
-    [33.8, 35.0, -6.85],
-    [33.0, 33.8, -7.65],
-    [31.5, 33.0, -9.30],
-    [29.5, 31.5, -9.65],
-    [20.0, 29.5, -13.3],
-  ];
-  for (const [latMin, latMax, lngCutoff] of atlanticBands) {
-    if (lat >= latMin && lat <= latMax && lng < lngCutoff) return true;
-  }
-  // Mediterranean / Strait of Gibraltar coast near Tanger (35.7595, -5.8339) -
-  // the sea is to the NORTH there, not the west, so the bands above can't
-  // catch it. This has to be a separate check reached by falling through the
-  // loop above, not an early `return lng < cutoff` inside a lat-range match -
-  // an earlier version of this function returned as soon as a band's
-  // latitude range matched, so Tanger's own Atlantic band (35.0-36.5) always
-  // decided the result and this check never ran.
-  if (lat > 35.78 && lng >= -6.0 && lng <= -5.5) return true;
-  return false;
-}
-
 async function loadListings() {
   try {
     const res = await fetch('./listings.json?t=' + Date.now(), { cache: 'no-store' });
@@ -454,11 +433,6 @@ async function loadListings() {
   }
 
   allListings = allListings
-    .filter(item => {
-      let lat = item.lat || 33.5731;
-      let lng = item.lng || -7.5898;
-      return !isInsideOcean(lat, lng);
-    })
     .map((item, idx) => {
       let numericPrice = item.price;
       if (!numericPrice && item.priceMAD) {
@@ -512,9 +486,6 @@ async function loadListings() {
 
 function setCityFilter(city) {
   selectedCity = city;
-  document.querySelectorAll('.filter-pill').forEach(btn => {
-    btn.classList.toggle('active', btn.getAttribute('data-city') === city);
-  });
   restart();
 }
 
@@ -524,31 +495,7 @@ function selectRandomRounds() {
   
   if (selectedCity !== 'all') {
     const target = selectedCity.toLowerCase();
-    pool = allListings.filter(h => {
-      const c = (h.city || '').toLowerCase();
-      if (target === 'tangier') {
-        return c.includes('tangier') || c.includes('tanger') || c.includes('طنجة');
-      }
-      if (target === 'casablanca') {
-        return c.includes('casablanca') || c.includes('الدار') || c.includes('casa');
-      }
-      if (target === 'marrakech') {
-        return c.includes('marrakech') || c.includes('مراكش');
-      }
-      if (target === 'rabat') {
-        return c.includes('rabat') || c.includes('الرباط');
-      }
-      if (target === 'oujda') {
-        return c.includes('oujda') || c.includes('وجدة');
-      }
-      if (target === 'fès') {
-        return c.includes('fès') || c.includes('فاس');
-      }
-      if (target === 'agadir') {
-        return c.includes('agadir') || c.includes('أڭادير');
-      }
-      return c.includes(target);
-    });
+    pool = allListings.filter(h => (h.city || '').toLowerCase() === target);
   }
 
   if (pool.length === 0) {
