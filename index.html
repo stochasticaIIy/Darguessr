@@ -160,10 +160,11 @@ p{color:var(--muted);line-height:1.8}
 /* DARK MODE OVERRIDES */
 body.dark{--ink:#f7f4ea;--cream:#0d1513;--lime:#dfff74;--orange:#ff725e;--line:#223531;--muted:#9aa8a4}
 body.dark .top, body.dark .stats, body.dark .hero-card, body.dark .map, body.dark .leader{background:#13201d;color:var(--ink);border-color:var(--line)}
-body.dark .city-select{background:#13201d;color:var(--ink);border-color:var(--line);box-shadow:0 1px 0 rgba(0,0,0,.25),0 6px 20px -12px rgba(0,0,0,.6);background-image:linear-gradient(45deg, transparent 50%, var(--lime) 50%),linear-gradient(135deg, var(--lime) 50%, transparent 50%)}
-body.dark .city-select:hover{border-color:var(--lime)}
-body.dark .city-select:focus{border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,114,94,.15),0 2px 0 rgba(0,0,0,.2),0 12px 28px -14px rgba(255,114,94,.3)}
-body.dark .city-select option{background:#13201d;color:var(--ink)}
+/* City select in dark mode: use lime accent pill (matches primary .btn + language .on button in dark theme) */
+body.dark .city-select{background:var(--lime);color:#132a26;border-color:var(--lime);font-weight:700;box-shadow:0 1px 0 rgba(223,255,116,.2),0 6px 20px -12px rgba(223,255,116,.35);background-image:linear-gradient(45deg, transparent 50%, #132a26 50%),linear-gradient(135deg, #132a26 50%, transparent 50%)}
+body.dark .city-select:hover{background:#e5ff8a;border-color:#e5ff8a;transform:translateY(-1px);box-shadow:0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5)}
+body.dark .city-select:focus{border-color:#b8d45f;box-shadow:0 0 0 4px rgba(223,255,116,.22),0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5);outline:none}
+body.dark .city-select option{background:#13201d;color:var(--ink);font-weight:600}
 body.dark .round{background:#13201d;color:var(--ink);border-color:var(--line)}
 body.dark .details{background:#13201d;border-top:1px solid var(--line)}
 body.dark .chip{border-color:var(--line);background:#1b2d29;color:var(--ink)}
