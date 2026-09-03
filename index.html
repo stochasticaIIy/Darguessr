@@ -13,7 +13,7 @@
 body{margin:0;background:var(--cream);color:var(--ink);font-family:'Noto Kufi Arabic',sans-serif;transition:background .3s,color .3s}
 .top{height:74px;padding:0 7vw;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
 .brand{font:700 22px 'DM Sans'}
-.brand:before{content:'◇';display:inline-grid;place-items:center;width:30px;height:30px;margin-left:9px;background:var(--ink);color:var(--lime);border-radius:8px}
+.brand:before{content:'â—‡';display:inline-grid;place-items:center;width:30px;height:30px;margin-left:9px;background:var(--ink);color:var(--lime);border-radius:8px}
 .lang{display:flex;gap:6px;align-items:center}
 .lang button{border:0;background:#fff;padding:7px 12px;border-radius:18px;cursor:pointer;font-family:inherit}
 .lang .on{color:#fff;background:var(--ink)}
@@ -278,9 +278,9 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 <header class="top">
   <div class="brand">DarGuessr</div>
   <div class="lang">
-    <button id="arBtn" class="on" onclick="setLang('ar')">ع</button>
+    <button id="arBtn" class="on" onclick="setLang('ar')">Ø¹</button>
     <button id="enBtn" onclick="setLang('en')">EN</button>
-    <button id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    <button id="darkModeBtn" onclick="toggleDarkMode()">ðŸŒ™</button>
   </div>
 </header>
 <main>
@@ -308,27 +308,27 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
     <div class="city-select-wrap" id="citySelectWrap">
       <!-- Hidden native select as value store so existing JS keeps working -->
       <select id="citySelect" style="display:none" onchange="setCityFilter(this.value)">
-        <option value="all">📍 كل المدن / All Cities</option>
-        <option value="Casablanca">الدار البيضاء / Casablanca</option>
-        <option value="Rabat">الرباط / Rabat</option>
-        <option value="Marrakech">مراكش / Marrakech</option>
-        <option value="Tanger">طنجة / Tanger</option>
-        <option value="Agadir">أكادير / Agadir</option>
-        <option value="Fès">فاس / Fès</option>
-        <option value="Salé">سلا / Salé</option>
-        <option value="Oujda">وجدة / Oujda</option>
-        <option value="Kénitra">القنيطرة / Kénitra</option>
-        <option value="Laâyoune">العيون / Laâyoune</option>
-        <option value="Dakhla">الداخلة / Dakhla</option>
-        <option value="Meknès">مكناس / Meknès</option>
-        <option value="Bouskoura">بوسكورة / Bouskoura</option>
-        <option value="Berkane">بركان / Berkane</option>
+        <option value="all">ðŸ“ ÙƒÙ„ Ø§Ù„Ù…Ø¯Ù† / All Cities</option>
+        <option value="Casablanca">Ø§Ù„Ø¯Ø§Ø± Ø§Ù„Ø¨ÙŠØ¶Ø§Ø¡ / Casablanca</option>
+        <option value="Rabat">Ø§Ù„Ø±Ø¨Ø§Ø· / Rabat</option>
+        <option value="Marrakech">Ù…Ø±Ø§ÙƒØ´ / Marrakech</option>
+        <option value="Tanger">Ø·Ù†Ø¬Ø© / Tanger</option>
+        <option value="Agadir">Ø£ÙƒØ§Ø¯ÙŠØ± / Agadir</option>
+        <option value="FÃ¨s">ÙØ§Ø³ / FÃ¨s</option>
+        <option value="SalÃ©">Ø³Ù„Ø§ / SalÃ©</option>
+        <option value="Oujda">ÙˆØ¬Ø¯Ø© / Oujda</option>
+        <option value="KÃ©nitra">Ø§Ù„Ù‚Ù†ÙŠØ·Ø±Ø© / KÃ©nitra</option>
+        <option value="LaÃ¢youne">Ø§Ù„Ø¹ÙŠÙˆÙ† / LaÃ¢youne</option>
+        <option value="Dakhla">Ø§Ù„Ø¯Ø§Ø®Ù„Ø© / Dakhla</option>
+        <option value="MeknÃ¨s">Ù…ÙƒÙ†Ø§Ø³ / MeknÃ¨s</option>
+        <option value="Bouskoura">Ø¨ÙˆØ³ÙƒÙˆØ±Ø© / Bouskoura</option>
+        <option value="Berkane">Ø¨Ø±ÙƒØ§Ù† / Berkane</option>
       </select>
       <!-- Custom trigger pill (replaces native select visible UI) -->
       <div class="city-select" id="cityTrigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-controls="cityDropdown">
-        <span id="cityTriggerLabel">📍 كل المدن / All Cities</span>
+        <span id="cityTriggerLabel">ðŸ“ ÙƒÙ„ Ø§Ù„Ù…Ø¯Ù† / All Cities</span>
       </div>
-      <!-- Custom dropdown popup (all options rendered as divs → perfect centering) -->
+      <!-- Custom dropdown popup (all options rendered as divs â†’ perfect centering) -->
       <div class="city-dropdown" id="cityDropdown" role="listbox"></div>
     </div>
 
@@ -343,13 +343,13 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <div class="round">
         <div class="gallery" id="gallery">
           <div class="track" id="track"></div>
-          <button class="arrow prev" onclick="move(-1)">‹</button>
-          <button class="arrow next" onclick="move(1)">›</button>
+          <button class="arrow prev" onclick="move(-1)">â€¹</button>
+          <button class="arrow next" onclick="move(1)">â€º</button>
           <span class="count" id="count">1 / 1</span>
           <div class="photo-zoom">
             <button onclick="zoomPhoto(1)">+</button>
-            <button onclick="zoomPhoto(-1)">−</button>
-            <button onclick="openFullscreen()">⤢</button>
+            <button onclick="zoomPhoto(-1)">âˆ’</button>
+            <button onclick="openFullscreen()">â¤¢</button>
           </div>
         </div>
         <div class="reveal" id="reveal">
@@ -393,7 +393,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
           <div id="map"></div>
           <div class="zoom">
             <button onclick="zoom(1)">+</button>
-            <button onclick="zoom(-1)">−</button>
+            <button onclick="zoom(-1)">âˆ’</button>
           </div>
         </div>
       </aside>
@@ -410,21 +410,21 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 
 <!-- FULLSCREEN IMAGE MODAL -->
 <div class="fs-modal" id="fsModal">
-  <button class="fs-close" onclick="closeFullscreen()">✕</button>
-  <button class="fs-arrow fs-prev" onclick="fsMove(-1)">‹</button>
-  <button class="fs-arrow fs-next" onclick="fsMove(1)">›</button>
+  <button class="fs-close" onclick="closeFullscreen()">âœ•</button>
+  <button class="fs-arrow fs-prev" onclick="fsMove(-1)">â€¹</button>
+  <button class="fs-arrow fs-next" onclick="fsMove(1)">â€º</button>
   <img id="fsImg" src="" alt="Fullscreen view">
   <span class="fs-count" id="fsCount">1 / 1</span>
 </div>
 
-<footer class="footer">© 2026 DarGuessr</footer>
+<footer class="footer">Â© 2026 DarGuessr</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 const FALLBACK_LISTINGS = [
   {
     id: "dar_001",
-    title: "شقة حديثة للإيجار في المعاريف",
+    title: "Ø´Ù‚Ø© Ø­Ø¯ÙŠØ«Ø© Ù„Ù„Ø¥ÙŠØ¬Ø§Ø± ÙÙŠ Ø§Ù„Ù…Ø¹Ø§Ø±ÙŠÙ",
     city: "Casablanca",
     type: "Appartement",
     area: "120",
@@ -450,8 +450,8 @@ let timerInt = null, timeLeft = 3000;
 const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
 
 const T={
-  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'50:00',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:' النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
-  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'50:00',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
+  ar:{e:'ØªØ­Ø¯ÙŠ Ø¥ÙŠØ¬Ø§Ø± Ø§Ù„Ø¹Ù‚Ø§Ø±Ø§Øª Ø¨Ø§Ù„Ù…ØºØ±Ø¨',t:'Ù‡Ù„ ØªØ³ØªØ·ÙŠØ¹ ØªØ®Ù…ÙŠÙ† Ø§Ù„Ø¥ÙŠØ¬Ø§Ø±ØŸ',i:'Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø´Ù‚Ø©ØŒ ÙˆØ®Ù…Ù‘Ù† Ø¥ÙŠØ¬Ø§Ø±Ù‡Ø§ Ø§Ù„Ø´Ù‡Ø±ÙŠ Ø¨Ø§Ù„Ø¯Ø±Ù‡Ù….',s:'Ø§Ø¨Ø¯Ø£ Ø§Ù„ØªØ®Ù…ÙŠÙ†',c:'Ù…Ø¯Ù† Ù„Ù„Ø§Ø³ØªÙƒØ´Ø§Ù',l:'Ø¥Ø¹Ù„Ø§Ù† Ù…Ø³Ø¬Ù‘Ù„',sec:'50:00',pr:'Ù„ÙƒÙ„ Ø¬ÙˆÙ„Ø©',gt:'ØªØ­Ø¯ÙŠ Ù…Ù† Ø®Ù…Ø³ Ø¬ÙˆÙ„Ø§Øª',gs:'Ù„Ø§ ØªØ­ØªØ§Ø¬ Ø¥Ù„Ù‰ Ø­Ø³Ø§Ø¨ - Ø¬Ø±Ù‘Ø¨ Ø£ÙØ¶Ù„ ØªØ®Ù…ÙŠÙ† Ù„Ø¯ÙŠÙƒ.',mt:'Ø§Ø³ØªÙƒØ´Ù Ø§Ù„Ø­ÙŠ',ms:'Ø§Ø³ØªØ®Ø¯Ù… Ø£Ø²Ø±Ø§Ø± + Ùˆ âˆ’ ÙÙ‚Ø·.',ld:'Ù…ØªØµØ¯Ø±Ùˆ Ù‡Ø°Ø§ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹',g:'Ø£Ø¯Ø®Ù„ ØªØ®Ù…ÙŠÙ†Ùƒ Ø¨Ø§Ù„Ø¯Ø±Ù‡Ù…',lk:'Ø£ÙƒÙ‘Ø¯ Ø§Ù„ØªØ®Ù…ÙŠÙ†',n:'Ø§Ù„Ø¬ÙˆÙ„Ø© Ø§Ù„ØªØ§Ù„ÙŠØ©',yg:'ØªØ®Ù…ÙŠÙ†Ùƒ',ac:'Ø§Ù„Ø¥ÙŠØ¬Ø§Ø± Ø§Ù„Ø­Ù‚ÙŠÙ‚ÙŠ',pt:' Ø§Ù„Ù†Ù‚Ø§Ø· Ø§Ù„Ù…ÙƒØªØ³Ø¨Ø©',co:'Ø§ÙƒØªÙ…Ù„ Ø§Ù„Ø¯ÙˆØ±Øª',st:'Ù†ØªÙŠØ¬ØªÙƒ ÙÙŠ ØªØ®Ù…ÙŠÙ† Ø§Ù„Ø¥ÙŠØ¬Ø§Ø±',rk:'ØªØ±ØªÙŠØ¨Ùƒ Ù‡Ø°Ø§ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹',so:'Ø¹Ø±Ø¶ Ø§Ù„Ø¥Ø¹Ù„Ø§Ù† Ø§Ù„Ø£ØµÙ„ÙŠ',nm:'Ø§Ø¯Ø®Ù„ Ø§Ø³Ù…Ùƒ',ad:'Ø£Ø¶ÙÙ†ÙŠ Ø¥Ù„Ù‰ Ø§Ù„ØªØ±ØªÙŠØ¨',ag:'Ø§Ù„Ø¹Ø¨ Ù…Ø¬Ø¯Ø¯Ø§Ù‹',gr:'ØªØ®Ù…ÙŠÙ† Ø±Ø§Ø¦Ø¹!',gd:'Ø­Ø³Ù†Ø§Ù‹ØŒ ØªØ®Ù…ÙŠÙ† Ø¬ÙŠØ¯!',kp:'Ø­Ø§ÙˆÙ„ ÙÙŠ Ø§Ù„Ø¬ÙˆÙ„Ø© Ø§Ù„ØªØ§Ù„ÙŠØ©!',exp:'ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØªØ±ØªÙŠØ¨ (.txt)',hi:'Ø´Ù‚Ø© Ù…ØªÙ…ÙŠØ²Ø© | Ø§Ù„Ù…ØºØ±Ø¨',hp:'???? Ø¯.Ù…. / Ø§Ù„Ø´Ù‡Ø±'},
+  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'50:00',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and âˆ’ buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
 };
 
 const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
@@ -516,7 +516,7 @@ function totalRounds() {
 function roundTitle() {
   const count = totalRounds();
   return L === 'ar'
-    ? `تحدي من ${fmt(count)} جولات`
+    ? `ØªØ­Ø¯ÙŠ Ù…Ù† ${fmt(count)} Ø¬ÙˆÙ„Ø§Øª`
     : `${fmt(count)}-round challenge`;
 }
 
@@ -535,7 +535,7 @@ function renderListingLinks(listings) {
     link.href = normalizeHttpUrl(h.url);
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    link.textContent = `${normalizeText(h.title, L === 'ar' ? 'إعلان عقاري' : 'Listing')} — ${t().so}`;
+    link.textContent = `${normalizeText(h.title, L === 'ar' ? 'Ø¥Ø¹Ù„Ø§Ù† Ø¹Ù‚Ø§Ø±ÙŠ' : 'Listing')} â€” ${t().so}`;
     linksEl.appendChild(link);
   });
 }
@@ -603,7 +603,7 @@ let isDark = false;
 function toggleDarkMode() {
   isDark = !isDark;
   document.body.classList.toggle('dark', isDark);
-  $('darkModeBtn').textContent = isDark ? '☀️' : '🌙';
+  $('darkModeBtn').textContent = isDark ? 'â˜€ï¸' : 'ðŸŒ™';
   try { localStorage.setItem('darguessr_dark', isDark ? '1' : '0'); } catch(e){}
 }
 
@@ -641,195 +641,6 @@ function saveSeenIds(ids) {
   try { localStorage.setItem('darguessr_seen_ids', JSON.stringify(ids)); } catch(e) {}
 }
 
-async function loadListings() {
-  try {
-    const res = await fetch('./listings.json?t=' + Date.now(), { cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      allListings = (Array.isArray(data) && data.length > 0) ? data : FALLBACK_LISTINGS;
-    } else {
-      allListings = FALLBACK_LISTINGS;
-    }
-  } catch (e) {
-    allListings = FALLBACK_LISTINGS;
-  }
-
-  allListings = allListings
-    .map((item, idx) => {
-      let numericPrice = item.price;
-      if (!numericPrice && item.priceMAD) {
-        numericPrice = parseInt(String(item.priceMAD).replace(/[^\d]/g, ''), 10) || 5000;
-      }
-      let lat = item.lat || 33.5731;
-      let lng = item.lng || -7.5898;
-
-      let pics = [];
-      if (Array.isArray(item.images) && item.images.length > 0) {
-        pics = item.images.filter(img => typeof img === 'string' && img.trim() !== '');
-      } else if (typeof item.images === 'string' && item.images.trim() !== '') {
-        try {
-          pics = JSON.parse(item.images);
-        } catch(e) {
-          pics = item.images.split(',').map(s => s.trim()).filter(Boolean);
-        }
-      }
-      if (pics.length === 0 && item.imageUrl) {
-        pics = [item.imageUrl];
-      }
-      if (pics.length === 0) {
-        pics = [FALLBACK_IMAGE];
-      }
-
-      return {
-        id: item.id || `dar_${idx}`,
-        title: normalizeText(item.title, 'إعلان عقاري في المغرب'),
-        city: normalizeText(item.city, 'Casablanca'),
-        type: normalizeText(item.type, 'Appartement'),
-        area: normalizeText(item.area, '—'),
-        bedrooms: item.bedrooms !== undefined ? item.bedrooms : '—',
-        bathrooms: item.bathrooms !== undefined ? item.bathrooms : '—',
-        priceMAD: item.priceMAD || String(numericPrice),
-        price: numericPrice,
-        lat: lat,
-        lng: lng,
-        url: normalizeHttpUrl(item.sourceUrl || "https://www.mubawab.ma"),
-        pics: pics.map(normalizeImageUrl)
-      };
-    });
-
-  if (allListings.length === 0) {
-    allListings = FALLBACK_LISTINGS;
-  }
-
-  if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length + '+';
-  const uniqueCities = new Set(allListings.map(h => (h.city || '').trim()).filter(Boolean));
-  if($('cityCountDisplay')) $('cityCountDisplay').textContent = uniqueCities.size;
-
-  // Populate hero section with a real random listing
-  if (allListings.length > 0) {
-    const hero = allListings[Math.floor(Math.random() * allListings.length)];
-    const heroImgEl = document.querySelector('.hero-img');
-    if (heroImgEl && hero.pics && hero.pics[0]) {
-      heroImgEl.style.backgroundImage = `url("${cssEscapeUrl(hero.pics[0])}")`;
-    }
-    const heroInfo = $('heroInfo');
-    if (heroInfo) {
-      heroInfo.innerHTML = `${hero.title || ''} <br><small>${hero.city || ''} · ${hero.type || ''} · ${hero.area ? hero.area + ' m²' : ''}</small>`;
-    }
-    const heroPrice = $('heroPrice');
-    if (heroPrice) {
-      heroPrice.textContent = `${hero.priceMAD || hero.price || '????'} د.م. / الشهر`;
-    }
-  }
-
-  selectRandomRounds();
-  render();
-}
-
-function setCityFilter(city) {
-  selectedCity = city;
-  restart();
-}
-
-function selectRandomRounds() {
-  let seen = getSeenIds();
-  let pool = allListings;
-  
-  if (selectedCity !== 'all') {
-    const target = selectedCity.toLowerCase();
-    pool = allListings.filter(h => (h.city || '').toLowerCase() === target);
-  }
-
-  if (pool.length === 0) {
-    pool = allListings;
-  }
-  
-  let available = pool.filter(h => !seen.includes(h.id));
-  if (available.length === 0) { available = [...pool]; }
-
-  const targetRounds = Math.min(MAX_ROUNDS, pool.length);
-  const selected = shuffleArray(available).slice(0, targetRounds);
-  if (selected.length < targetRounds) {
-    const usedIds = new Set(selected.map(h => h.id));
-    const topUp = shuffleArray(pool.filter(h => !usedIds.has(h.id))).slice(0, targetRounds - selected.length);
-    selected.push(...topUp);
-  }
-
-  activeHomes = selected;
-  saveSeenIds([...new Set([...seen, ...activeHomes.map(h => h.id)])]);
-}
-
-// jsonbin.io accepts either a Master Key (header X-Master-Key) or a scoped
-// Access Key (header X-Access-Key) - they are NOT interchangeable on the same
-// header. Since we can't tell which kind of key was pasted in, try Master Key
-// first and, if that's rejected, retry once as an Access Key. Any failure is
-// logged to the console with the real HTTP status/body so it's diagnosable -
-// open DevTools > Console (and Network, filtering for "jsonbin") to see it.
-async function jsonbinRequest(url, options = {}) {
-  const baseHeaders = { ...(options.headers || {}) };
-  const headerVariants = [
-    { 'X-Master-Key': JSONBIN_API_KEY },
-    { 'X-Access-Key': JSONBIN_API_KEY }
-  ];
-  let lastErr;
-  for (const authHeader of headerVariants) {
-    try {
-      const res = await fetch(url, { ...options, headers: { ...baseHeaders, ...authHeader } });
-      if (res.ok) return res;
-      const bodyText = await res.text().catch(() => '');
-      lastErr = new Error(`jsonbin.io ${res.status} ${res.statusText} using ${Object.keys(authHeader)[0]} — ${bodyText}`);
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  throw lastErr;
-}
-
-async function getLeaders() {
-  if (!JSONBIN_ENABLED) {
-    try {
-      const saved = localStorage.getItem('darguessr_leaders_cache');
-      cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
-    } catch (e) {
-      cachedLeaders = DEFAULT_LEADERS;
-    }
-    return cachedLeaders;
-  }
-  try {
-    const res = await jsonbinRequest(`${JSONBIN_BASE}/latest`, {
-      headers: { 'X-Bin-Meta': 'false' },
-      cache: 'no-store'
-    });
-    const data = await res.json();
-    cachedLeaders = (Array.isArray(data) && data.length > 0) ? data : DEFAULT_LEADERS;
-    try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(cachedLeaders)); } catch (e) {}
-  } catch (e) {
-    console.error('[DarGuessr/jsonbin] Could not read the leaderboard, showing last known / default instead:', e.message || e);
-    try {
-      const saved = localStorage.getItem('darguessr_leaders_cache');
-      cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
-    } catch (e2) {
-      cachedLeaders = DEFAULT_LEADERS;
-    }
-  }
-  return cachedLeaders;
-}
-
-async function saveLeaders(leaders) {
-  cachedLeaders = leaders;
-  try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(leaders)); } catch (e) {}
-  if (!JSONBIN_ENABLED) return;
-  try {
-    await jsonbinRequest(JSONBIN_BASE, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(leaders)
-    });
-  } catch (e) {
-    console.error('[DarGuessr/jsonbin] Could not write the leaderboard:', e.message || e);
-    throw e;
-  }
-}
 
 async function updateLeaderboardUI() {
   const leaderGrid = $('leaderGrid');
@@ -838,7 +649,7 @@ async function updateLeaderboardUI() {
   loading.style.textAlign = 'center';
   loading.style.color = 'var(--muted)';
   loading.style.fontFamily = "'DM Sans'";
-  loading.textContent = L === 'ar' ? '...جارٍ التحميل' : 'Loading...';
+  loading.textContent = L === 'ar' ? '...Ø¬Ø§Ø±Ù Ø§Ù„ØªØ­Ù…ÙŠÙ„' : 'Loading...';
   leaderGrid.replaceChildren(loading);
 
   const list = await getLeaders();
@@ -846,7 +657,7 @@ async function updateLeaderboardUI() {
   list.forEach((x, i) => {
     const row = document.createElement('div');
     row.className = 'leader';
-    row.append(`${String(i + 1).padStart(2, '0')} · `);
+    row.append(`${String(i + 1).padStart(2, '0')} Â· `);
 
     const name = document.createElement('span');
     name.className = 'leader-name';
@@ -879,7 +690,7 @@ async function addPlayer() {
   $('playerName').disabled = true;
   $('addButton').disabled = true;
   const originalLabel = $('addButton').textContent;
-  $('addButton').textContent = L === 'ar' ? '...جارٍ الحفظ' : 'Saving...';
+  $('addButton').textContent = L === 'ar' ? '...Ø¬Ø§Ø±Ù Ø§Ù„Ø­ÙØ¸' : 'Saving...';
   try {
     let list = await getLeaders(); // re-fetch the shared list right before writing, so we merge with
                                     // whatever other players have already added instead of overwriting them
@@ -890,12 +701,12 @@ async function addPlayer() {
     await updateLeaderboardUI();
     $('playerName').disabled = false;
     $('addButton').disabled = false;
-    const addedMsg = L === 'ar' ? 'تمّ إضافتك ✓' : 'Added ✓';
+    const addedMsg = L === 'ar' ? 'ØªÙ…Ù‘ Ø¥Ø¶Ø§ÙØªÙƒ âœ“' : 'Added âœ“';
     $('addButton').textContent = addedMsg;
     setTimeout(() => { $('addButton').textContent = originalLabel; }, 1600);
   } catch (e) {
     console.error(e);
-    alert(L === 'ar' ? 'تعذّر حفظ نتيجتك في الترتيب، تحقق من اتصالك وحاول مرة أخرى.' : "Couldn't save your score to the leaderboard - check your connection and try again.");
+    alert(L === 'ar' ? 'ØªØ¹Ø°Ù‘Ø± Ø­ÙØ¸ Ù†ØªÙŠØ¬ØªÙƒ ÙÙŠ Ø§Ù„ØªØ±ØªÙŠØ¨ØŒ ØªØ­Ù‚Ù‚ Ù…Ù† Ø§ØªØµØ§Ù„Ùƒ ÙˆØ­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.' : "Couldn't save your score to the leaderboard - check your connection and try again.");
     $('playerName').disabled = false;
     $('addButton').disabled = false;
     $('addButton').textContent = originalLabel;
@@ -1038,15 +849,15 @@ function render() {
   $('final').style.display = 'none';
   $('details').style.display = 'block';
   
-  const bedLabel = L === 'ar' ? 'غرف النوم' : 'Beds';
-  const bathLabel = L === 'ar' ? 'الحمامات' : 'Baths';
+  const bedLabel = L === 'ar' ? 'ØºØ±Ù Ø§Ù„Ù†ÙˆÙ…' : 'Beds';
+  const bathLabel = L === 'ar' ? 'Ø§Ù„Ø­Ù…Ø§Ù…Ø§Øª' : 'Baths';
   const chips = [
-    `📍 ${h.city}`,
-    `🏠 ${h.type}`,
-    (h.area && h.area !== '—') ? `📐 ${h.area} m²` : '',
-    (h.bedrooms && h.bedrooms !== '—') ? `🛏️ ${h.bedrooms} ${bedLabel}` : '',
-    (h.bathrooms && h.bathrooms !== '—') ? `🛁 ${h.bathrooms} ${bathLabel}` : '',
-    L === 'ar' ? 'إعلان حقيقي' : 'Real Listing'
+    `ðŸ“ ${h.city}`,
+    `ðŸ  ${h.type}`,
+    (h.area && h.area !== 'â€”') ? `ðŸ“ ${h.area} mÂ²` : '',
+    (h.bedrooms && h.bedrooms !== 'â€”') ? `ðŸ›ï¸ ${h.bedrooms} ${bedLabel}` : '',
+    (h.bathrooms && h.bathrooms !== 'â€”') ? `ðŸ› ${h.bathrooms} ${bathLabel}` : '',
+    L === 'ar' ? 'Ø¥Ø¹Ù„Ø§Ù† Ø­Ù‚ÙŠÙ‚ÙŠ' : 'Real Listing'
   ].filter(Boolean);
   $('chips').replaceChildren(...chips.map(buildChip));
   
@@ -1085,10 +896,10 @@ function submit() {
   $('reveal').className = 'reveal ' + (pt >= 85 ? '' : pt >= 55 ? 'yellow' : 'red');
   $('feedback').textContent = pt >= 85 ? t().gr : pt >= 55 ? t().gd : t().kp;
   $('accuracy').textContent = fmt(pt) + '%';
-  $('yourGuess').textContent = fmt(g) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
-  $('actual').textContent = fmt(a) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
+  $('yourGuess').textContent = fmt(g) + ' ' + (L === 'ar' ? 'Ø¯Ø±Ù‡Ù…' : 'MAD');
+  $('actual').textContent = fmt(a) + ' ' + (L === 'ar' ? 'Ø¯Ø±Ù‡Ù…' : 'MAD');
   $('points').textContent = '+' + fmt(pt);
-  $('nextBtn').textContent = r === totalRounds() - 1 ? (L === 'ar' ? 'عرض النتائج' : 'See results') : t().n;
+  $('nextBtn').textContent = r === totalRounds() - 1 ? (L === 'ar' ? 'Ø¹Ø±Ø¶ Ø§Ù„Ù†ØªØ§Ø¦Ø¬' : 'See results') : t().n;
 }
 
 function nextRound() {
@@ -1237,694 +1048,6 @@ window.addEventListener('mousedown', (e) => {
 })();
 
 buildCityDropdown();
-setLang('ar');
-loadListings();
-updateLeaderboardUI();
-</script>
-</body>
-</html>
-);
-
-function shuffleArray(items) {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
-function normalizeText(value, fallback = '') {
-  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
-}
-
-function normalizeHttpUrl(value, fallback = 'https://www.mubawab.ma') {
-  const candidate = normalizeText(value);
-  if (!candidate) return fallback;
-  try {
-    const parsed = new URL(candidate, window.location.href);
-    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-      return parsed.href;
-    }
-  } catch (e) {}
-  return fallback;
-}
-
-function normalizeImageUrl(value) {
-  const candidate = normalizeText(value);
-  if (!candidate) return FALLBACK_IMAGE;
-  if (candidate.startsWith('data:image/')) return candidate;
-  return normalizeHttpUrl(candidate, FALLBACK_IMAGE);
-}
-
-function cssEscapeUrl(url) {
-  return normalizeImageUrl(url).replace(/"/g, '%22').replace(/'/g, '%27');
-}
-
-function totalRounds() {
-  return Math.max(1, activeHomes.length || 0);
-}
-
-function roundTitle() {
-  const count = totalRounds();
-  return L === 'ar'
-    ? `تحدي من ${fmt(count)} جولات`
-    : `${fmt(count)}-round challenge`;
-}
-
-function buildChip(text) {
-  const chip = document.createElement('span');
-  chip.className = 'chip';
-  chip.textContent = text;
-  return chip;
-}
-
-function renderListingLinks(listings) {
-  const linksEl = $('links');
-  linksEl.replaceChildren();
-  listings.forEach((h) => {
-    const link = document.createElement('a');
-    link.href = normalizeHttpUrl(h.url);
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.textContent = `${normalizeText(h.title, L === 'ar' ? 'إعلان عقاري' : 'Listing')} — ${t().so}`;
-    linksEl.appendChild(link);
-  });
-}
-
-function renderGallery(trackEl, pics) {
-  trackEl.replaceChildren();
-  pics.forEach((pic) => {
-    const slide = document.createElement('div');
-    slide.className = 'slide';
-    const inner = document.createElement('div');
-    inner.className = 'slide-inner';
-    inner.style.backgroundImage = `url("${cssEscapeUrl(pic)}")`;
-    slide.appendChild(inner);
-    trackEl.appendChild(slide);
-  });
-}
-
-let audioCtx = null;
-function initAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
-function playTone(freq, type, duration, vol = 0.1) {
-  try {
-    initAudio();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type;
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
-  } catch(e) {}
-}
-function soundGuess() {
-  playTone(587.33, 'triangle', 0.12, 0.08);
-  setTimeout(() => playTone(880, 'sine', 0.18, 0.1), 100);
-  vibrate([40, 40, 60]);
-}
-function soundFinal(totalScore, maxScore = MAX_ROUNDS * 100) {
-  if (totalScore >= maxScore * 0.7) {
-    playTone(523.25, 'triangle', 0.2, 0.1);
-    setTimeout(() => playTone(659.25, 'triangle', 0.2, 0.1), 120);
-    setTimeout(() => playTone(783.99, 'triangle', 0.2, 0.1), 240);
-    setTimeout(() => playTone(1046.50, 'sine', 0.4, 0.12), 360);
-    vibrate([100, 50, 100, 50, 200]);
-  } else {
-    playTone(440, 'sine', 0.3, 0.08);
-    setTimeout(() => playTone(349.23, 'sine', 0.3, 0.08), 150);
-    setTimeout(() => playTone(293.66, 'sine', 0.5, 0.08), 300);
-    vibrate([80, 80, 150]);
-  }
-}
-function soundTick() { playTone(800, 'sine', 0.04, 0.02); vibrate(20); }
-function vibrate(pattern) {
-  if (navigator.vibrate) {
-    try { navigator.vibrate(pattern); } catch(e) {}
-  }
-}
-
-let isDark = false;
-function toggleDarkMode() {
-  isDark = !isDark;
-  document.body.classList.toggle('dark', isDark);
-  $('darkModeBtn').textContent = isDark ? '☀️' : '🌙';
-  try { localStorage.setItem('darguessr_dark', isDark ? '1' : '0'); } catch(e){}
-}
-
-try {
-  if (localStorage.getItem('darguessr_dark') === '1') {
-    toggleDarkMode();
-  }
-} catch(e){}
-
-function openFullscreen() {
-  updateFsImage();
-  $('fsModal').style.display = 'flex';
-}
-function closeFullscreen() {
-  $('fsModal').style.display = 'none';
-}
-function updateFsImage() {
-  const h = activeHomes[r];
-  if (!h || !h.pics || h.pics.length === 0) return;
-  const pic = h.pics[p];
-  $('fsImg').src = normalizeImageUrl(pic);
-  $('fsCount').textContent = `${p + 1} / ${h.pics.length}`;
-  const hasMultiple = h.pics.length > 1;
-  document.querySelectorAll('.fs-arrow').forEach(el => el.style.display = hasMultiple ? 'flex' : 'none');
-  $('fsCount').style.display = hasMultiple ? 'block' : 'none';
-}
-function fsMove(n) {
-  move(n);
-}
-
-function getSeenIds() {
-  try { return JSON.parse(localStorage.getItem('darguessr_seen_ids') || '[]'); } catch(e) { return []; }
-}
-function saveSeenIds(ids) {
-  try { localStorage.setItem('darguessr_seen_ids', JSON.stringify(ids)); } catch(e) {}
-}
-
-async function loadListings() {
-  try {
-    const res = await fetch('./listings.json?t=' + Date.now(), { cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      allListings = (Array.isArray(data) && data.length > 0) ? data : FALLBACK_LISTINGS;
-    } else {
-      allListings = FALLBACK_LISTINGS;
-    }
-  } catch (e) {
-    allListings = FALLBACK_LISTINGS;
-  }
-
-  allListings = allListings
-    .map((item, idx) => {
-      let numericPrice = item.price;
-      if (!numericPrice && item.priceMAD) {
-        numericPrice = parseInt(String(item.priceMAD).replace(/[^\d]/g, ''), 10) || 5000;
-      }
-      let lat = item.lat || 33.5731;
-      let lng = item.lng || -7.5898;
-
-      let pics = [];
-      if (Array.isArray(item.images) && item.images.length > 0) {
-        pics = item.images.filter(img => typeof img === 'string' && img.trim() !== '');
-      } else if (typeof item.images === 'string' && item.images.trim() !== '') {
-        try {
-          pics = JSON.parse(item.images);
-        } catch(e) {
-          pics = item.images.split(',').map(s => s.trim()).filter(Boolean);
-        }
-      }
-      if (pics.length === 0 && item.imageUrl) {
-        pics = [item.imageUrl];
-      }
-      if (pics.length === 0) {
-        pics = [FALLBACK_IMAGE];
-      }
-
-      return {
-        id: item.id || `dar_${idx}`,
-        title: normalizeText(item.title, 'إعلان عقاري في المغرب'),
-        city: normalizeText(item.city, 'Casablanca'),
-        type: normalizeText(item.type, 'Appartement'),
-        area: normalizeText(item.area, '—'),
-        bedrooms: item.bedrooms !== undefined ? item.bedrooms : '—',
-        bathrooms: item.bathrooms !== undefined ? item.bathrooms : '—',
-        priceMAD: item.priceMAD || String(numericPrice),
-        price: numericPrice,
-        lat: lat,
-        lng: lng,
-        url: normalizeHttpUrl(item.sourceUrl || "https://www.mubawab.ma"),
-        pics: pics.map(normalizeImageUrl)
-      };
-    });
-
-  if (allListings.length === 0) {
-    allListings = FALLBACK_LISTINGS;
-  }
-
-  if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length + '+';
-  const uniqueCities = new Set(allListings.map(h => (h.city || '').trim()).filter(Boolean));
-  if($('cityCountDisplay')) $('cityCountDisplay').textContent = uniqueCities.size;
-
-  // Populate hero section with a real random listing
-  if (allListings.length > 0) {
-    const hero = allListings[Math.floor(Math.random() * allListings.length)];
-    const heroImgEl = document.querySelector('.hero-img');
-    if (heroImgEl && hero.pics && hero.pics[0]) {
-      heroImgEl.style.backgroundImage = `url("${cssEscapeUrl(hero.pics[0])}")`;
-    }
-    const heroInfo = $('heroInfo');
-    if (heroInfo) {
-      heroInfo.innerHTML = `${hero.title || ''} <br><small>${hero.city || ''} · ${hero.type || ''} · ${hero.area ? hero.area + ' m²' : ''}</small>`;
-    }
-    const heroPrice = $('heroPrice');
-    if (heroPrice) {
-      heroPrice.textContent = `${hero.priceMAD || hero.price || '????'} د.م. / الشهر`;
-    }
-  }
-
-  selectRandomRounds();
-}
-
-function setCityFilter(city) {
-  selectedCity = city;
-  restart();
-}
-
-function selectRandomRounds() {
-  let seen = getSeenIds();
-  let pool = allListings;
-  
-  if (selectedCity !== 'all') {
-    const target = selectedCity.toLowerCase();
-    pool = allListings.filter(h => (h.city || '').toLowerCase() === target);
-  }
-
-  if (pool.length === 0) {
-    pool = allListings;
-  }
-  
-  let available = pool.filter(h => !seen.includes(h.id));
-  if (available.length === 0) { available = [...pool]; }
-
-  const targetRounds = Math.min(MAX_ROUNDS, pool.length);
-  const selected = shuffleArray(available).slice(0, targetRounds);
-  if (selected.length < targetRounds) {
-    const usedIds = new Set(selected.map(h => h.id));
-    const topUp = shuffleArray(pool.filter(h => !usedIds.has(h.id))).slice(0, targetRounds - selected.length);
-    selected.push(...topUp);
-  }
-
-  activeHomes = selected;
-  saveSeenIds([...new Set([...seen, ...activeHomes.map(h => h.id)])]);
-}
-
-// jsonbin.io accepts either a Master Key (header X-Master-Key) or a scoped
-// Access Key (header X-Access-Key) - they are NOT interchangeable on the same
-// header. Since we can't tell which kind of key was pasted in, try Master Key
-// first and, if that's rejected, retry once as an Access Key. Any failure is
-// logged to the console with the real HTTP status/body so it's diagnosable -
-// open DevTools > Console (and Network, filtering for "jsonbin") to see it.
-async function jsonbinRequest(url, options = {}) {
-  const baseHeaders = { ...(options.headers || {}) };
-  const headerVariants = [
-    { 'X-Master-Key': JSONBIN_API_KEY },
-    { 'X-Access-Key': JSONBIN_API_KEY }
-  ];
-  let lastErr;
-  for (const authHeader of headerVariants) {
-    try {
-      const res = await fetch(url, { ...options, headers: { ...baseHeaders, ...authHeader } });
-      if (res.ok) return res;
-      const bodyText = await res.text().catch(() => '');
-      lastErr = new Error(`jsonbin.io ${res.status} ${res.statusText} using ${Object.keys(authHeader)[0]} — ${bodyText}`);
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  throw lastErr;
-}
-
-async function getLeaders() {
-  if (!JSONBIN_ENABLED) {
-    try {
-      const saved = localStorage.getItem('darguessr_leaders_cache');
-      cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
-    } catch (e) {
-      cachedLeaders = DEFAULT_LEADERS;
-    }
-    return cachedLeaders;
-  }
-  try {
-    const res = await jsonbinRequest(`${JSONBIN_BASE}/latest`, {
-      headers: { 'X-Bin-Meta': 'false' },
-      cache: 'no-store'
-    });
-    const data = await res.json();
-    cachedLeaders = (Array.isArray(data) && data.length > 0) ? data : DEFAULT_LEADERS;
-    try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(cachedLeaders)); } catch (e) {}
-  } catch (e) {
-    console.error('[DarGuessr/jsonbin] Could not read the leaderboard, showing last known / default instead:', e.message || e);
-    try {
-      const saved = localStorage.getItem('darguessr_leaders_cache');
-      cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
-    } catch (e2) {
-      cachedLeaders = DEFAULT_LEADERS;
-    }
-  }
-  return cachedLeaders;
-}
-
-async function saveLeaders(leaders) {
-  cachedLeaders = leaders;
-  try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(leaders)); } catch (e) {}
-  if (!JSONBIN_ENABLED) return;
-  try {
-    await jsonbinRequest(JSONBIN_BASE, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(leaders)
-    });
-  } catch (e) {
-    console.error('[DarGuessr/jsonbin] Could not write the leaderboard:', e.message || e);
-    throw e;
-  }
-}
-
-async function updateLeaderboardUI() {
-  const leaderGrid = $('leaderGrid');
-  const loading = document.createElement('div');
-  loading.style.gridColumn = '1 / -1';
-  loading.style.textAlign = 'center';
-  loading.style.color = 'var(--muted)';
-  loading.style.fontFamily = "'DM Sans'";
-  loading.textContent = L === 'ar' ? '...جارٍ التحميل' : 'Loading...';
-  leaderGrid.replaceChildren(loading);
-
-  const list = await getLeaders();
-  leaderGrid.replaceChildren();
-  list.forEach((x, i) => {
-    const row = document.createElement('div');
-    row.className = 'leader';
-    row.append(`${String(i + 1).padStart(2, '0')} · `);
-
-    const name = document.createElement('span');
-    name.className = 'leader-name';
-    name.dir = 'ltr';
-    name.textContent = String(x[0] ?? '');
-
-    const points = document.createElement('b');
-    points.textContent = fmt(Number(x[1]) || 0);
-
-    row.appendChild(name);
-    row.appendChild(points);
-    leaderGrid.appendChild(row);
-  });
-}
-
-function exportLeadersTxt() {
-  const list = cachedLeaders.length ? cachedLeaders : DEFAULT_LEADERS;
-  const textContent = list.map((x, i) => `${String(i + 1).padStart(2, '0')}. ${x[0]} - ${x[1]} pts`).join('\r\n');
-  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'darguessr_rankings.txt';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-async function addPlayer() {
-  const n = $('playerName').value.trim();
-  if (!n) return $('playerName').focus();
-  $('playerName').disabled = true;
-  $('addButton').disabled = true;
-  const originalLabel = $('addButton').textContent;
-  $('addButton').textContent = L === 'ar' ? '...جارٍ الحفظ' : 'Saving...';
-  try {
-    let list = await getLeaders(); // re-fetch the shared list right before writing, so we merge with
-                                    // whatever other players have already added instead of overwriting them
-    list.push([n, score]);
-    list.sort((a, b) => b[1] - a[1]);
-    list = list.slice(0, 10);
-    await saveLeaders(list);
-    await updateLeaderboardUI();
-    $('addButton').textContent = originalLabel;
-  } catch (e) {
-    console.error(e);
-    alert(L === 'ar' ? 'تعذّر حفظ نتيجتك في الترتيب، تحقق من اتصالك وحاول مرة أخرى.' : "Couldn't save your score to the leaderboard - check your connection and try again.");
-    $('playerName').disabled = false;
-    $('addButton').disabled = false;
-    $('addButton').textContent = originalLabel;
-  }
-}
-
-function placeMap(h) {
-  if (!mapInst) {
-    mapInst = window.L.map('map', { zoomControl: false, attributionControl: true }).setView([h.lat, h.lng], 14);
-    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(mapInst);
-    marker = window.L.circleMarker([h.lat, h.lng], { radius: 9, weight: 3, color: '#fff', fillColor: '#ff725e', fillOpacity: 1 }).addTo(mapInst);
-  } else {
-    mapInst.setView([h.lat, h.lng], 14);
-    marker.setLatLng([h.lat, h.lng]);
-    setTimeout(() => mapInst.invalidateSize(), 150);
-  }
-}
-
-function zoom(n) {
-  z = Math.max(-3, Math.min(5, z + n));
-  if (mapInst) mapInst.setZoom(14 + z);
-}
-
-function zoomPhoto(n) {
-  photoZoom = Math.max(1, Math.min(3, photoZoom + (n * 0.5)));
-  if (photoZoom === 1) {
-    panX = 0;
-    panY = 0;
-  }
-  updatePhotoZoomScale();
-}
-
-function updatePhotoZoomScale() {
-  document.querySelectorAll('.slide-inner').forEach(el => {
-    el.style.transform = `scale(${photoZoom}) translate(${panX}px, ${panY}px)`;
-    el.style.cursor = photoZoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default';
-  });
-}
-
-function resetPhotoTransform() {
-  photoZoom = 1;
-  panX = 0;
-  panY = 0;
-  isDragging = false;
-  updatePhotoZoomScale();
-}
-
-function move(n) {
-  const h = activeHomes[r];
-  const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
-  p = (p + n + total) % total;
-  $('track').style.transform = `translateX(-${p * 100}%)`;
-  $('count').textContent = `${p + 1} / ${total}`;
-  resetPhotoTransform();
-  if ($('fsModal').style.display === 'flex') {
-    updateFsImage();
-  }
-}
-
-const galleryEl = $('gallery');
-
-galleryEl.addEventListener('mousedown', (e) => {
-  if (photoZoom <= 1) return;
-  isDragging = true;
-  startX = e.clientX - panX;
-  startY = e.clientY - panY;
-  updatePhotoZoomScale();
-  e.preventDefault();
-});
-
-window.addEventListener('mousemove', (e) => {
-  if (!isDragging || photoZoom <= 1) return;
-  panX = e.clientX - startX;
-  panY = e.clientY - startY;
-  updatePhotoZoomScale();
-});
-
-window.addEventListener('mouseup', () => {
-  if (isDragging) {
-    isDragging = false;
-    updatePhotoZoomScale();
-  }
-});
-
-galleryEl.addEventListener('touchstart', (e) => {
-  if (photoZoom <= 1) return;
-  if (e.touches.length === 1) {
-    isDragging = true;
-    startX = e.touches[0].clientX - panX;
-    startY = e.touches[0].clientY - panY;
-    updatePhotoZoomScale();
-  }
-}, {passive: true});
-
-window.addEventListener('touchmove', (e) => {
-  if (!isDragging || photoZoom <= 1 || e.touches.length !== 1) return;
-  panX = e.touches[0].clientX - startX;
-  panY = e.touches[0].clientY - startY;
-  updatePhotoZoomScale();
-}, {passive: true});
-
-window.addEventListener('touchend', () => {
-  if (isDragging) {
-    isDragging = false;
-    updatePhotoZoomScale();
-  }
-});
-
-function formatTimerDisplay(seconds) {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-}
-
-function startTimer() {
-  clearInterval(timerInt);
-  timeLeft = 3000;
-  if ($('seconds')) $('seconds').textContent = formatTimerDisplay(timeLeft);
-  timerInt = setInterval(() => {
-    timeLeft--;
-    if ($('seconds')) $('seconds').textContent = formatTimerDisplay(timeLeft);
-    if (timeLeft <= 10 && timeLeft > 0) {
-      soundTick();
-    }
-    if (timeLeft <= 0) {
-      clearInterval(timerInt);
-      submit();
-    }
-  }, 1000);
-}
-
-function stopTimer() { clearInterval(timerInt); }
-
-function render() {
-  if (!activeHomes || activeHomes.length === 0) return;
-  const h = activeHomes[r];
-  if (!h) return nextRound();
-  $('gallery').style.display = 'block';
-  $('reveal').style.display = 'none';
-  $('final').style.display = 'none';
-  $('details').style.display = 'block';
-  
-  const bedLabel = L === 'ar' ? 'غرف النوم' : 'Beds';
-  const bathLabel = L === 'ar' ? 'الحمامات' : 'Baths';
-  const chips = [
-    `📍 ${h.city}`,
-    `🏠 ${h.type}`,
-    (h.area && h.area !== '—') ? `📐 ${h.area} m²` : '',
-    (h.bedrooms && h.bedrooms !== '—') ? `🛏️ ${h.bedrooms} ${bedLabel}` : '',
-    (h.bathrooms && h.bathrooms !== '—') ? `🛁 ${h.bathrooms} ${bathLabel}` : '',
-    L === 'ar' ? 'إعلان حقيقي' : 'Real Listing'
-  ].filter(Boolean);
-  $('chips').replaceChildren(...chips.map(buildChip));
-  
-  const track = $('track');
-  renderGallery(track, h.pics);
-
-  const totalPics = h.pics.length;
-  const hasMultiple = totalPics > 1;
-  document.querySelectorAll('.gallery .arrow').forEach(el => el.style.display = hasMultiple ? 'block' : 'none');
-  
-  z = 0;
-  resetPhotoTransform();
-  placeMap(h);
-  $('guess').value = '';
-  $('guess').placeholder = t().g;
-  p = 0;
-  move(0);
-  $('gameTitle').textContent = roundTitle();
-  const rounds = totalRounds();
-  $('progress').childNodes[0].nodeValue = `${r + 1} / ${String(rounds).padStart(2, '0')}`;
-  $('bar').style.width = `${((r + 1) / rounds) * 100}%`;
-  
-  startTimer();
-}
-
-function submit() {
-  stopTimer();
-  soundGuess();
-  if (!activeHomes[r]) return;
-  const val = +$('guess').value;
-  const g = val > 0 ? val : 0;
-  const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
-  score += pt;
-  $('gallery').style.display = 'none';
-  $('reveal').style.display = 'flex';
-  $('reveal').className = 'reveal ' + (pt >= 85 ? '' : pt >= 55 ? 'yellow' : 'red');
-  $('feedback').textContent = pt >= 85 ? t().gr : pt >= 55 ? t().gd : t().kp;
-  $('accuracy').textContent = fmt(pt) + '%';
-  $('yourGuess').textContent = fmt(g) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
-  $('actual').textContent = fmt(a) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
-  $('points').textContent = '+' + fmt(pt);
-  $('nextBtn').textContent = r === totalRounds() - 1 ? (L === 'ar' ? 'عرض النتائج' : 'See results') : t().n;
-}
-
-function nextRound() {
-  if (++r < totalRounds()) return render();
-  stopTimer();
-  const maxScore = totalRounds() * 100;
-  soundFinal(score, maxScore);
-  $('reveal').style.display = 'none';
-  $('details').style.display = 'none';
-  $('final').style.display = 'block';
-  $('score').textContent = fmt(score) + ` / ${maxScore}`;
-  const scoreRatio = maxScore > 0 ? score / maxScore : 0;
-  $('playerRank').textContent = t().rk + ': ' + (scoreRatio >= 0.85 ? 'Top 2%' : scoreRatio >= 0.6 ? 'Top 12%' : 'Top 35%');
-  renderListingLinks(activeHomes);
-  $('playerName').placeholder = t().nm;
-  $('addButton').textContent = t().ad;
-}
-
-function restart() {
-  r = 0;
-  score = 0;
-  selectRandomRounds();
-  $('playerName').value = '';
-  $('playerName').disabled = false;
-  $('addButton').disabled = false;
-  render();
-}
-
-function setLang(n) {
-  L = n;
-  document.documentElement.lang = n;
-  document.documentElement.dir = n === 'ar' ? 'rtl' : 'ltr';
-  document.body.dir = n === 'ar' ? 'rtl' : 'ltr';
-  document.body.classList.toggle('en', n === 'en');
-  $('arBtn').classList.toggle('on', n === 'ar');
-  $('enBtn').classList.toggle('on', n === 'en');
-  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
-  Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
-  render();
-  updateLeaderboardUI();
-}
-
-// KEYBOARD NAVIGATION (Right arrow for next, Left arrow for previous)
-window.addEventListener('keydown', (e) => {
-  const activeEl = document.activeElement;
-  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
-
-  if (e.key === 'Escape') {
-    if ($('fsModal').style.display === 'flex') {
-      closeFullscreen();
-      e.preventDefault();
-    }
-  }
-
-  if (isInput) return;
-
-  if (e.key === 'ArrowRight') {
-    move(1);
-    e.preventDefault();
-  } else if (e.key === 'ArrowLeft') {
-    move(-1);
-    e.preventDefault();
-  }
-});
-
-$('guess').addEventListener('keyup', (e) => {
-  if (e.key === 'Enter') submit();
-});
-
 setLang('ar');
 loadListings();
 updateLeaderboardUI();
