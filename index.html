@@ -44,7 +44,7 @@ p{color:var(--muted);line-height:1.8}
   background:#fff;
   border:1.5px solid var(--line);
   border-radius:999px;
-  padding:12px 48px 12px 22px;
+  padding:12px 44px;
   font:600 14px 'DM Sans','Noto Kufi Arabic',sans-serif;
   cursor:pointer;
   color:var(--ink);
@@ -52,16 +52,22 @@ p{color:var(--muted);line-height:1.8}
   transition:all .22s cubic-bezier(.2,.7,.3,1);
   min-width:280px;
   text-align:center;
+  text-align-last:center;
   box-shadow:0 1px 0 rgba(0,0,0,.04), 0 6px 20px -12px rgba(19,42,38,.18);
   position:relative;
   background-image:
     linear-gradient(45deg, transparent 50%, var(--ink) 50%),
     linear-gradient(135deg, var(--ink) 50%, transparent 50%);
   background-position:
-    calc(100% - 22px) 52%,
-    calc(100% - 14px) 52%;
-  background-size:8px 8px, 8px 8px;
+    calc(100% - 20px) 52%,
+    calc(100% - 12px) 52%;
+  background-size:7px 7px, 7px 7px;
   background-repeat:no-repeat
+}
+html[dir="rtl"] .city-select{
+  background-position:
+    20px 52%,
+    12px 52%
 }
 .city-select:hover{
   border-color:var(--ink);
@@ -168,7 +174,11 @@ body.dark .city-select{
   font-weight:700;
   box-shadow:0 1px 0 rgba(223,255,116,.2),0 6px 20px -12px rgba(223,255,116,.35);
   background-image:linear-gradient(45deg, transparent 50%, #132a26 50%),linear-gradient(135deg, #132a26 50%, transparent 50%);
+  background-position:calc(100% - 20px) 52%, calc(100% - 12px) 52%;
   -webkit-text-fill-color:#132a26 !important
+}
+html[dir="rtl"] body.dark .city-select{
+  background-position:20px 52%, 12px 52%
 }
 body.dark .city-select::-ms-value{background:var(--lime);color:#132a26}
 body.dark .city-select::-moz-color-swatch{background:var(--lime);color:#132a26}
