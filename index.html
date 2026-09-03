@@ -83,7 +83,9 @@ html[dir="rtl"] .city-select{
   color:var(--ink);
   font:600 13px 'DM Sans','Noto Kufi Arabic',sans-serif;
   text-align:center;
-  padding:6px 10px
+  text-align-last:center;
+  padding:8px 14px;
+  direction:inherit
 }
 
 .head{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}
@@ -184,7 +186,8 @@ body.dark .city-select::-ms-value{background:var(--lime);color:#132a26}
 body.dark .city-select::-moz-color-swatch{background:var(--lime);color:#132a26}
 body.dark .city-select:hover{background:#e5ff8a !important;border-color:#e5ff8a;transform:translateY(-1px);box-shadow:0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5)}
 body.dark .city-select:focus{border-color:#b8d45f;box-shadow:0 0 0 4px rgba(223,255,116,.22),0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5);outline:none}
-body.dark .city-select option{background:#13201d;color:var(--ink);font-weight:600}
+body.dark .city-select option{background:#13201d;color:var(--ink);font-weight:600;text-align:center;text-align-last:center;padding:8px 14px}
+html[dir="rtl"] .city-select option{direction:rtl;text-align:center;text-align-last:center}
 body.dark .round{background:#13201d;color:var(--ink);border-color:var(--line)}
 body.dark .details{background:#13201d;border-top:1px solid var(--line)}
 body.dark .chip{border-color:var(--line);background:#1b2d29;color:var(--ink)}
