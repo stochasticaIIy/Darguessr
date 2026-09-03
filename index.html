@@ -35,12 +35,11 @@ p{color:var(--muted);line-height:1.8}
 .city-select-wrap{
   margin-bottom:22px;
   display:flex;
-  justify-content:center
+  justify-content:center;
+  position:relative;
+  z-index:500
 }
 .city-select{
-  appearance:none;
-  -webkit-appearance:none;
-  -moz-appearance:none;
   background:#fff;
   border:1.5px solid var(--line);
   border-radius:999px;
@@ -52,9 +51,9 @@ p{color:var(--muted);line-height:1.8}
   transition:all .22s cubic-bezier(.2,.7,.3,1);
   min-width:280px;
   text-align:center;
-  text-align-last:center;
   box-shadow:0 1px 0 rgba(0,0,0,.04), 0 6px 20px -12px rgba(19,42,38,.18);
   position:relative;
+  user-select:none;
   background-image:
     linear-gradient(45deg, transparent 50%, var(--ink) 50%),
     linear-gradient(135deg, var(--ink) 50%, transparent 50%);
@@ -64,11 +63,69 @@ p{color:var(--muted);line-height:1.8}
   background-size:7px 7px, 7px 7px;
   background-repeat:no-repeat
 }
-html[dir="rtl"] .city-select{
-  background-position:
-    20px 52%,
-    12px 52%
+.city-select.open,
+.city-select:hover{
+  border-color:var(--ink);
+  transform:translateY(-1px);
+  box-shadow:0 2px 0 rgba(0,0,0,.04), 0 12px 28px -14px rgba(19,42,38,.3)
 }
+.city-select:focus-visible{
+  border-color:var(--orange);
+  box-shadow:0 0 0 4px rgba(255,114,94,.12), 0 2px 0 rgba(0,0,0,.04), 0 12px 28px -14px rgba(255,114,94,.35)
+}
+html[dir="rtl"] .city-select{
+  background-position:20px 52%, 12px 52%
+}
+.city-dropdown{
+  position:absolute;
+  top:calc(100% + 10px);
+  left:50%;
+  transform:translateX(-50%) translateY(-6px);
+  min-width:320px;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:8px;
+  box-shadow:0 20px 60px -20px rgba(19,42,38,.35), 0 4px 0 rgba(0,0,0,.03);
+  display:none;
+  opacity:0;
+  transition:opacity .18s ease, transform .18s ease;
+  max-height:420px;
+  overflow-y:auto
+}
+.city-dropdown.open{
+  display:block;
+  opacity:1;
+  transform:translateX(-50%) translateY(0)
+}
+.city-option{
+  padding:11px 16px;
+  border-radius:12px;
+  font:600 13px 'DM Sans','Noto Kufi Arabic',sans-serif;
+  color:var(--ink);
+  text-align:center;
+  text-align-last:center;
+  cursor:pointer;
+  transition:background .14s ease, color .14s ease;
+  user-select:none
+}
+.city-option:hover,
+.city-option.kbd-focus{
+  background:var(--ink);
+  color:#fff
+}
+.city-option.selected{
+  background:rgba(255,114,94,.12);
+  color:var(--orange);
+  font-weight:700
+}
+.city-option.selected:hover{
+  background:var(--orange);
+  color:#fff
+}
+.city-select option{display:none !important}
 .city-select:hover{
   border-color:var(--ink);
   transform:translateY(-1px);
@@ -182,12 +239,14 @@ body.dark .city-select{
 html[dir="rtl"] body.dark .city-select{
   background-position:20px 52%, 12px 52%
 }
-body.dark .city-select::-ms-value{background:var(--lime);color:#132a26}
-body.dark .city-select::-moz-color-swatch{background:var(--lime);color:#132a26}
-body.dark .city-select:hover{background:#e5ff8a !important;border-color:#e5ff8a;transform:translateY(-1px);box-shadow:0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5)}
-body.dark .city-select:focus{border-color:#b8d45f;box-shadow:0 0 0 4px rgba(223,255,116,.22),0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5);outline:none}
-body.dark .city-select option{background:#13201d;color:var(--ink);font-weight:600;text-align:center;text-align-last:center;padding:8px 14px}
-html[dir="rtl"] .city-select option{direction:rtl;text-align:center;text-align-last:center}
+body.dark .city-select:hover,
+body.dark .city-select.open{background:#e5ff8a !important;border-color:#e5ff8a;transform:translateY(-1px);box-shadow:0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5)}
+body.dark .city-select:focus-visible{border-color:#b8d45f;box-shadow:0 0 0 4px rgba(223,255,116,.22),0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5);outline:none}
+body.dark .city-dropdown{background:rgba(19,32,29,.96);border-color:var(--line);box-shadow:0 20px 60px -20px rgba(0,0,0,.7), 0 4px 0 rgba(0,0,0,.2)}
+body.dark .city-option:hover,
+body.dark .city-option.kbd-focus{background:var(--lime);color:#132a26}
+body.dark .city-option.selected{background:rgba(255,114,94,.22);color:var(--orange)}
+body.dark .city-option.selected:hover{background:var(--orange);color:#fff}
 body.dark .round{background:#13201d;color:var(--ink);border-color:var(--line)}
 body.dark .details{background:#13201d;border-top:1px solid var(--line)}
 body.dark .chip{border-color:var(--line);background:#1b2d29;color:var(--ink)}
@@ -246,8 +305,9 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
     <div><b id="seconds">0:50</b><span id="perRound"></span></div>
   </section>
   <section class="game" id="play">
-    <div class="city-select-wrap">
-      <select id="citySelect" class="city-select" onchange="setCityFilter(this.value)">
+    <div class="city-select-wrap" id="citySelectWrap">
+      <!-- Hidden native select as value store so existing JS keeps working -->
+      <select id="citySelect" style="display:none" onchange="setCityFilter(this.value)">
         <option value="all">📍 كل المدن / All Cities</option>
         <option value="Casablanca">الدار البيضاء / Casablanca</option>
         <option value="Rabat">الرباط / Rabat</option>
@@ -264,6 +324,12 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
         <option value="Bouskoura">بوسكورة / Bouskoura</option>
         <option value="Berkane">بركان / Berkane</option>
       </select>
+      <!-- Custom trigger pill (replaces native select visible UI) -->
+      <div class="city-select" id="cityTrigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-controls="cityDropdown">
+        <span id="cityTriggerLabel">📍 كل المدن / All Cities</span>
+      </div>
+      <!-- Custom dropdown popup (all options rendered as divs → perfect centering) -->
+      <div class="city-dropdown" id="cityDropdown" role="listbox"></div>
     </div>
 
     <div class="head">
@@ -1092,6 +1158,85 @@ $('guess').addEventListener('keyup', (e) => {
   if (e.key === 'Enter') submit();
 });
 
+/* ---------- CUSTOM CITY DROPDOWN LOGIC ---------- */
+let cityKbdIdx = -1;
+function buildCityDropdown() {
+  const sel = $('citySelect');
+  const dd = $('cityDropdown');
+  dd.replaceChildren();
+  Array.from(sel.options).forEach((opt, i) => {
+    const row = document.createElement('div');
+    row.className = 'city-option' + (opt.value === sel.value ? ' selected' : '');
+    row.dataset.value = opt.value;
+    row.dataset.idx = i;
+    row.textContent = opt.textContent;
+    row.setAttribute('role', 'option');
+    row.setAttribute('aria-selected', opt.value === sel.value ? 'true' : 'false');
+    row.addEventListener('click', () => selectCityOption(i));
+    dd.appendChild(row);
+  });
+}
+function toggleCityDropdown(force) {
+  const wrap = $('citySelectWrap');
+  const trigger = $('cityTrigger');
+  const dd = $('cityDropdown');
+  const openNow = typeof force === 'boolean' ? force : !dd.classList.contains('open');
+  dd.classList.toggle('open', openNow);
+  trigger.classList.toggle('open', openNow);
+  trigger.setAttribute('aria-expanded', String(openNow));
+  cityKbdIdx = -1;
+  if (openNow) {
+    buildCityDropdown();
+    const sel = $('citySelect');
+    const cur = Array.from(dd.children).findIndex(el => el.dataset.value === sel.value);
+    if (cur >= 0) { cityKbdIdx = cur; dd.children[cur].scrollIntoView({block:'nearest'}); }
+  }
+}
+function closeCityDropdown() { toggleCityDropdown(false); }
+function selectCityOption(i) {
+  const sel = $('citySelect');
+  const dd = $('cityDropdown');
+  const triggerLabel = $('cityTriggerLabel');
+  const opts = dd.querySelectorAll('.city-option');
+  if (!opts[i]) return;
+  const val = opts[i].dataset.value;
+  const txt = opts[i].textContent;
+  sel.value = val;
+  triggerLabel.textContent = txt;
+  closeCityDropdown();
+  sel.dispatchEvent(new Event('change'));
+}
+// Click-outside to close
+window.addEventListener('mousedown', (e) => {
+  const wrap = $('citySelectWrap');
+  if (wrap && !wrap.contains(e.target)) closeCityDropdown();
+});
+// Trigger click + keyboard
+(function initCityTrigger() {
+  const trigger = $('cityTrigger');
+  const dd = $('cityDropdown');
+  if (!trigger) return;
+  trigger.addEventListener('click', () => toggleCityDropdown());
+  trigger.addEventListener('keydown', (e) => {
+    const opts = dd.querySelectorAll('.city-option');
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault();
+      if (!dd.classList.contains('open')) toggleCityDropdown(true);
+      else if (cityKbdIdx >= 0) selectCityOption(cityKbdIdx);
+    }
+    if (e.key === 'Escape') { closeCityDropdown(); trigger.focus(); e.preventDefault(); return; }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      if (!dd.classList.contains('open')) { toggleCityDropdown(true); }
+      e.preventDefault();
+      if (!opts.length) return;
+      const dir = e.key === 'ArrowDown' ? +1 : -1;
+      cityKbdIdx = cityKbdIdx < 0 ? (dir > 0 ? 0 : opts.length - 1) : (cityKbdIdx + dir + opts.length) % opts.length;
+      opts.forEach((el, k) => el.classList.toggle('kbd-focus', k === cityKbdIdx));
+      opts[cityKbdIdx].scrollIntoView({block:'nearest'});
+    }
+  });
+})();
+
+buildCityDropdown();
 setLang('ar');
 loadListings();
 updateLeaderboardUI();
