@@ -18,7 +18,7 @@ body{margin:0;background:var(--cream);color:var(--ink);font-family:'Noto Kufi Ar
 .lang{display:flex;gap:6px;align-items:center}
 .lang button{border:0;background:#fff;padding:7px 12px;border-radius:18px;cursor:pointer;font-family:inherit;font-size:13px}
 .lang .on{color:#fff;background:var(--ink)}
-.hero{padding:7vw;display:grid;grid-template-columns:1.1fr .9fr;gap:px;align-items:center}
+.hero{padding:7vw;display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
 .eyebrow{font:600 12px 'DM Sans';letter-spacing:1px;color:var(--muted);text-transform:uppercase}
 h1{font-size:clamp(40px,6vw,80px);line-height:1.1;margin:15px 0;letter-spacing:-1.5px}
 p{color:var(--muted);line-height:1.8}
@@ -373,7 +373,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 let currentMode = 'sale'; // 'rent' or 'sale'
 let allListings = [], activeHomes = [], selectedCity = 'all';
 let L='ar', r=0, score=0, p=0, z=0, mapInst=null, marker=null, cachedLeaders=[];
-let timerInt = null, timeLeft = 3000;
+let timerInt = null, timeLeft = 50;
 
 const $ = x => document.getElementById(x);
 const fmt = n => Number(n).toLocaleString(L === 'ar' ? 'ar-MA' : 'en-US');
@@ -589,13 +589,19 @@ function zoom(n) {
   if (mapInst) mapInst.setZoom(14 + z);
 }
 
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+}
+
 function startTimer() {
   clearInterval(timerInt);
-  timeLeft = 3000;
-  $('seconds').textContent = '50:00';
+  timeLeft = 3000; // 50 minutes = 3000 seconds
+  $('seconds').textContent = formatTime(timeLeft);
   timerInt = setInterval(() => {
     timeLeft--;
-    $('seconds').textContent = `0:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
+    $('seconds').textContent = formatTime(timeLeft);
     if (timeLeft <= 0) {
       clearInterval(timerInt);
       submit();
@@ -644,7 +650,21 @@ async function loadLeaders() {
     });
     if (res.ok) {
       const data = await res.json();
-      cachedLeaders = data.record && data.record.leaders ? data.record.leaders : [];
+      const raw = data.record;
+      // Handle both formats: array of [name, score] or array of {name, score}
+      if (Array.isArray(raw)) {
+        cachedLeaders = raw.map(item => {
+          if (Array.isArray(item)) return { name: item[0], score: item[1] };
+          return item;
+        });
+      } else if (raw && Array.isArray(raw.leaders)) {
+        cachedLeaders = raw.leaders.map(item => {
+          if (Array.isArray(item)) return { name: item[0], score: item[1] };
+          return item;
+        });
+      } else {
+        cachedLeaders = [];
+      }
       renderLeaders();
     }
   } catch(e) {
@@ -667,8 +687,13 @@ async function addPlayer() {
   const name = ($('playerName').value || '').trim();
   if (!name) return;
   $('addButton').disabled = true;
-  const newEntry = { name: name, score: score, date: new Date().toISOString().split('T')[0] };
-  const updated = [...cachedLeaders, newEntry].sort((a,b) => b.score - a.score).slice(0, 50);
+  const newEntry = [name, score];
+  // Support the raw array of tuples format stored in jsonbin: [ [name, score], ... ]
+  const rawList = cachedLeaders.map(l => [l.name, l.score]);
+  rawList.push(newEntry);
+  rawList.sort((a,b) => b[1] - a[1]);
+  const trimmed = rawList.slice(0, 30);
+
   try {
     await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
       method: 'PUT',
@@ -676,9 +701,9 @@ async function addPlayer() {
         'Content-Type': 'application/json',
         'X-Master-Key': JSONBIN_API_KEY
       },
-      body: JSON.stringify({ leaders: updated })
+      body: JSON.stringify(trimmed)
     });
-    cachedLeaders = updated;
+    cachedLeaders = trimmed.map(t => ({ name: t[0], score: t[1] }));
     renderLeaders();
     $('playerName').value = '';
     $('addButton').textContent = '✓ تم!';
