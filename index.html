@@ -198,9 +198,10 @@ html[dir="rtl"] .city-select{
 .final{display:none;padding:38px;text-align:center}
 .final h3{font-size:38px;margin:7px}
 .score{font:700 55px 'DM Sans';color:var(--orange)}
-.rank{display:inline-block;margin:12px;padding:8px 11px;border-radius:7px;background:var(--lime);color:var(--ink);font-size:13px;font-weight:700}
+.rank{display:inline-block;margin:12px;padding:8px 11px;border-radius:7px;background:var(--lime);color:#132a26;font-size:13px;font-weight:700}
 .links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:22px 0;text-align:right}
-.links a{background:#eef3eb;color:var(--ink);padding:10px;border-radius:7px;text-decoration:none;font-size:12px}
+.links a{background:#eef3eb;color:#132a26;padding:10px 12px;border-radius:7px;text-decoration:none;font-size:12px;display:block;transition:background .15s,color .15s}
+.links a:hover{background:#dfe8dc;color:#0b1916}
 .add-name{margin:18px 0;display:flex;justify-content:center;gap:8px}
 
 .leaders{max-width:900px;margin:40px auto}
@@ -215,10 +216,19 @@ body.dark .top, body.dark .stats, body.dark .hero-card, body.dark .map, body.dar
 body.dark .mode-btn{background:#1b2d29;color:var(--ink);border-color:var(--line)}
 body.dark .mode-btn.on{background:var(--lime);color:#132a26}
 body.dark .city-select{background:var(--lime)!important;color:#132a26!important;border-color:var(--lime)}
-body.dark .round,.details{background:#13201d}
+body.dark .round, body.dark .details, body.dark .final{background:#13201d;color:var(--ink)}
+body.dark .final h3{color:#f7f4ea}
+body.dark .score{color:var(--orange)}
+body.dark .rank{background:var(--lime);color:#132a26!important}
+body.dark .links a{background:#1b2d29;color:#f7f4ea;border:1px solid #2e4741}
+body.dark .links a:hover{background:#253e38;color:#fff;border-color:var(--lime)}
+body.dark .name-input{background:#1b2d29;color:#f7f4ea;border:1px solid #2e4741}
+body.dark .name-input::placeholder{color:#9aa8a4}
 body.dark .btn{background:var(--lime);color:#132a26}
+body.dark .guess{background:var(--lime);color:#132a26}
+body.dark .next-btn{background:var(--lime);color:#132a26}
 body.dark .lang button{background:#1b2d29;color:var(--ink)}
-body.dark .lang .on{background:var(--lime);color:var(--ink)}
+body.dark .lang .on{background:var(--lime);color:#132a26}
 body.dark .zoom, body.dark .photo-zoom{background:rgba(19,32,29,.95)!important;border-color:#2e4741!important;box-shadow:0 4px 16px rgba(0,0,0,0.6)!important}
 body.dark .zoom button, body.dark .photo-zoom button{color:#f7f4ea!important;border-bottom:1px solid #2e4741!important}
 body.dark .zoom button:last-child, body.dark .photo-zoom button:last-child{border-bottom:0!important}
@@ -986,11 +996,8 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
-  // If user is typing in the guess box
+  // If user is typing in an input box, bypass gallery shortcuts
   if (isInput) {
-    if (e.key === 'Enter') {
-      submit();
-    }
     return;
   }
 
@@ -1013,12 +1020,6 @@ window.addEventListener('keydown', (e) => {
   } else if (e.key === 'f' || e.key === 'F') {
     e.preventDefault();
     if (isFullscreenOpen) closeFullscreen(); else openFullscreen();
-  } else if (e.key === 'Enter') {
-    if ($('reveal').style.display === 'flex') {
-      nextRound();
-    } else if ($('final').style.display === 'block') {
-      restart();
-    }
   }
 });
 
