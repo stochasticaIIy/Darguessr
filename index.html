@@ -170,7 +170,7 @@ html[dir="rtl"] .city-select{
 
 .details{padding:22px;width:100%;background:var(--ink);border-top:1px solid #49625c}
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 12px}
-.chip{border:1px solid #55736b;border-radius:7px;padding:5px 8px;font-size:12px}
+.chip{border:1px solid #55736b;border-radius:7px;padding:5px 9px;font-size:12px;background:#1b2d29;color:#f7f4ea;font-weight:600}
 .input{padding-top:14px;border-top:1px solid #49625c;display:flex;flex-wrap:wrap;gap:9px}
 .input input,.name-input{border:0;border-radius:8px;padding:13px;font:700 14px 'DM Sans';min-width:210px;flex:1}
 .guess{background:var(--lime);color:var(--ink)}
@@ -216,6 +216,11 @@ body.dark .top, body.dark .stats, body.dark .hero-card, body.dark .map, body.dar
 body.dark .mode-btn{background:#1b2d29;color:var(--ink);border-color:var(--line)}
 body.dark .mode-btn.on{background:var(--lime);color:#132a26}
 body.dark .city-select{background:var(--lime)!important;color:#132a26!important;border-color:var(--lime)}
+body.dark .city-dropdown{background:rgba(19,32,29,.98)!important;border-color:#2e4741!important;box-shadow:0 20px 60px -20px rgba(0,0,0,.8)!important}
+body.dark .city-option{color:#f7f4ea!important}
+body.dark .city-option:hover{background:#253e38!important;color:#ffffff!important}
+body.dark .city-option.selected{background:rgba(255,114,94,.22)!important;color:var(--orange)!important;font-weight:700}
+body.dark .leaflet-tile{filter:brightness(0.65) invert(1) contrast(1.8) hue-rotate(190deg) saturate(0.4)}
 body.dark .round, body.dark .details, body.dark .final{background:#13201d;color:var(--ink)}
 body.dark .final h3{color:#f7f4ea}
 body.dark .score{color:var(--orange)}
@@ -584,12 +589,20 @@ function render() {
     track.appendChild(s);
   });
   
+  const roomText = h.bedrooms && h.bedrooms !== '—'
+    ? (L === 'ar' ? `🛏️ ${h.bedrooms} غرف` : `🛏️ ${h.bedrooms} ${Number(h.bedrooms) === 1 ? 'room' : 'rooms'}`)
+    : '';
+  const bathText = h.bathrooms && h.bathrooms !== '—'
+    ? (L === 'ar' ? `🛁 ${h.bathrooms} حمامات` : `🛁 ${h.bathrooms} ${Number(h.bathrooms) === 1 ? 'bathroom' : 'bathrooms'}`)
+    : '';
+
   const chips = [
     `📍 ${h.city}`,
     `🏠 ${h.type}`,
     h.area && h.area !== '—' ? `📐 ${h.area} m²` : '',
-    h.bedrooms ? `🛏️ ${h.bedrooms}` : '',
-    currentMode === 'sale' ? '🏷️ للبيع' : '🔑 للكراء'
+    roomText,
+    bathText,
+    currentMode === 'sale' ? (L === 'ar' ? '🏷️ للبيع' : '🏷️ For Sale') : (L === 'ar' ? '🔑 للكراء' : '🔑 For Rent')
   ].filter(Boolean);
   
   const chipsEl = $('chips');
@@ -700,14 +713,12 @@ let currentTileLayer = null;
 
 function applyMapTiles() {
   if (!mapInst) return;
-  const isDark = document.body.classList.contains('dark');
-  const url = isDark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-  if (currentTileLayer) {
-    mapInst.removeLayer(currentTileLayer);
+  if (!currentTileLayer) {
+    currentTileLayer = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(mapInst);
   }
-  currentTileLayer = window.L.tileLayer(url, { maxZoom: 19 }).addTo(mapInst);
 }
 
 function placeMap(h) {
@@ -964,7 +975,7 @@ function toggleCityDropdown() {
     dd.replaceChildren();
     Array.from($('citySelect').options).forEach(opt => {
       const d = document.createElement('div');
-      d.className = 'city-option';
+      d.className = 'city-option' + (opt.value === selectedCity ? ' selected' : '');
       d.textContent = opt.textContent;
       d.onclick = () => {
         $('citySelect').value = opt.value;
