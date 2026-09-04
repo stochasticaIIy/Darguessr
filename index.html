@@ -959,9 +959,14 @@ function renderLeaders() {
 }
 
 async function addPlayer() {
-  const name = ($('playerName').value || '').trim();
+  const nameInput = $('playerName');
+  const addBtn = $('addButton');
+  const name = ((nameInput && nameInput.value) || '').trim();
   if (!name) return;
-  $('addButton').disabled = true;
+  if (addBtn) {
+    addBtn.disabled = true;
+    addBtn.textContent = '...';
+  }
   const newEntry = [name, score];
   // Support the raw array of tuples format stored in jsonbin: [ [name, score], ... ]
   const rawList = cachedLeaders.map(l => [l.name, l.score]);
@@ -980,10 +985,32 @@ async function addPlayer() {
     });
     cachedLeaders = trimmed.map(t => ({ name: t[0], score: t[1] }));
     renderLeaders();
-    $('playerName').value = '';
-    $('addButton').textContent = '✓ تم!';
+    if (nameInput) {
+      nameInput.value = '';
+      nameInput.disabled = true;
+    }
+    if (addBtn) {
+      addBtn.textContent = L === 'ar' ? '✓ تم!' : '✓ Added!';
+      addBtn.disabled = true;
+    }
   } catch(e) {
-    $('addButton').disabled = false;
+    if (addBtn) {
+      addBtn.disabled = false;
+      addBtn.textContent = t().ad;
+    }
+  }
+}
+
+function resetLeaderboardForm() {
+  const addBtn = $('addButton');
+  const nameInput = $('playerName');
+  if (addBtn) {
+    addBtn.disabled = false;
+    addBtn.textContent = t().ad;
+  }
+  if (nameInput) {
+    nameInput.disabled = false;
+    nameInput.value = '';
   }
 }
 
@@ -1027,6 +1054,7 @@ function nextRound() {
   $('final').style.display = 'block';
   $('score').textContent = `${score} / 500`;
   $('playerRank').textContent = `${t().rk}: ${score >= 400 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%'}`;
+  resetLeaderboardForm();
   
   const linksEl = $('links');
   linksEl.replaceChildren();
@@ -1041,6 +1069,7 @@ function nextRound() {
 
 function restart() {
   r = 0; score = 0;
+  resetLeaderboardForm();
   selectRandomRounds();
   render();
 }
