@@ -546,7 +546,18 @@ async function loadListings() {
     const res = await fetch(file + '?t=' + Date.now());
     if (res.ok) {
       const data = await res.json();
-      allListings = Array.isArray(data) ? data : [];
+      if (Array.isArray(data) && data.length > 0) {
+        allListings = data;
+      }
+    }
+    if (!allListings.length) {
+      const fb = await fetch('./listings.json?t=' + Date.now());
+      if (fb.ok) {
+        const fbData = await fb.json();
+        if (Array.isArray(fbData) && fbData.length > 0) {
+          allListings = fbData;
+        }
+      }
     }
   } catch(e) {}
   
@@ -565,6 +576,10 @@ function updateHero() {
 }
 
 function selectRandomRounds() {
+  if (!allListings || !allListings.length) {
+    activeHomes = [];
+    return;
+  }
   let pool = allListings;
   if (selectedCity === 'other') {
     const mainCityKeys = [
@@ -584,10 +599,15 @@ function selectRandomRounds() {
     });
   }
   if (!pool.length) pool = allListings;
+  if (!pool.length) {
+    activeHomes = [];
+    return;
+  }
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   activeHomes = [];
   for (let i = 0; i < 5; i++) {
-    activeHomes.push(shuffled[i % shuffled.length]);
+    const item = shuffled[i % shuffled.length];
+    if (item) activeHomes.push(item);
   }
 }
 
@@ -747,17 +767,22 @@ function applyMapTiles() {
 }
 
 function placeMap(h) {
-  if (!h || h.lat == null || h.lng == null) return;
+  if (!h) return;
+  const lat = Number(h.lat);
+  const lng = Number(h.lng);
+  if (isNaN(lat) || isNaN(lng)) return;
+
+  const currentZoom = 14 + (Number(z) || 0);
 
   if (!mapInst) {
-    mapInst = window.L.map('map', { zoomControl: false }).setView([h.lat, h.lng], 14 + z);
+    mapInst = window.L.map('map', { zoomControl: false }).setView([lat, lng], currentZoom);
     applyMapTiles();
-    marker = window.L.circleMarker([h.lat, h.lng], { radius: 9, weight: 3, color: '#fff', fillColor: '#ff725e', fillOpacity: 1 }).addTo(mapInst);
+    marker = window.L.circleMarker([lat, lng], { radius: 9, weight: 3, color: '#fff', fillColor: '#ff725e', fillOpacity: 1 }).addTo(mapInst);
   } else {
-    mapInst.setView([h.lat, h.lng], 14 + z);
-    if (marker) marker.setLatLng([h.lat, h.lng]);
+    mapInst.setView([lat, lng], currentZoom);
+    if (marker) marker.setLatLng([lat, lng]);
     setTimeout(() => {
-      mapInst.invalidateSize();
+      if (mapInst) mapInst.invalidateSize();
     }, 100);
   }
 }
@@ -771,8 +796,10 @@ function resetMapZoom() {
   z = 0;
   if (mapInst) {
     const h = activeHomes[r];
-    if (h) {
-      mapInst.setView([h.lat, h.lng], 14);
+    const lat = Number(h?.lat);
+    const lng = Number(h?.lng);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      mapInst.setView([lat, lng], 14);
     } else {
       mapInst.setZoom(14);
     }
