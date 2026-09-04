@@ -53,6 +53,36 @@ p{color:var(--muted);line-height:1.8}
   color:#fff;
   border-color:var(--ink);
 }
+.mode-btn.locked:not(.on){
+  opacity:0.45;
+  cursor:not-allowed;
+}
+.mode-btn.locked:not(.on):hover{
+  border-color:#ff725e;
+  opacity:0.65;
+}
+.mode-lock-notice{
+  text-align:center;
+  font-size:12px;
+  font-weight:700;
+  color:#ff725e;
+  background:rgba(255,114,94,.12);
+  border:1px solid rgba(255,114,94,.35);
+  border-radius:8px;
+  padding:6px 14px;
+  margin:-10px auto 16px;
+  max-width:440px;
+  animation:fadeInNotice .25s ease;
+}
+body.dark .mode-lock-notice{
+  background:rgba(255,114,94,.18);
+  border-color:rgba(255,114,94,.45);
+  color:#ff8e7d;
+}
+@keyframes fadeInNotice{
+  from{opacity:0;transform:translateY(-4px)}
+  to{opacity:1;transform:translateY(0)}
+}
 
 /* CITY SELECTOR */
 .city-select-wrap{
@@ -270,6 +300,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
         <button id="heroRentBtn" class="mode-btn on" onclick="switchMode('rent')">🔑 كراء / Rent</button>
         <button id="heroSaleBtn" class="mode-btn" onclick="switchMode('sale')">🏷️ بيع / Sale</button>
       </div>
+      <div id="heroModeNotice" class="mode-lock-notice" style="display:none;margin-left:0;margin-right:auto"></div>
       <a href="#play"><button class="btn" id="start" style="margin-top:12px"></button></a>
     </div>
     <div class="hero-card">
@@ -293,6 +324,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <button id="gameModeRent" class="mode-btn on" onclick="switchMode('rent')">🔑 كراء (Rent)</button>
       <button id="gameModeSale" class="mode-btn" onclick="switchMode('sale')">🏷️ بيع (Sale)</button>
     </div>
+    <div id="gameModeNotice" class="mode-lock-notice" style="display:none"></div>
 
     <!-- City Selector -->
     <div class="city-select-wrap" id="citySelectWrap">
@@ -365,6 +397,10 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
           <div class="add-name">
             <input class="name-input" id="playerName">
             <button class="btn" id="addButton" onclick="addPlayer()"></button>
+          </div>
+          <div class="final-mode-wrap" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px">
+            <button id="finalModeRent" class="mode-btn" onclick="switchMode('rent')">🔑 كراء (Rent)</button>
+            <button id="finalModeSale" class="mode-btn" onclick="switchMode('sale')">🏷️ بيع (Sale)</button>
           </div>
           <button class="btn" id="again" onclick="restart()"></button>
         </div>
@@ -476,6 +512,7 @@ let currentMode = 'sale'; // 'rent' or 'sale'
 let allListings = [], activeHomes = [], selectedCity = 'all';
 let L='ar', r=0, score=0, p=0, z=0, mapInst=null, marker=null, cachedLeaders=[];
 let timerInt = null, timeLeft = 50;
+let gameSessionActive = false;
 
 const $ = x => document.getElementById(x);
 const fmt = n => Number(n).toLocaleString(L === 'ar' ? 'ar-MA' : 'en-US');
@@ -569,12 +606,74 @@ const T = {
 
 function t() { return T[L]; }
 
+function isResultsShown() {
+  const finalEl = $('final');
+  return !!(finalEl && finalEl.style.display === 'block');
+}
+
+function canSwitchMode() {
+  // If all 5 rounds are completed and results are shown, switching is allowed
+  if (isResultsShown()) return true;
+  // If the game session has not started active guessing yet (round 1 not yet submitted), switching is allowed
+  if (!gameSessionActive && r === 0) return true;
+  // While rounds 1-5 are underway, switching is strictly prohibited
+  return false;
+}
+
+let modeNoticeTimer = null;
+function showModeNotice(msg) {
+  ['heroModeNotice', 'gameModeNotice'].forEach(id => {
+    const el = $(id);
+    if (el) {
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+  });
+  if (modeNoticeTimer) clearTimeout(modeNoticeTimer);
+  modeNoticeTimer = setTimeout(() => {
+    ['heroModeNotice', 'gameModeNotice'].forEach(id => {
+      const el = $(id);
+      if (el) el.style.display = 'none';
+    });
+  }, 3500);
+}
+
+function updateModeButtonsState() {
+  const allowed = canSwitchMode();
+  const noticeTitle = allowed ? '' : (L === 'ar' ? 'لا يمكن تغيير النمط حتى انتهاء الجولات الـ 5 وعرض النتائج' : 'Mode switches are prohibited until all 5 rounds are done and results are shown');
+  document.querySelectorAll('#heroRentBtn, #heroSaleBtn, #gameModeRent, #gameModeSale, #finalModeRent, #finalModeSale').forEach(b => {
+    b.classList.toggle('locked', !allowed);
+    if (noticeTitle) {
+      b.setAttribute('title', noticeTitle);
+    } else {
+      b.removeAttribute('title');
+    }
+  });
+}
+
+function updateModeButtonsActive() {
+  document.querySelectorAll('#heroRentBtn, #gameModeRent, #finalModeRent').forEach(b => b.classList.toggle('on', currentMode === 'rent'));
+  document.querySelectorAll('#heroSaleBtn, #gameModeSale, #finalModeSale').forEach(b => b.classList.toggle('on', currentMode === 'sale'));
+}
+
 function switchMode(m) {
+  if (m === currentMode) return;
+  if (!canSwitchMode()) {
+    showModeNotice(L === 'ar'
+      ? '🔒 لا يمكنك تغيير النمط حتى انتهاء الجولات الـ 5 وعرض النتائج!'
+      : '🔒 Mode switches are prohibited until all 5 rounds are done and results are shown!');
+    return;
+  }
+  ['heroModeNotice', 'gameModeNotice'].forEach(id => {
+    const el = $(id);
+    if (el) el.style.display = 'none';
+  });
   currentMode = m;
-  document.querySelectorAll('#heroRentBtn, #gameModeRent').forEach(b => b.classList.toggle('on', m === 'rent'));
-  document.querySelectorAll('#heroSaleBtn, #gameModeSale').forEach(b => b.classList.toggle('on', m === 'sale'));
+  updateModeButtonsActive();
   $('quickAdds').style.display = m === 'sale' ? 'flex' : 'none';
+  gameSessionActive = false;
   loadListings();
+  updateModeButtonsState();
 }
 
 function addGuess(val) {
@@ -710,6 +809,10 @@ function render() {
   $('gameTitle').textContent = currentMode === 'sale' ? t().gt_sale : t().gt_rent;
   $('progress').childNodes[0].nodeValue = `${r + 1} / 05`;
   $('bar').style.width = `${((r + 1) / 5) * 100}%`;
+  
+  if (r > 0) gameSessionActive = true;
+  updateModeButtonsState();
+  updateModeButtonsActive();
   
   startTimer();
 }
@@ -1028,6 +1131,8 @@ function exportLeadersTxt() {
 
 function submit() {
   clearInterval(timerInt);
+  gameSessionActive = true;
+  updateModeButtonsState();
   const val = +$('guess').value || 0;
   const a = activeHomes[r].price;
   const pt = Math.max(0, Math.round(100 - Math.abs(val - a) / a * 100));
@@ -1055,6 +1160,9 @@ function nextRound() {
   $('score').textContent = `${score} / 500`;
   $('playerRank').textContent = `${t().rk}: ${score >= 400 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%'}`;
   resetLeaderboardForm();
+  gameSessionActive = false;
+  updateModeButtonsState();
+  updateModeButtonsActive();
   
   const linksEl = $('links');
   linksEl.replaceChildren();
@@ -1069,9 +1177,11 @@ function nextRound() {
 
 function restart() {
   r = 0; score = 0;
+  gameSessionActive = false;
   resetLeaderboardForm();
   selectRandomRounds();
   render();
+  updateModeButtonsState();
 }
 
 function setLang(lang) {
@@ -1081,6 +1191,18 @@ function setLang(lang) {
   document.body.classList.toggle('en', lang === 'en');
   $('arBtn').classList.toggle('on', lang === 'ar');
   $('enBtn').classList.toggle('on', lang === 'en');
+  
+  const rentText = L === 'ar' ? '🔑 كراء / Rent' : '🔑 Rent';
+  const saleText = L === 'ar' ? '🏷️ بيع / Sale' : '🏷️ Sale';
+  const gameRentText = L === 'ar' ? '🔑 كراء (Rent)' : '🔑 Rent';
+  const gameSaleText = L === 'ar' ? '🏷️ بيع (Sale)' : '🏷️ Sale';
+  
+  if ($('heroRentBtn')) $('heroRentBtn').textContent = rentText;
+  if ($('heroSaleBtn')) $('heroSaleBtn').textContent = saleText;
+  if ($('gameModeRent')) $('gameModeRent').textContent = gameRentText;
+  if ($('gameModeSale')) $('gameModeSale').textContent = gameSaleText;
+  if ($('finalModeRent')) $('finalModeRent').textContent = gameRentText;
+  if ($('finalModeSale')) $('finalModeSale').textContent = gameSaleText;
   
   $('eyebrow').textContent = currentMode === 'sale' ? t().e_sale : t().e_rent;
   $('title').textContent = currentMode === 'sale' ? t().t_sale : t().t_rent;
@@ -1104,6 +1226,8 @@ function setLang(lang) {
   $('addButton').textContent = t().ad;
   $('playerName').placeholder = t().nm;
   
+  updateModeButtonsState();
+  updateModeButtonsActive();
   render();
 }
 
