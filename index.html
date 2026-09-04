@@ -18,7 +18,7 @@ body{margin:0;background:var(--cream);color:var(--ink);font-family:'Noto Kufi Ar
 .lang{display:flex;gap:6px;align-items:center}
 .lang button{border:0;background:#fff;padding:7px 12px;border-radius:18px;cursor:pointer;font-family:inherit;font-size:13px}
 .lang .on{color:#fff;background:var(--ink)}
-.hero{padding:7vw;display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
+.hero{padding:7vw;display:grid;grid-template-columns:1.1fr .9fr;gap:px;align-items:center}
 .eyebrow{font:600 12px 'DM Sans';letter-spacing:1px;color:var(--muted);text-transform:uppercase}
 h1{font-size:clamp(40px,6vw,80px);line-height:1.1;margin:15px 0;letter-spacing:-1.5px}
 p{color:var(--muted);line-height:1.8}
@@ -252,7 +252,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
   <section class="stats">
     <div><b id="cityCountDisplay">14+</b><span id="city"></span></div>
     <div><b id="listingCountDisplay">0</b><span id="listing"></span></div>
-    <div><b id="seconds">0:50</b><span id="perRound"></span></div>
+    <div><b id="seconds">50:00</b><span id="perRound"></span></div>
   </section>
 
   <section class="game" id="play">
@@ -373,7 +373,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 let currentMode = 'sale'; // 'rent' or 'sale'
 let allListings = [], activeHomes = [], selectedCity = 'all';
 let L='ar', r=0, score=0, p=0, z=0, mapInst=null, marker=null, cachedLeaders=[];
-let timerInt = null, timeLeft = 50;
+let timerInt = null, timeLeft = 3000;
 
 const $ = x => document.getElementById(x);
 const fmt = n => Number(n).toLocaleString(L === 'ar' ? 'ar-MA' : 'en-US');
@@ -390,7 +390,7 @@ const T = {
     c: 'مدن للاستكشاف',
     l_rent: 'إعلان للكراء',
     l_sale: 'عقار للبيع',
-    sec: '0:50',
+    sec: '50:00',
     pr: 'لكل جولة',
     gt_rent: 'تحدي الإيجار من 5 جولات',
     gt_sale: 'تحدي البيع من 5 جولات',
@@ -432,7 +432,7 @@ const T = {
     c: 'cities to explore',
     l_rent: 'rental listings',
     l_sale: 'properties for sale',
-    sec: '0:50',
+    sec: '50:00',
     pr: 'per round',
     gt_rent: '5-round Rent Challenge',
     gt_sale: '5-round Sale Price Challenge',
@@ -591,8 +591,8 @@ function zoom(n) {
 
 function startTimer() {
   clearInterval(timerInt);
-  timeLeft = 50;
-  $('seconds').textContent = '0:50';
+  timeLeft = 3000;
+  $('seconds').textContent = '50:00';
   timerInt = setInterval(() => {
     timeLeft--;
     $('seconds').textContent = `0:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
