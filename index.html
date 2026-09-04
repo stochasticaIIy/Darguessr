@@ -534,12 +534,61 @@ function addGuess(val) {
   $('guess').value = cur + val;
 }
 
+const CITY_CENTERS = {
+  casablanca: { lat: 33.5731, lng: -7.5898, radius: 40 },
+  rabat: { lat: 34.0209, lng: -6.8416, radius: 30 },
+  sale: { lat: 34.0531, lng: -6.7985, radius: 25 },
+  marrakech: { lat: 31.6295, lng: -7.9811, radius: 35 },
+  tanger: { lat: 35.7595, lng: -5.8340, radius: 30 },
+  agadir: { lat: 30.4278, lng: -9.5981, radius: 35 },
+  fes: { lat: 34.0181, lng: -5.0078, radius: 30 },
+  meknes: { lat: 33.8950, lng: -5.5547, radius: 30 },
+  oujda: { lat: 34.6867, lng: -1.9114, radius: 30 },
+  kenitra: { lat: 34.2610, lng: -6.5802, radius: 30 },
+  laayoune: { lat: 27.1536, lng: -13.2033, radius: 35 },
+  dakhla: { lat: 23.7167, lng: -15.9500, radius: 35 },
+  bouskoura: { lat: 33.4489, lng: -7.6486, radius: 25 },
+  berkane: { lat: 34.9167, lng: -2.3167, radius: 25 },
+};
+
+function sanitizeListingCoords(h) {
+  if (!h || !h.city || typeof h.lat !== 'number' || typeof h.lng !== 'number') return h;
+  const key = (h.city || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const center = CITY_CENTERS[key] || Object.entries(CITY_CENTERS).find(([k]) => k.startsWith(key) || key.startsWith(k))?.[1];
+  if (!center) return h;
+
+  const dLat = ((h.lat - center.lat) * Math.PI) / 180;
+  const dLon = ((h.lng - center.lng) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((center.lat * Math.PI) / 180) *
+      Math.cos((h.lat * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const distKm = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  if (distKm > (center.radius || 35)) {
+    let hash = 0;
+    const str = String(h.id || h.title || 'city');
+    for (let i = 0; i < str.length; i++) hash = (hash << 5) - hash + str.charCodeAt(i);
+    const jLat = (((Math.abs(hash) % 100) / 100) - 0.5) * 0.035;
+    const jLng = ((((Math.abs(hash >> 3)) % 100) / 100) - 0.5) * 0.035;
+    return {
+      ...h,
+      lat: center.lat + jLat,
+      lng: center.lng + jLng,
+    };
+  }
+  return h;
+}
+
 async function loadListings() {
   const file = currentMode === 'sale' ? './listings_sale.json' : './listings_rent.json';
   try {
     const res = await fetch(file + '?t=' + Date.now());
     if (res.ok) {
-      allListings = await res.json();
+      const data = await res.json();
+      allListings = Array.isArray(data) ? data.map(sanitizeListingCoords) : [];
     }
   } catch(e) {}
   
