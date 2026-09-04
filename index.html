@@ -7,30 +7,53 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<title>DarGuessr</title>
+<title>DarGuessr — Rent & Sale Morocco Real Estate Challenge</title>
 <style>
 :root{--ink:#132a26;--cream:#f7f4ea;--lime:#dfff74;--orange:#ff725e;--line:#d8d8ce;--muted:#698079}
 *{box-sizing:border-box}
 body{margin:0;background:var(--cream);color:var(--ink);font-family:'Noto Kufi Arabic',sans-serif;transition:background .3s,color .3s}
 .top{height:74px;padding:0 7vw;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
-.brand{font:700 22px 'DM Sans'}
+.brand{font:700 22px 'DM Sans';display:flex;align-items:center}
 .brand:before{content:'◇';display:inline-grid;place-items:center;width:30px;height:30px;margin-left:9px;background:var(--ink);color:var(--lime);border-radius:8px}
 .lang{display:flex;gap:6px;align-items:center}
-.lang button{border:0;background:#fff;padding:7px 12px;border-radius:18px;cursor:pointer;font-family:inherit}
+.lang button{border:0;background:#fff;padding:7px 12px;border-radius:18px;cursor:pointer;font-family:inherit;font-size:13px}
 .lang .on{color:#fff;background:var(--ink)}
 .hero{padding:7vw;display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
-.eyebrow{font:600 12px 'DM Sans';letter-spacing:1px;color:var(--muted)}
-h1{font-size:clamp(44px,7vw,88px);line-height:1.1;margin:15px 0;letter-spacing:-2px}
+.eyebrow{font:600 12px 'DM Sans';letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+h1{font-size:clamp(40px,6vw,80px);line-height:1.1;margin:15px 0;letter-spacing:-1.5px}
 p{color:var(--muted);line-height:1.8}
 .btn{border:0;border-radius:9px;padding:14px 20px;background:var(--ink);color:#fff;font-weight:700;cursor:pointer;font-family:inherit}
 .btn:disabled{opacity:0.6;cursor:not-allowed}
 .hero-card{border:1px solid var(--ink);border-radius:17px;overflow:hidden;background:#fff;box-shadow:9px 9px var(--orange)}
-.hero-img{height:190px;background:url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80') center/cover}
+.hero-img{height:200px;background:url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80') center/cover}
 .hero-card div:last-child{padding:19px;font-size:18px;font-weight:700}
 .stats{display:flex;gap:60px;padding:22px 7vw;border-block:1px solid var(--line);background:#fff}
 .stats b{display:block;font-size:24px}
 .stats span{font-size:13px;color:var(--muted)}
-.game{padding:68px 7vw 35px}
+.game{padding:50px 7vw 35px}
+
+/* MODE SELECTOR */
+.mode-toggle{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:20px;
+}
+.mode-btn{
+  border:1.5px solid var(--line);
+  background:#fff;
+  border-radius:30px;
+  padding:10px 22px;
+  font:700 14px 'DM Sans','Noto Kufi Arabic',sans-serif;
+  cursor:pointer;
+  transition:all .2s;
+  color:var(--ink);
+}
+.mode-btn.on{
+  background:var(--ink);
+  color:#fff;
+  border-color:var(--ink);
+}
 
 /* CITY SELECTOR */
 .city-select-wrap{
@@ -70,10 +93,6 @@ p{color:var(--muted);line-height:1.8}
   transform:translateY(-1px);
   box-shadow:0 2px 0 rgba(0,0,0,.04), 0 12px 28px -14px rgba(19,42,38,.3)
 }
-.city-select:focus-visible{
-  border-color:var(--orange);
-  box-shadow:0 0 0 4px rgba(255,114,94,.12), 0 2px 0 rgba(0,0,0,.04), 0 12px 28px -14px rgba(255,114,94,.35)
-}
 html[dir="rtl"] .city-select{
   background-position:20px 52%, 12px 52%
 }
@@ -107,47 +126,14 @@ html[dir="rtl"] .city-select{
   font:600 13px 'DM Sans','Noto Kufi Arabic',sans-serif;
   color:var(--ink);
   text-align:center;
-  text-align-last:center;
   cursor:pointer;
   transition:background .14s ease, color .14s ease;
-  user-select:none
 }
-.city-option:hover,
-.city-option.kbd-focus{
-  background:var(--ink);
-  color:#fff
-}
-.city-option.selected{
-  background:rgba(255,114,94,.12);
-  color:var(--orange);
-  font-weight:700
-}
-.city-option.selected:hover{
-  background:var(--orange);
-  color:#fff
-}
-.city-select option{display:none !important}
-.city-select:hover{
-  border-color:var(--ink);
-  transform:translateY(-1px);
-  box-shadow:0 2px 0 rgba(0,0,0,.04), 0 12px 28px -14px rgba(19,42,38,.3)
-}
-.city-select:focus{
-  border-color:var(--orange);
-  box-shadow:0 0 0 4px rgba(255,114,94,.12), 0 2px 0 rgba(0,0,0,.04), 0 12px 28px -14px rgba(255,114,94,.35)
-}
-.city-select option{
-  background:#fff;
-  color:var(--ink);
-  font:600 13px 'DM Sans','Noto Kufi Arabic',sans-serif;
-  text-align:center;
-  text-align-last:center;
-  padding:8px 14px;
-  direction:inherit
-}
+.city-option:hover{background:var(--ink);color:#fff}
+.city-option.selected{background:rgba(255,114,94,.12);color:var(--orange);font-weight:700}
 
 .head{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}
-.head h2{margin:0;font-size:37px}
+.head h2{margin:0;font-size:34px}
 .head p{margin:6px 0}
 .progress{direction:ltr;font:13px 'DM Sans';color:var(--muted);text-align:left}
 .bar{height:6px;width:125px;background:#ddd;border-radius:6px;margin-top:6px}
@@ -156,42 +142,34 @@ html[dir="rtl"] .city-select{
 .round,.map{border-radius:17px;overflow:hidden}
 .round{background:var(--ink);color:#fff;display:flex;flex-direction:column}
 
-/* GALLERY & REVEAL WITH CONTAIN BACKGROUND & ZOOM/PAN SUPPORT */
 .gallery{height:65vh;min-height:500px;position:relative;overflow:hidden;width:100%;background:#0b1715}
 .reveal{height:65vh;min-height:500px;position:relative;display:none;align-items:center;justify-content:center;text-align:center;background:#286e52;padding:25px;width:100%}
 
 .track{height:100%;display:flex;direction:ltr;transition:.35s}
 .slide{min-width:100%;height:100%;position:relative;overflow:hidden;background-color:#0b1715}
-.slide-inner{width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat;transform-origin:center;will-change:transform}
+.slide-inner{width:100%;height:100%;background-size:contain;background-position:center;background-repeat:no-repeat}
 
 .arrow{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:#fff;font-size:23px;cursor:pointer}
 .prev{left:16px;right:auto}
 .next{right:16px;left:auto}
 .count{position:absolute;left:15px;bottom:14px;padding:5px 8px;border-radius:15px;background:#000a;font:12px 'DM Sans';z-index:3}
 
-/* PHOTO ZOOM & MAP ZOOM CONTROLS */
-.zoom{position:absolute;z-index:1000;top:12px;right:12px;left:auto;display:grid;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12)}
-.photo-zoom{position:absolute;z-index:3;top:12px;left:12px;right:auto;display:grid;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.12)}
-.zoom button, .photo-zoom button{width:40px;height:40px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.zoom,.photo-zoom{position:absolute;z-index:1000;top:12px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border:1px solid var(--line)}
+.zoom{right:12px;left:auto;display:grid}
+.photo-zoom{left:12px;right:auto;display:grid;z-index:3}
+.zoom button, .photo-zoom button{width:40px;height:40px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .zoom button:last-child, .photo-zoom button:last-child{border-bottom:0}
-.zoom button:hover, .photo-zoom button:hover{background:rgba(0,0,0,.08)}
 
-/* FULLSCREEN MODAL */
-.fs-modal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px}
-.fs-modal img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
-.fs-close{position:absolute;top:20px;left:20px;background:#fff;border:0;border-radius:50%;width:45px;height:45px;font-size:24px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--ink);z-index:3001}
-.fs-arrow{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border:0;border-radius:50%;background:#fff;font-size:28px;cursor:pointer;z-index:3001;display:flex;align-items:center;justify-content:center;color:var(--ink)}
-.fs-prev{left:25px;right:auto}
-.fs-next{right:25px;left:auto}
-.fs-count{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);padding:6px 14px;border-radius:15px;background:#000a;font:14px 'DM Sans';color:#fff;z-index:3001}
-
-/* SEAMLESSLY INTEGRATED TEXT DETAILS SECTION BELOW */
 .details{padding:22px;width:100%;background:var(--ink);border-top:1px solid #49625c}
 .chips{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 12px}
 .chip{border:1px solid #55736b;border-radius:7px;padding:5px 8px;font-size:12px}
-.input{padding-top:14px;border-top:1px solid #49625c;display:flex;gap:9px}
-.input input,.name-input{border:0;border-radius:8px;padding:13px;font:700 14px 'DM Sans';width:210px}
+.input{padding-top:14px;border-top:1px solid #49625c;display:flex;flex-wrap:wrap;gap:9px}
+.input input,.name-input{border:0;border-radius:8px;padding:13px;font:700 14px 'DM Sans';min-width:210px;flex:1}
 .guess{background:var(--lime);color:var(--ink)}
+
+.quick-adds{display:flex;gap:6px;width:100%;margin-top:6px}
+.quick-btn{background:#253d37;border:1px solid #49625c;color:#fff;border-radius:6px;padding:4px 9px;font:600 11px 'DM Sans';cursor:pointer}
+
 .map{border:1px solid var(--line);background:#fff;display:flex;flex-direction:column}
 .map-head{padding:21px;border-bottom:1px solid var(--line)}
 .map-head h3{margin:0;font-size:20px}
@@ -199,6 +177,7 @@ html[dir="rtl"] .city-select{
 .map-body{position:relative;flex:1;min-height:530px}
 .map-body #map{width:100%;height:100%;background:var(--cream)}
 .leaflet-control-zoom{display:none!important}
+
 .reveal.yellow{background:#a66f00}
 .reveal.red{background:#a64141}
 .reveal h3{font:700 52px 'DM Sans';margin:9px}
@@ -207,73 +186,38 @@ html[dir="rtl"] .city-select{
 .reveal-stat b{display:block;font:700 16px 'DM Sans'}
 .reveal-stat small{font-size:11px}
 .next-btn{background:#fff;color:var(--ink)}
+
 .final{display:none;padding:38px;text-align:center}
-.final h3{font-size:42px;margin:7px}
-.score{font:700 55px 'DM Sans'}
-.rank{display:inline-block;margin:12px;padding:8px 11px;border-radius:7px;background:var(--lime);color:var(--ink);font-size:13px}
+.final h3{font-size:38px;margin:7px}
+.score{font:700 55px 'DM Sans';color:var(--orange)}
+.rank{display:inline-block;margin:12px;padding:8px 11px;border-radius:7px;background:var(--lime);color:var(--ink);font-size:13px;font-weight:700}
 .links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:22px 0;text-align:right}
 .links a{background:#eef3eb;color:var(--ink);padding:10px;border-radius:7px;text-decoration:none;font-size:12px}
 .add-name{margin:18px 0;display:flex;justify-content:center;gap:8px}
-.add-name input{border:1px solid var(--line)}
+
 .leaders{max-width:900px;margin:40px auto}
 .leaders h3{text-align:center}
 .leader-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .leader{border:1px solid var(--line);border-radius:10px;background:#fff;padding:14px;display:flex;gap:8px;align-items:center;font-family:'DM Sans'}
 .leader b{margin-right:auto;margin-left:0}
-.leader-name{direction:ltr;unicode-bidi:isolate;display:inline-block}
-.footer{padding:25px 7vw;color:var(--muted);font:13px 'DM Sans'}
 
-/* DARK MODE OVERRIDES */
+/* DARK MODE */
 body.dark{--ink:#f7f4ea;--cream:#0d1513;--lime:#dfff74;--orange:#ff725e;--line:#223531;--muted:#9aa8a4}
 body.dark .top, body.dark .stats, body.dark .hero-card, body.dark .map, body.dark .leader{background:#13201d;color:var(--ink);border-color:var(--line)}
-/* City select in dark mode: use lime accent pill (matches primary .btn + language .on button in dark theme) */
-body.dark .city-select{
-  background:var(--lime) !important;
-  color:#132a26 !important;
-  border-color:var(--lime);
-  font-weight:700;
-  box-shadow:0 1px 0 rgba(223,255,116,.2),0 6px 20px -12px rgba(223,255,116,.35);
-  background-image:linear-gradient(45deg, transparent 50%, #132a26 50%),linear-gradient(135deg, #132a26 50%, transparent 50%);
-  background-position:calc(100% - 20px) 52%, calc(100% - 12px) 52%;
-  -webkit-text-fill-color:#132a26 !important
-}
-html[dir="rtl"] body.dark .city-select{
-  background-position:20px 52%, 12px 52%
-}
-body.dark .city-select:hover,
-body.dark .city-select.open{background:#e5ff8a !important;border-color:#e5ff8a;transform:translateY(-1px);box-shadow:0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5)}
-body.dark .city-select:focus-visible{border-color:#b8d45f;box-shadow:0 0 0 4px rgba(223,255,116,.22),0 2px 0 rgba(223,255,116,.2),0 12px 28px -14px rgba(223,255,116,.5);outline:none}
-body.dark .city-dropdown{background:rgba(19,32,29,.96);border-color:var(--line);box-shadow:0 20px 60px -20px rgba(0,0,0,.7), 0 4px 0 rgba(0,0,0,.2)}
-body.dark .city-option:hover,
-body.dark .city-option.kbd-focus{background:var(--lime);color:#132a26}
-body.dark .city-option.selected{background:rgba(255,114,94,.22);color:var(--orange)}
-body.dark .city-option.selected:hover{background:var(--orange);color:#fff}
-body.dark .round{background:#13201d;color:var(--ink);border-color:var(--line)}
-body.dark .details{background:#13201d;border-top:1px solid var(--line)}
-body.dark .chip{border-color:var(--line);background:#1b2d29;color:var(--ink)}
+body.dark .mode-btn{background:#1b2d29;color:var(--ink);border-color:var(--line)}
+body.dark .mode-btn.on{background:var(--lime);color:#132a26}
+body.dark .city-select{background:var(--lime)!important;color:#132a26!important;border-color:var(--lime)}
+body.dark .round,.details{background:#13201d}
 body.dark .btn{background:var(--lime);color:#132a26}
-body.dark .btn.guess{background:var(--lime);color:#132a26}
-body.dark .next-btn{background:#f7f4ea;color:#132a26}
-body.dark .brand:before{background:var(--lime);color:#132a26}
 body.dark .lang button{background:#1b2d29;color:var(--ink)}
 body.dark .lang .on{background:var(--lime);color:var(--ink)}
-body.dark .map-body #map{background:#0d1513}
-body.dark .zoom, body.dark .photo-zoom{background:rgba(19, 32, 29, 0.85);border-color:var(--line)}
-body.dark .zoom button, body.dark .photo-zoom button{color:var(--ink);border-color:var(--line)}
-body.dark .zoom button:hover, body.dark .photo-zoom button:hover{background:rgba(255, 255, 255, 0.08)}
-body.dark .links a{background:#1b2d29;color:var(--ink)}
-body.dark .input input, body.dark .name-input{background:#13201d;color:var(--ink);border:1px solid var(--line)}
 
 body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 .en .hero,.en .head,.en .top{direction:ltr}
 .en .links{text-align:left}
 .en .leader b{margin-left:auto;margin-right:0}
-.en .fs-close{left:auto;right:20px}
-@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero{padding:50px 20px}.game{padding:50px 20px}.top{padding:0 20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}.reveal-grid{grid-template-columns:1fr}}
+@media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero,.game,.top{padding-inline:20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}}
 </style>
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
 <header class="top">
@@ -290,24 +234,36 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       <div class="eyebrow" id="eyebrow"></div>
       <h1 id="title"></h1>
       <p id="intro"></p>
-      <a href="#play"><button class="btn" id="start"></button></a>
+      <div class="mode-toggle" style="justify-content:flex-start">
+        <button id="heroRentBtn" class="mode-btn on" onclick="switchMode('rent')">🔑 كراء / Rent</button>
+        <button id="heroSaleBtn" class="mode-btn" onclick="switchMode('sale')">🏷️ بيع / Sale</button>
+      </div>
+      <a href="#play"><button class="btn" id="start" style="margin-top:12px"></button></a>
     </div>
     <div class="hero-card">
-      <div class="hero-img"></div>
+      <div class="hero-img" id="heroImg"></div>
       <div>
         <span id='heroInfo'></span><br>
-        <small id='heroPrice'></small>
+        <small id='heroPrice' style="color:var(--orange)"></small>
       </div>
     </div>
   </section>
+
   <section class="stats">
-    <div><b id="cityCountDisplay">0</b><span id="city"></span></div>
+    <div><b id="cityCountDisplay">14+</b><span id="city"></span></div>
     <div><b id="listingCountDisplay">0</b><span id="listing"></span></div>
     <div><b id="seconds">0:50</b><span id="perRound"></span></div>
   </section>
+
   <section class="game" id="play">
+    <!-- Mode Toggle in game area -->
+    <div class="mode-toggle">
+      <button id="gameModeRent" class="mode-btn on" onclick="switchMode('rent')">🔑 كراء (Rent)</button>
+      <button id="gameModeSale" class="mode-btn" onclick="switchMode('sale')">🏷️ بيع (Sale)</button>
+    </div>
+
+    <!-- City Selector -->
     <div class="city-select-wrap" id="citySelectWrap">
-      <!-- Hidden native select as value store so existing JS keeps working -->
       <select id="citySelect" style="display:none" onchange="setCityFilter(this.value)">
         <option value="all">📍 كل المدن / All Cities</option>
         <option value="Casablanca">الدار البيضاء / Casablanca</option>
@@ -319,18 +275,13 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
         <option value="Salé">سلا / Salé</option>
         <option value="Oujda">وجدة / Oujda</option>
         <option value="Kénitra">القنيطرة / Kénitra</option>
-        <option value="Laâyoune">العيون / Laâyoune</option>
-        <option value="Dakhla">الداخلة / Dakhla</option>
-        <option value="Meknès">مكناس / Meknès</option>
         <option value="Bouskoura">بوسكورة / Bouskoura</option>
-        <option value="Berkane">بركان / Berkane</option>
+        <option value="Meknès">مكناس / Meknès</option>
       </select>
-      <!-- Custom trigger pill (replaces native select visible UI) -->
-      <div class="city-select" id="cityTrigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-controls="cityDropdown">
+      <div class="city-select" id="cityTrigger" onclick="toggleCityDropdown()">
         <span id="cityTriggerLabel">📍 كل المدن / All Cities</span>
       </div>
-      <!-- Custom dropdown popup (all options rendered as divs → perfect centering) -->
-      <div class="city-dropdown" id="cityDropdown" role="listbox"></div>
+      <div class="city-dropdown" id="cityDropdown"></div>
     </div>
 
     <div class="head">
@@ -340,6 +291,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
       </div>
       <div class="progress" id="progress">01 / 05<div class="bar"><i id="bar"></i></div></div>
     </div>
+
     <div class="grid">
       <div class="round">
         <div class="gallery" id="gallery">
@@ -347,11 +299,6 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
           <button class="arrow prev" onclick="move(-1)">‹</button>
           <button class="arrow next" onclick="move(1)">›</button>
           <span class="count" id="count">1 / 1</span>
-          <div class="photo-zoom">
-            <button onclick="zoomPhoto(1)">+</button>
-            <button onclick="zoomPhoto(-1)">−</button>
-            <button onclick="openFullscreen()">⤢</button>
-          </div>
         </div>
         <div class="reveal" id="reveal">
           <div>
@@ -380,8 +327,15 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
         <div class="details" id="details">
           <div class="chips" id="chips"></div>
           <div class="input">
-            <input id="guess" type="number" min="1" step="1">
+            <input id="guess" type="number" min="1" step="100">
             <button class="btn guess" id="guessBtn" onclick="submit()"></button>
+          </div>
+          <div class="quick-adds" id="quickAdds" style="display:none">
+            <span style="font-size:11px;color:#9aa8a4;align-self:center">إضافة:</span>
+            <button class="quick-btn" onclick="addGuess(200000)">+200K</button>
+            <button class="quick-btn" onclick="addGuess(500000)">+500K</button>
+            <button class="quick-btn" onclick="addGuess(1000000)">+1M</button>
+            <button class="quick-btn" onclick="addGuess(2000000)">+2M</button>
           </div>
         </div>
       </div>
@@ -399,6 +353,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
         </div>
       </aside>
     </div>
+
     <div class="leaders">
       <h3 id="leadersTitle"></h3>
       <div class="leader-grid" id="leaderGrid"></div>
@@ -409,509 +364,223 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
   </section>
 </main>
 
-<!-- FULLSCREEN IMAGE MODAL -->
-<div class="fs-modal" id="fsModal">
-  <button class="fs-close" onclick="closeFullscreen()">✕</button>
-  <button class="fs-arrow fs-prev" onclick="fsMove(-1)">‹</button>
-  <button class="fs-arrow fs-next" onclick="fsMove(1)">›</button>
-  <img id="fsImg" src="" alt="Fullscreen view">
-  <span class="fs-count" id="fsCount">1 / 1</span>
-</div>
-
-<footer class="footer">© 2026 DarGuessr</footer>
+<footer style="padding:25px 7vw;color:var(--muted);font-size:13px;border-top:1px solid var(--line)">
+  © 2026 DarGuessr — Moroccan Real Estate Challenge (Rent & Sale Modes)
+</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
-const FALLBACK_LISTINGS = [
-  {
-    id: "dar_001",
-    title: "شقة حديثة للإيجار في المعاريف",
-    city: "Casablanca",
-    type: "Appartement",
-    area: "120",
-    bedrooms: 3,
-    bathrooms: 2,
-    priceMAD: "6,500",
-    price: 6500,
-    lat: 33.5883,
-    lng: -7.6322,
-    sourceUrl: "https://mubawab.ma",
-    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80", "https://images.unsplash.com/photo-1502005229762-ae1b2c820a53?auto=format&fit=crop&w=1200&q=80"]
+let currentMode = 'sale'; // 'rent' or 'sale'
+let allListings = [], activeHomes = [], selectedCity = 'all';
+let L='ar', r=0, score=0, p=0, z=0, mapInst=null, marker=null, cachedLeaders=[];
+let timerInt = null, timeLeft = 50;
+
+const $ = x => document.getElementById(x);
+const fmt = n => Number(n).toLocaleString(L === 'ar' ? 'ar-MA' : 'en-US');
+
+const T = {
+  ar: {
+    e_rent: 'تحدي إيجار العقارات بالمغرب',
+    e_sale: 'تحدي أسعار شراء العقارات بالمغرب',
+    t_rent: 'هل تستطيع تخمين الإيجار؟',
+    t_sale: 'هل تستطيع تخمين سعر البيع؟',
+    i_rent: 'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم المغربي.',
+    i_sale: 'شاهد العقار للبيع، وخمّن سعر الشراء الإجمالي بالدرهم المغربي.',
+    s: 'ابدأ التخمين',
+    c: 'مدن للاستكشاف',
+    l_rent: 'إعلان للكراء',
+    l_sale: 'عقار للبيع',
+    sec: '0:50',
+    pr: 'لكل جولة',
+    gt_rent: 'تحدي الإيجار من 5 جولات',
+    gt_sale: 'تحدي البيع من 5 جولات',
+    gs: 'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',
+    mt: 'استكشف الحي',
+    ms: 'استخدم أزرار + و − فقط.',
+    ld: 'متصدرو هذا الأسبوع',
+    g_rent: 'أدخل تخمين الإيجار بالدرهم',
+    g_sale: 'أدخل تخمين سعر البيع بالدرهم',
+    lk: 'أكّد التخمين',
+    n: 'الجولة التالية',
+    yg: 'تخمينك',
+    ac_rent: 'الإيجار الحقيقي',
+    ac_sale: 'سعر البيع الحقيقي',
+    pt: 'النقاط المكتسبة',
+    co: 'اكتمل التحدي',
+    st_rent: 'نتيجتك في تخمين الإيجار',
+    st_sale: 'نتيجتك في تخمين أسعار البيع',
+    rk: 'ترتيبك هذا الأسبوع',
+    so: 'عرض الإعلان الأصلي',
+    nm: 'ادخل اسمك',
+    ad: 'أضفني إلى الترتيب',
+    ag: 'العب مجدداً',
+    gr: 'تخمين رائع ودقيق!',
+    gd: 'حسناً، تخمين جيد!',
+    kp: 'حاول في الجولة التالية!',
+    exp: 'تحميل الترتيب (.txt)',
+    u_rent: 'د.م. / الشهر',
+    u_sale: 'د.م.'
+  },
+  en: {
+    e_rent: 'THE MOROCCO RENT CHALLENGE',
+    e_sale: 'THE MOROCCO PROPERTY SALE CHALLENGE',
+    t_rent: 'Can you guess the rent?',
+    t_sale: 'Can you guess the sale price?',
+    i_rent: 'See a rental, estimate its monthly price in MAD, and test your skill.',
+    i_sale: 'See a property for sale, estimate its total price in MAD, and test your skill.',
+    s: 'Start guessing',
+    c: 'cities to explore',
+    l_rent: 'rental listings',
+    l_sale: 'properties for sale',
+    sec: '0:50',
+    pr: 'per round',
+    gt_rent: '5-round Rent Challenge',
+    gt_sale: '5-round Sale Price Challenge',
+    gs: 'No account needed - take your best shot.',
+    mt: 'Explore the neighborhood',
+    ms: 'Use the + and − buttons only.',
+    ld: "This week's leaders",
+    g_rent: 'Your rent guess in MAD',
+    g_sale: 'Your sale price guess in MAD',
+    lk: 'Lock in my guess',
+    n: 'Next round',
+    yg: 'Your guess',
+    ac_rent: 'Actual rent',
+    ac_sale: 'Actual sale price',
+    pt: 'Points won',
+    co: 'CHALLENGE COMPLETE',
+    st_rent: 'Your Morocco rent score',
+    st_sale: 'Your Morocco sale price score',
+    rk: 'Your weekly rank',
+    so: 'View original listing',
+    nm: 'Enter your name',
+    ad: 'Add me to rankings',
+    ag: 'Play again',
+    gr: 'Excellent eye!',
+    gd: 'Good guess!',
+    kp: 'Keep going!',
+    exp: 'Export Rankings (.txt)',
+    u_rent: 'MAD / month',
+    u_sale: 'MAD'
   }
-];
-
-const MAX_ROUNDS = 5;
-const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80";
-
-let allListings = [];
-let activeHomes = [];
-let selectedCity = 'all';
-let L='ar',r=0,score=0,p=0,z=0,photoZoom=1,panX=0,panY=0,isDragging=false,startX=0,startY=0,mapInst=null,marker=null,cachedLeaders=[];
-let timerInt = null, timeLeft = 3000;
-const $=x=>document.getElementById(x),t=()=>T[L],fmt=n=>n.toLocaleString(L==='ar'?'ar-MA':'en-US');
-
-const T={
-  ar:{e:'تحدي إيجار العقارات بالمغرب',t:'هل تستطيع تخمين الإيجار؟',i:'شاهد الشقة، وخمّن إيجارها الشهري بالدرهم.',s:'ابدأ التخمين',c:'مدن للاستكشاف',l:'إعلان مسجّل',sec:'50:00',pr:'لكل جولة',gt:'تحدي من خمس جولات',gs:'لا تحتاج إلى حساب - جرّب أفضل تخمين لديك.',mt:'استكشف الحي',ms:'استخدم أزرار + و − فقط.',ld:'متصدرو هذا الأسبوع',g:'أدخل تخمينك بالدرهم',lk:'أكّد التخمين',n:'الجولة التالية',yg:'تخمينك',ac:'الإيجار الحقيقي',pt:' النقاط المكتسبة',co:'اكتمل الدورت',st:'نتيجتك في تخمين الإيجار',rk:'ترتيبك هذا الأسبوع',so:'عرض الإعلان الأصلي',nm:'ادخل اسمك',ad:'أضفني إلى الترتيب',ag:'العب مجدداً',gr:'تخمين رائع!',gd:'حسناً، تخمين جيد!',kp:'حاول في الجولة التالية!',exp:'تحميل الترتيب (.txt)',hi:'شقة متميزة | المغرب',hp:'???? د.م. / الشهر'},
-  en:{e:'THE MOROCCO RENT CHALLENGE',t:'Can you guess the rent?',i:'See a rental, estimate its monthly price in dirhams, and find out how close you are.',s:'Start guessing',c:'cities to explore',l:'scraped listings',sec:'50:00',pr:'per round',gt:'Your five-round challenge',gs:'No account needed - take your best shot.',mt:'Explore the neighborhood',ms:'Use the + and − buttons only.',ld:"This week's leaders",g:'Your guess in MAD',lk:'Lock in my guess',n:'Next round',yg:'Your guess',ac:'Actual rent',pt:'Points won',co:'CHALLENGE COMPLETE',st:'Your Morocco rent score',rk:'Your weekly rank',so:'View the original listing',nm:'Enter your name',ad:'Add me to rankings',ag:'Play again',gr:'Excellent eye!',gd:'Good guess!',kp:'Keep going!',exp:'Export Rankings (.txt)',hi:'Featured | Morocco',hp:'???? MAD / month'}
 };
 
-const DEFAULT_LEADERS = [['Yasmine K.', 4820], ['Amine R.', 4570], ['Sara B.', 4225]];
+function t() { return T[L]; }
 
-/* ---- JSONBIN.IO CONFIG ----
-   Fill these in with your own bin:
-   1. Log in to jsonbin.io -> open your bin -> copy the Bin ID from the URL (or the bin's Info panel).
-   2. Go to jsonbin.io -> API Keys and copy a key. Prefer creating a scoped Access Key with only
-      "Bins: Read" + "Bins: Update" permissions for this one bin, rather than your account's
-      X-Master-Key - since this key sits in client-side code, anyone can view-source the page and
-      read it, and a scoped key limits what they could do with it.
-   3. Paste the Bin ID and key below. Leave JSONBIN_BIN_ID empty to fall back to local-only scores.
-*/
-const JSONBIN_BIN_ID = '6a724dd4da38895dfeba1777';
-const JSONBIN_API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
-const JSONBIN_BASE = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
-const JSONBIN_ENABLED = JSONBIN_BIN_ID && JSONBIN_API_KEY
-  && JSONBIN_BIN_ID.length >= 12
-  && !['', 'PASTE_YOUR_BIN_ID_HERE'].includes(JSONBIN_BIN_ID.trim())
-  && JSONBIN_API_KEY.startsWith('$2a$10');
-
-function shuffleArray(items) {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
+function switchMode(m) {
+  currentMode = m;
+  document.querySelectorAll('#heroRentBtn, #gameModeRent').forEach(b => b.classList.toggle('on', m === 'rent'));
+  document.querySelectorAll('#heroSaleBtn, #gameModeSale').forEach(b => b.classList.toggle('on', m === 'sale'));
+  $('quickAdds').style.display = m === 'sale' ? 'flex' : 'none';
+  loadListings();
 }
 
-function normalizeText(value, fallback = '') {
-  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
-}
-
-function normalizeHttpUrl(value, fallback = 'https://www.mubawab.ma') {
-  const candidate = normalizeText(value);
-  if (!candidate) return fallback;
-  try {
-    const parsed = new URL(candidate, window.location.href);
-    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-      return parsed.href;
-    }
-  } catch (e) {}
-  return fallback;
-}
-
-function normalizeImageUrl(value) {
-  const candidate = normalizeText(value);
-  if (!candidate) return FALLBACK_IMAGE;
-  if (candidate.startsWith('data:image/')) return candidate;
-  return normalizeHttpUrl(candidate, FALLBACK_IMAGE);
-}
-
-function cssEscapeUrl(url) {
-  return normalizeImageUrl(url).replace(/"/g, '%22').replace(/'/g, '%27');
-}
-
-function totalRounds() {
-  return Math.max(1, activeHomes.length || 0);
-}
-
-function roundTitle() {
-  const count = totalRounds();
-  return L === 'ar'
-    ? `تحدي من ${fmt(count)} جولات`
-    : `${fmt(count)}-round challenge`;
-}
-
-function buildChip(text) {
-  const chip = document.createElement('span');
-  chip.className = 'chip';
-  chip.textContent = text;
-  return chip;
-}
-
-function renderListingLinks(listings) {
-  const linksEl = $('links');
-  linksEl.replaceChildren();
-  listings.forEach((h) => {
-    const link = document.createElement('a');
-    link.href = normalizeHttpUrl(h.url);
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.textContent = `${normalizeText(h.title, L === 'ar' ? 'إعلان عقاري' : 'Listing')} — ${t().so}`;
-    linksEl.appendChild(link);
-  });
-}
-
-function renderGallery(trackEl, pics) {
-  trackEl.replaceChildren();
-  pics.forEach((pic) => {
-    const slide = document.createElement('div');
-    slide.className = 'slide';
-    const inner = document.createElement('div');
-    inner.className = 'slide-inner';
-    inner.style.backgroundImage = `url("${cssEscapeUrl(pic)}")`;
-    slide.appendChild(inner);
-    trackEl.appendChild(slide);
-  });
-}
-
-let audioCtx = null;
-function initAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
-function playTone(freq, type, duration, vol = 0.1) {
-  try {
-    initAudio();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type;
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + duration);
-  } catch(e) {}
-}
-function soundGuess() {
-  playTone(587.33, 'triangle', 0.12, 0.08);
-  setTimeout(() => playTone(880, 'sine', 0.18, 0.1), 100);
-  vibrate([40, 40, 60]);
-}
-function soundFinal(totalScore, maxScore = MAX_ROUNDS * 100) {
-  if (totalScore >= maxScore * 0.7) {
-    playTone(523.25, 'triangle', 0.2, 0.1);
-    setTimeout(() => playTone(659.25, 'triangle', 0.2, 0.1), 120);
-    setTimeout(() => playTone(783.99, 'triangle', 0.2, 0.1), 240);
-    setTimeout(() => playTone(1046.50, 'sine', 0.4, 0.12), 360);
-    vibrate([100, 50, 100, 50, 200]);
-  } else {
-    playTone(440, 'sine', 0.3, 0.08);
-    setTimeout(() => playTone(349.23, 'sine', 0.3, 0.08), 150);
-    setTimeout(() => playTone(293.66, 'sine', 0.5, 0.08), 300);
-    vibrate([80, 80, 150]);
-  }
-}
-function soundTick() { playTone(800, 'sine', 0.04, 0.02); vibrate(20); }
-function vibrate(pattern) {
-  if (navigator.vibrate) {
-    try { navigator.vibrate(pattern); } catch(e) {}
-  }
-}
-
-let isDark = false;
-function toggleDarkMode() {
-  isDark = !isDark;
-  document.body.classList.toggle('dark', isDark);
-  $('darkModeBtn').textContent = isDark ? '☀️' : '🌙';
-  try { localStorage.setItem('darguessr_dark', isDark ? '1' : '0'); } catch(e){}
-}
-
-try {
-  if (localStorage.getItem('darguessr_dark') === '1') {
-    toggleDarkMode();
-  }
-} catch(e){}
-
-function openFullscreen() {
-  updateFsImage();
-  $('fsModal').style.display = 'flex';
-}
-function closeFullscreen() {
-  $('fsModal').style.display = 'none';
-}
-function updateFsImage() {
-  const h = activeHomes[r];
-  if (!h || !h.pics || h.pics.length === 0) return;
-  const pic = h.pics[p];
-  $('fsImg').src = normalizeImageUrl(pic);
-  $('fsCount').textContent = `${p + 1} / ${h.pics.length}`;
-  const hasMultiple = h.pics.length > 1;
-  document.querySelectorAll('.fs-arrow').forEach(el => el.style.display = hasMultiple ? 'flex' : 'none');
-  $('fsCount').style.display = hasMultiple ? 'block' : 'none';
-}
-function fsMove(n) {
-  move(n);
-}
-
-function getSeenIds() {
-  try { return JSON.parse(localStorage.getItem('darguessr_seen_ids') || '[]'); } catch(e) { return []; }
-}
-function saveSeenIds(ids) {
-  try { localStorage.setItem('darguessr_seen_ids', JSON.stringify(ids)); } catch(e) {}
+function addGuess(val) {
+  const cur = parseInt($('guess').value || '0', 10);
+  $('guess').value = cur + val;
 }
 
 async function loadListings() {
+  const file = currentMode === 'sale' ? './listings_sale.json' : './listings_rent.json';
   try {
-    const res = await fetch('./listings.json?t=' + Date.now(), { cache: 'no-store' });
+    const res = await fetch(file + '?t=' + Date.now());
     if (res.ok) {
-      const data = await res.json();
-      allListings = (Array.isArray(data) && data.length > 0) ? data : FALLBACK_LISTINGS;
-    } else {
-      allListings = FALLBACK_LISTINGS;
+      allListings = await res.json();
     }
-  } catch (e) {
-    allListings = FALLBACK_LISTINGS;
-  }
-
-  allListings = allListings
-    .map((item, idx) => {
-      let numericPrice = item.price;
-      if (!numericPrice && item.priceMAD) {
-        numericPrice = parseInt(String(item.priceMAD).replace(/[^\d]/g, ''), 10) || 5000;
-      }
-      let lat = item.lat || 33.5731;
-      let lng = item.lng || -7.5898;
-
-      let pics = [];
-      if (Array.isArray(item.images) && item.images.length > 0) {
-        pics = item.images.filter(img => typeof img === 'string' && img.trim() !== '');
-      } else if (typeof item.images === 'string' && item.images.trim() !== '') {
-        try {
-          pics = JSON.parse(item.images);
-        } catch(e) {
-          pics = item.images.split(',').map(s => s.trim()).filter(Boolean);
-        }
-      }
-      if (pics.length === 0 && item.imageUrl) {
-        pics = [item.imageUrl];
-      }
-      if (pics.length === 0) {
-        pics = [FALLBACK_IMAGE];
-      }
-
-      return {
-        id: item.id || `dar_${idx}`,
-        title: normalizeText(item.title, 'إعلان عقاري في المغرب'),
-        city: normalizeText(item.city, 'Casablanca'),
-        type: normalizeText(item.type, 'Appartement'),
-        area: normalizeText(item.area, '—'),
-        bedrooms: item.bedrooms !== undefined ? item.bedrooms : '—',
-        bathrooms: item.bathrooms !== undefined ? item.bathrooms : '—',
-        priceMAD: item.priceMAD || String(numericPrice),
-        price: numericPrice,
-        lat: lat,
-        lng: lng,
-        url: normalizeHttpUrl(item.sourceUrl || "https://www.mubawab.ma"),
-        pics: pics.map(normalizeImageUrl)
-      };
-    });
-
-  if (allListings.length === 0) {
-    allListings = FALLBACK_LISTINGS;
-  }
-
-  if($('listingCountDisplay')) $('listingCountDisplay').textContent = allListings.length + '+';
-  const uniqueCities = new Set(allListings.map(h => (h.city || '').trim()).filter(Boolean));
-  if($('cityCountDisplay')) $('cityCountDisplay').textContent = uniqueCities.size;
-
-  // Populate hero section with a real random listing
-  if (allListings.length > 0) {
-    const hero = allListings[Math.floor(Math.random() * allListings.length)];
-    const heroImgEl = document.querySelector('.hero-img');
-    if (heroImgEl && hero.pics && hero.pics[0]) {
-      heroImgEl.style.backgroundImage = `url("${cssEscapeUrl(hero.pics[0])}")`;
-    }
-    const heroInfo = $('heroInfo');
-    if (heroInfo) {
-      heroInfo.innerHTML = `${hero.title || ''} <br><small>${hero.city || ''} · ${hero.type || ''} · ${hero.area ? hero.area + ' m²' : ''}</small>`;
-    }
-    const heroPrice = $('heroPrice');
-    if (heroPrice) {
-      heroPrice.textContent = `${hero.priceMAD || hero.price || '????'} د.م. / الشهر`;
-    }
-  }
-
+  } catch(e) {}
+  
+  $('listingCountDisplay').textContent = allListings.length + '+';
   selectRandomRounds();
+  updateHero();
   render();
 }
 
-function setCityFilter(city) {
-  selectedCity = city;
-  restart();
+function updateHero() {
+  if (!allListings.length) return;
+  const h = allListings[0];
+  $('heroImg').style.backgroundImage = `url("${h.images ? h.images[0] : h.imageUrl}")`;
+  $('heroInfo').textContent = `${h.title} — ${h.city} (${h.type})`;
+  $('heroPrice').textContent = currentMode === 'sale' ? '???? د.م. للبيع' : '???? د.م. / الشهر';
 }
 
 function selectRandomRounds() {
-  let seen = getSeenIds();
   let pool = allListings;
-  
   if (selectedCity !== 'all') {
-    const target = selectedCity.toLowerCase();
-    pool = allListings.filter(h => (h.city || '').toLowerCase() === target);
+    pool = allListings.filter(x => (x.city || '').toLowerCase() === selectedCity.toLowerCase());
   }
+  if (!pool.length) pool = allListings;
+  activeHomes = [...pool].sort(() => Math.random() - 0.5).slice(0, 5);
+}
 
-  if (pool.length === 0) {
-    pool = allListings;
-  }
+function render() {
+  if (!activeHomes.length) return;
+  const h = activeHomes[r];
+  if (!h) return;
   
-  let available = pool.filter(h => !seen.includes(h.id));
-  if (available.length === 0) { available = [...pool]; }
-
-  const targetRounds = Math.min(MAX_ROUNDS, pool.length);
-  const selected = shuffleArray(available).slice(0, targetRounds);
-  if (selected.length < targetRounds) {
-    const usedIds = new Set(selected.map(h => h.id));
-    const topUp = shuffleArray(pool.filter(h => !usedIds.has(h.id))).slice(0, targetRounds - selected.length);
-    selected.push(...topUp);
-  }
-
-  activeHomes = selected;
-  saveSeenIds([...new Set([...seen, ...activeHomes.map(h => h.id)])]);
-}
-
-// jsonbin.io accepts either a Master Key (header X-Master-Key) or a scoped
-// Access Key (header X-Access-Key) - they are NOT interchangeable on the same
-// header. Since we can't tell which kind of key was pasted in, try Master Key
-// first and, if that's rejected, retry once as an Access Key. Any failure is
-// logged to the console with the real HTTP status/body so it's diagnosable -
-// open DevTools > Console (and Network, filtering for "jsonbin") to see it.
-async function jsonbinRequest(url, options = {}) {
-  const baseHeaders = { ...(options.headers || {}) };
-  const headerVariants = [
-    { 'X-Master-Key': JSONBIN_API_KEY },
-    { 'X-Access-Key': JSONBIN_API_KEY }
-  ];
-  let lastErr;
-  for (const authHeader of headerVariants) {
-    try {
-      const res = await fetch(url, { ...options, headers: { ...baseHeaders, ...authHeader } });
-      if (res.ok) return res;
-      const bodyText = await res.text().catch(() => '');
-      lastErr = new Error(`jsonbin.io ${res.status} ${res.statusText} using ${Object.keys(authHeader)[0]} — ${bodyText}`);
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  throw lastErr;
-}
-
-async function getLeaders() {
-  if (!JSONBIN_ENABLED) {
-    try {
-      const saved = localStorage.getItem('darguessr_leaders_cache');
-      cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
-    } catch (e) {
-      cachedLeaders = DEFAULT_LEADERS;
-    }
-    return cachedLeaders;
-  }
-  try {
-    const res = await jsonbinRequest(`${JSONBIN_BASE}/latest`, {
-      headers: { 'X-Bin-Meta': 'false' },
-      cache: 'no-store'
-    });
-    const data = await res.json();
-    cachedLeaders = (Array.isArray(data) && data.length > 0) ? data : DEFAULT_LEADERS;
-    try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(cachedLeaders)); } catch (e) {}
-  } catch (e) {
-    console.error('[DarGuessr/jsonbin] Could not read the leaderboard, showing last known / default instead:', e.message || e);
-    try {
-      const saved = localStorage.getItem('darguessr_leaders_cache');
-      cachedLeaders = saved ? JSON.parse(saved) : DEFAULT_LEADERS;
-    } catch (e2) {
-      cachedLeaders = DEFAULT_LEADERS;
-    }
-  }
-  return cachedLeaders;
-}
-
-async function saveLeaders(leaders) {
-  cachedLeaders = leaders;
-  try { localStorage.setItem('darguessr_leaders_cache', JSON.stringify(leaders)); } catch (e) {}
-  if (!JSONBIN_ENABLED) return;
-  try {
-    await jsonbinRequest(JSONBIN_BASE, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(leaders)
-    });
-  } catch (e) {
-    console.error('[DarGuessr/jsonbin] Could not write the leaderboard:', e.message || e);
-    throw e;
-  }
-}
-
-async function updateLeaderboardUI() {
-  const leaderGrid = $('leaderGrid');
-  const loading = document.createElement('div');
-  loading.style.gridColumn = '1 / -1';
-  loading.style.textAlign = 'center';
-  loading.style.color = 'var(--muted)';
-  loading.style.fontFamily = "'DM Sans'";
-  loading.textContent = L === 'ar' ? '...جارٍ التحميل' : 'Loading...';
-  leaderGrid.replaceChildren(loading);
-
-  const list = await getLeaders();
-  leaderGrid.replaceChildren();
-  list.forEach((x, i) => {
-    const row = document.createElement('div');
-    row.className = 'leader';
-    row.append(`${String(i + 1).padStart(2, '0')} · `);
-
-    const name = document.createElement('span');
-    name.className = 'leader-name';
-    name.dir = 'ltr';
-    name.textContent = String(x[0] ?? '');
-
-    const points = document.createElement('b');
-    points.textContent = fmt(Number(x[1]) || 0);
-
-    row.appendChild(name);
-    row.appendChild(points);
-    leaderGrid.appendChild(row);
+  $('gallery').style.display = 'block';
+  $('reveal').style.display = 'none';
+  $('final').style.display = 'none';
+  $('details').style.display = 'block';
+  
+  const track = $('track');
+  track.replaceChildren();
+  const pics = h.images || [h.imageUrl];
+  pics.forEach(p => {
+    const s = document.createElement('div');
+    s.className = 'slide';
+    const inner = document.createElement('div');
+    inner.className = 'slide-inner';
+    inner.style.backgroundImage = `url("${p}")`;
+    s.appendChild(inner);
+    track.appendChild(s);
   });
+  
+  const chips = [
+    `📍 ${h.city}`,
+    `🏠 ${h.type}`,
+    h.area && h.area !== '—' ? `📐 ${h.area} m²` : '',
+    h.bedrooms ? `🛏️ ${h.bedrooms}` : '',
+    currentMode === 'sale' ? '🏷️ للبيع' : '🔑 للكراء'
+  ].filter(Boolean);
+  
+  const chipsEl = $('chips');
+  chipsEl.replaceChildren();
+  chips.forEach(c => {
+    const span = document.createElement('span');
+    span.className = 'chip';
+    span.textContent = c;
+    chipsEl.appendChild(span);
+  });
+  
+  placeMap(h);
+  $('guess').value = '';
+  $('guess').placeholder = currentMode === 'sale' ? t().g_sale : t().g_rent;
+  p = 0;
+  move(0);
+  
+  $('gameTitle').textContent = currentMode === 'sale' ? t().gt_sale : t().gt_rent;
+  $('progress').childNodes[0].nodeValue = `${r + 1} / 05`;
+  $('bar').style.width = `${((r + 1) / 5) * 100}%`;
+  
+  startTimer();
 }
 
-function exportLeadersTxt() {
-  const list = cachedLeaders.length ? cachedLeaders : DEFAULT_LEADERS;
-  const textContent = list.map((x, i) => `${String(i + 1).padStart(2, '0')}. ${x[0]} - ${x[1]} pts`).join('\r\n');
-  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'darguessr_rankings.txt';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-async function addPlayer() {
-  const n = $('playerName').value.trim();
-  if (!n) return $('playerName').focus();
-  $('playerName').disabled = true;
-  $('addButton').disabled = true;
-  const originalLabel = $('addButton').textContent;
-  $('addButton').textContent = L === 'ar' ? '...جارٍ الحفظ' : 'Saving...';
-  try {
-    let list = await getLeaders(); // re-fetch the shared list right before writing, so we merge with
-                                    // whatever other players have already added instead of overwriting them
-    list.push([n, score]);
-    list.sort((a, b) => b[1] - a[1]);
-    list = list.slice(0, 10);
-    await saveLeaders(list);
-    await updateLeaderboardUI();
-    $('playerName').disabled = false;
-    $('addButton').disabled = false;
-    const addedMsg = L === 'ar' ? 'تمّ إضافتك ✓' : 'Added ✓';
-    $('addButton').textContent = addedMsg;
-    setTimeout(() => { $('addButton').textContent = originalLabel; }, 1600);
-  } catch (e) {
-    console.error(e);
-    alert(L === 'ar' ? 'تعذّر حفظ نتيجتك في الترتيب، تحقق من اتصالك وحاول مرة أخرى.' : "Couldn't save your score to the leaderboard - check your connection and try again.");
-    $('playerName').disabled = false;
-    $('addButton').disabled = false;
-    $('addButton').textContent = originalLabel;
-  }
+function move(n) {
+  const h = activeHomes[r];
+  const pics = h ? (h.images || [h.imageUrl]) : [];
+  p = (p + n + pics.length) % pics.length;
+  $('track').style.transform = `translateX(-${p * 100}%)`;
+  $('count').textContent = `${p + 1} / ${pics.length}`;
 }
 
 function placeMap(h) {
   if (!mapInst) {
-    mapInst = window.L.map('map', { zoomControl: false, attributionControl: true }).setView([h.lat, h.lng], 14);
-    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(mapInst);
+    mapInst = window.L.map('map', { zoomControl: false }).setView([h.lat, h.lng], 14);
+    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInst);
     marker = window.L.circleMarker([h.lat, h.lng], { radius: 9, weight: 3, color: '#fff', fillColor: '#ff725e', fillOpacity: 1 }).addTo(mapInst);
   } else {
     mapInst.setView([h.lat, h.lng], 14);
     marker.setLatLng([h.lat, h.lng]);
-    setTimeout(() => mapInst.invalidateSize(), 150);
   }
 }
 
@@ -920,107 +589,13 @@ function zoom(n) {
   if (mapInst) mapInst.setZoom(14 + z);
 }
 
-function zoomPhoto(n) {
-  photoZoom = Math.max(1, Math.min(3, photoZoom + (n * 0.5)));
-  if (photoZoom === 1) {
-    panX = 0;
-    panY = 0;
-  }
-  updatePhotoZoomScale();
-}
-
-function updatePhotoZoomScale() {
-  document.querySelectorAll('.slide-inner').forEach(el => {
-    el.style.transform = `scale(${photoZoom}) translate(${panX}px, ${panY}px)`;
-    el.style.cursor = photoZoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default';
-  });
-}
-
-function resetPhotoTransform() {
-  photoZoom = 1;
-  panX = 0;
-  panY = 0;
-  isDragging = false;
-  updatePhotoZoomScale();
-}
-
-function move(n) {
-  const h = activeHomes[r];
-  const total = (h && h.pics && h.pics.length > 0) ? h.pics.length : 1;
-  p = (p + n + total) % total;
-  $('track').style.transform = `translateX(-${p * 100}%)`;
-  $('count').textContent = `${p + 1} / ${total}`;
-  resetPhotoTransform();
-  if ($('fsModal').style.display === 'flex') {
-    updateFsImage();
-  }
-}
-
-const galleryEl = $('gallery');
-
-galleryEl.addEventListener('mousedown', (e) => {
-  if (photoZoom <= 1) return;
-  isDragging = true;
-  startX = e.clientX - panX;
-  startY = e.clientY - panY;
-  updatePhotoZoomScale();
-  e.preventDefault();
-});
-
-window.addEventListener('mousemove', (e) => {
-  if (!isDragging || photoZoom <= 1) return;
-  panX = e.clientX - startX;
-  panY = e.clientY - startY;
-  updatePhotoZoomScale();
-});
-
-window.addEventListener('mouseup', () => {
-  if (isDragging) {
-    isDragging = false;
-    updatePhotoZoomScale();
-  }
-});
-
-galleryEl.addEventListener('touchstart', (e) => {
-  if (photoZoom <= 1) return;
-  if (e.touches.length === 1) {
-    isDragging = true;
-    startX = e.touches[0].clientX - panX;
-    startY = e.touches[0].clientY - panY;
-    updatePhotoZoomScale();
-  }
-}, {passive: true});
-
-window.addEventListener('touchmove', (e) => {
-  if (!isDragging || photoZoom <= 1 || e.touches.length !== 1) return;
-  panX = e.touches[0].clientX - startX;
-  panY = e.touches[0].clientY - startY;
-  updatePhotoZoomScale();
-}, {passive: true});
-
-window.addEventListener('touchend', () => {
-  if (isDragging) {
-    isDragging = false;
-    updatePhotoZoomScale();
-  }
-});
-
-function formatTimerDisplay(seconds) {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-}
-
 function startTimer() {
   clearInterval(timerInt);
-  timeLeft = 3000;
-  if ($('seconds')) $('seconds').textContent = formatTimerDisplay(timeLeft);
+  timeLeft = 50;
+  $('seconds').textContent = '0:50';
   timerInt = setInterval(() => {
     timeLeft--;
-    if ($('seconds')) $('seconds').textContent = formatTimerDisplay(timeLeft);
-    if (timeLeft <= 10 && timeLeft > 0) {
-      soundTick();
-    }
+    $('seconds').textContent = `0:${timeLeft < 10 ? '0' : ''}${timeLeft}`;
     if (timeLeft <= 0) {
       clearInterval(timerInt);
       submit();
@@ -1028,221 +603,213 @@ function startTimer() {
   }, 1000);
 }
 
-function stopTimer() { clearInterval(timerInt); }
+function playTick() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(440, ctx.currentTime);
+    g.gain.setValueAtTime(0.05, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.05);
+  } catch(e) {}
+}
 
-function render() {
-  if (!activeHomes || activeHomes.length === 0) return;
-  const h = activeHomes[r];
-  if (!h) return nextRound();
-  $('gallery').style.display = 'block';
-  $('reveal').style.display = 'none';
-  $('final').style.display = 'none';
-  $('details').style.display = 'block';
-  
-  const bedLabel = L === 'ar' ? 'غرف النوم' : 'Beds';
-  const bathLabel = L === 'ar' ? 'الحمامات' : 'Baths';
-  const chips = [
-    `📍 ${h.city}`,
-    `🏠 ${h.type}`,
-    (h.area && h.area !== '—') ? `📐 ${h.area} m²` : '',
-    (h.bedrooms && h.bedrooms !== '—') ? `🛏️ ${h.bedrooms} ${bedLabel}` : '',
-    (h.bathrooms && h.bathrooms !== '—') ? `🛁 ${h.bathrooms} ${bathLabel}` : '',
-    L === 'ar' ? 'إعلان حقيقي' : 'Real Listing'
-  ].filter(Boolean);
-  $('chips').replaceChildren(...chips.map(buildChip));
-  
-  const track = $('track');
-  renderGallery(track, h.pics);
+function playCorrect() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [523.25, 659.25, 783.99].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.09);
+      g.gain.setValueAtTime(0.12, ctx.currentTime + idx * 0.09);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.09 + 0.25);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(ctx.currentTime + idx * 0.09);
+      osc.stop(ctx.currentTime + idx * 0.09 + 0.25);
+    });
+  } catch(e) {}
+}
 
-  const totalPics = h.pics.length;
-  const hasMultiple = totalPics > 1;
-  document.querySelectorAll('.gallery .arrow').forEach(el => el.style.display = hasMultiple ? 'block' : 'none');
-  
-  z = 0;
-  resetPhotoTransform();
-  placeMap(h);
-  $('guess').value = '';
-  $('guess').placeholder = t().g;
-  p = 0;
-  move(0);
-  $('gameTitle').textContent = roundTitle();
-  const rounds = totalRounds();
-  $('progress').childNodes[0].nodeValue = `${r + 1} / ${String(rounds).padStart(2, '0')}`;
-  $('bar').style.width = `${((r + 1) / rounds) * 100}%`;
-  
-  startTimer();
+const JSONBIN_BIN_ID = '6a724dd4da38895dfeba1777';
+const JSONBIN_API_KEY = '$2a$10$3xI2W00BsiGhjbq2yCC4jeq6sj7TqNA3I1lGa2AAfthmUjM5M.r7q';
+
+async function loadLeaders() {
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_API_KEY }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      cachedLeaders = data.record && data.record.leaders ? data.record.leaders : [];
+      renderLeaders();
+    }
+  } catch(e) {
+    console.warn('Leaderboard offline', e);
+  }
+}
+
+function renderLeaders() {
+  const grid = $('leaderGrid');
+  grid.replaceChildren();
+  cachedLeaders.slice(0, 9).forEach((item, idx) => {
+    const d = document.createElement('div');
+    d.className = 'leader';
+    d.innerHTML = `<span>#${idx + 1}</span> <span>${item.name || 'لاعب'}</span> <b>${item.score || 0} pts</b>`;
+    grid.appendChild(d);
+  });
+}
+
+async function addPlayer() {
+  const name = ($('playerName').value || '').trim();
+  if (!name) return;
+  $('addButton').disabled = true;
+  const newEntry = { name: name, score: score, date: new Date().toISOString().split('T')[0] };
+  const updated = [...cachedLeaders, newEntry].sort((a,b) => b.score - a.score).slice(0, 50);
+  try {
+    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_API_KEY
+      },
+      body: JSON.stringify({ leaders: updated })
+    });
+    cachedLeaders = updated;
+    renderLeaders();
+    $('playerName').value = '';
+    $('addButton').textContent = '✓ تم!';
+  } catch(e) {
+    $('addButton').disabled = false;
+  }
+}
+
+function exportLeadersTxt() {
+  let content = "=== DarGuessr Leaders ===\n\n";
+  cachedLeaders.forEach((l, i) => {
+    content += `${i + 1}. ${l.name} - ${l.score} pts (${l.date || ''})\n`;
+  });
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `darguessr_leaderboard_${Date.now()}.txt`;
+  a.click();
 }
 
 function submit() {
-  stopTimer();
-  soundGuess();
-  if (!activeHomes[r]) return;
-  const val = +$('guess').value;
-  const g = val > 0 ? val : 0;
-  const a = activeHomes[r].price, pt = Math.max(0, Math.round(100 - Math.abs(g - a) / a * 100));
+  clearInterval(timerInt);
+  const val = +$('guess').value || 0;
+  const a = activeHomes[r].price;
+  const pt = Math.max(0, Math.round(100 - Math.abs(val - a) / a * 100));
   score += pt;
+  if (pt >= 70) playCorrect(); else playTick();
+  
   $('gallery').style.display = 'none';
   $('reveal').style.display = 'flex';
   $('reveal').className = 'reveal ' + (pt >= 85 ? '' : pt >= 55 ? 'yellow' : 'red');
   $('feedback').textContent = pt >= 85 ? t().gr : pt >= 55 ? t().gd : t().kp;
-  $('accuracy').textContent = fmt(pt) + '%';
-  $('yourGuess').textContent = fmt(g) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
-  $('actual').textContent = fmt(a) + ' ' + (L === 'ar' ? 'درهم' : 'MAD');
-  $('points').textContent = '+' + fmt(pt);
-  $('nextBtn').textContent = r === totalRounds() - 1 ? (L === 'ar' ? 'عرض النتائج' : 'See results') : t().n;
+  $('accuracy').textContent = pt + '%';
+  
+  const unit = currentMode === 'sale' ? t().u_sale : t().u_rent;
+  $('yourGuess').textContent = `${fmt(val)} ${unit}`;
+  $('actual').textContent = `${fmt(a)} ${unit}`;
+  $('points').textContent = `+${pt}`;
+  $('nextBtn').textContent = r === 4 ? (L === 'ar' ? 'عرض النتائج' : 'See results') : t().n;
 }
 
 function nextRound() {
-  if (++r < totalRounds()) return render();
-  stopTimer();
-  const maxScore = totalRounds() * 100;
-  soundFinal(score, maxScore);
+  if (++r < 5) return render();
   $('reveal').style.display = 'none';
   $('details').style.display = 'none';
   $('final').style.display = 'block';
-  $('score').textContent = fmt(score) + ` / ${maxScore}`;
-  const scoreRatio = maxScore > 0 ? score / maxScore : 0;
-  $('playerRank').textContent = t().rk + ': ' + (scoreRatio >= 0.85 ? 'Top 2%' : scoreRatio >= 0.6 ? 'Top 12%' : 'Top 35%');
-  renderListingLinks(activeHomes);
-  $('playerName').placeholder = t().nm;
-  $('addButton').textContent = t().ad;
+  $('score').textContent = `${score} / 500`;
+  $('playerRank').textContent = `${t().rk}: ${score >= 400 ? 'Top 2%' : score >= 300 ? 'Top 12%' : 'Top 35%'}`;
+  
+  const linksEl = $('links');
+  linksEl.replaceChildren();
+  activeHomes.forEach(h => {
+    const a = document.createElement('a');
+    a.href = h.sourceUrl;
+    a.target = '_blank';
+    a.textContent = `${h.city} — ${fmt(h.price)} (${t().so})`;
+    linksEl.appendChild(a);
+  });
 }
 
 function restart() {
-  r = 0;
-  score = 0;
+  r = 0; score = 0;
   selectRandomRounds();
-  $('playerName').value = '';
-  $('playerName').disabled = false;
-  $('addButton').disabled = false;
   render();
 }
 
-function setLang(n) {
-  L = n;
-  document.documentElement.lang = n;
-  document.documentElement.dir = n === 'ar' ? 'rtl' : 'ltr';
-  document.body.dir = n === 'ar' ? 'rtl' : 'ltr';
-  document.body.classList.toggle('en', n === 'en');
-  $('arBtn').classList.toggle('on', n === 'ar');
-  $('enBtn').classList.toggle('on', n === 'en');
-  const b = { eyebrow: 'e', title: 't', intro: 'i', start: 's', city: 'c', listing: 'l', seconds: 'sec', perRound: 'pr', gameTitle: 'gt', gameSub: 'gs', mapTitle: 'mt', mapSub: 'ms', leadersTitle: 'ld', guessBtn: 'lk', yourLabel: 'yg', actualLabel: 'ac', pointsLabel: 'pt', complete: 'co', scoreTitle: 'st', again: 'ag', exportBtn: 'exp', heroInfo: 'hi', heroPrice: 'hp' };
-  Object.entries(b).forEach(([id, k]) => { if ($(id)) $(id).textContent = t()[k]; });
+function setLang(lang) {
+  L = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('en', lang === 'en');
+  $('arBtn').classList.toggle('on', lang === 'ar');
+  $('enBtn').classList.toggle('on', lang === 'en');
+  
+  $('eyebrow').textContent = currentMode === 'sale' ? t().e_sale : t().e_rent;
+  $('title').textContent = currentMode === 'sale' ? t().t_sale : t().t_rent;
+  $('intro').textContent = currentMode === 'sale' ? t().i_sale : t().i_rent;
+  $('start').textContent = t().s;
+  $('city').textContent = t().c;
+  $('listing').textContent = currentMode === 'sale' ? t().l_sale : t().l_rent;
+  $('perRound').textContent = t().pr;
+  $('gameSub').textContent = t().gs;
+  $('mapTitle').textContent = t().mt;
+  $('mapSub').textContent = t().ms;
+  $('leadersTitle').textContent = t().ld;
+  $('guessBtn').textContent = t().lk;
+  $('yourLabel').textContent = t().yg;
+  $('actualLabel').textContent = currentMode === 'sale' ? t().ac_sale : t().ac_rent;
+  $('pointsLabel').textContent = t().pt;
+  $('complete').textContent = t().co;
+  $('scoreTitle').textContent = currentMode === 'sale' ? t().st_sale : t().st_rent;
+  $('again').textContent = t().ag;
+  $('exportBtn').textContent = t().exp;
+  $('addButton').textContent = t().ad;
+  $('playerName').placeholder = t().nm;
+  
   render();
-  updateLeaderboardUI();
 }
 
-// KEYBOARD NAVIGATION (Right arrow for next, Left arrow for previous)
-window.addEventListener('keydown', (e) => {
-  const activeEl = document.activeElement;
-  const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
-
-  if (e.key === 'Escape') {
-    if ($('fsModal').style.display === 'flex') {
-      closeFullscreen();
-      e.preventDefault();
-    }
-  }
-
-  if (isInput) return;
-
-  if (e.key === 'ArrowRight') {
-    move(1);
-    e.preventDefault();
-  } else if (e.key === 'ArrowLeft') {
-    move(-1);
-    e.preventDefault();
-  }
-});
-
-$('guess').addEventListener('keyup', (e) => {
-  if (e.key === 'Enter') submit();
-});
-
-/* ---------- CUSTOM CITY DROPDOWN LOGIC ---------- */
-let cityKbdIdx = -1;
-function buildCityDropdown() {
-  const sel = $('citySelect');
-  const dd = $('cityDropdown');
-  dd.replaceChildren();
-  Array.from(sel.options).forEach((opt, i) => {
-    const row = document.createElement('div');
-    row.className = 'city-option' + (opt.value === sel.value ? ' selected' : '');
-    row.dataset.value = opt.value;
-    row.dataset.idx = i;
-    row.textContent = opt.textContent;
-    row.setAttribute('role', 'option');
-    row.setAttribute('aria-selected', opt.value === sel.value ? 'true' : 'false');
-    row.addEventListener('click', () => selectCityOption(i));
-    dd.appendChild(row);
-  });
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
 }
-function toggleCityDropdown(force) {
-  const wrap = $('citySelectWrap');
-  const trigger = $('cityTrigger');
+
+function toggleCityDropdown() {
   const dd = $('cityDropdown');
-  const openNow = typeof force === 'boolean' ? force : !dd.classList.contains('open');
-  dd.classList.toggle('open', openNow);
-  trigger.classList.toggle('open', openNow);
-  trigger.setAttribute('aria-expanded', String(openNow));
-  cityKbdIdx = -1;
-  if (openNow) {
-    buildCityDropdown();
-    const sel = $('citySelect');
-    const cur = Array.from(dd.children).findIndex(el => el.dataset.value === sel.value);
-    if (cur >= 0) { cityKbdIdx = cur; dd.children[cur].scrollIntoView({block:'nearest'}); }
+  dd.classList.toggle('open');
+  if (dd.classList.contains('open')) {
+    dd.replaceChildren();
+    Array.from($('citySelect').options).forEach(opt => {
+      const d = document.createElement('div');
+      d.className = 'city-option';
+      d.textContent = opt.textContent;
+      d.onclick = () => {
+        $('citySelect').value = opt.value;
+        $('cityTriggerLabel').textContent = opt.textContent;
+        dd.classList.remove('open');
+        setCityFilter(opt.value);
+      };
+      dd.appendChild(d);
+    });
   }
 }
-function closeCityDropdown() { toggleCityDropdown(false); }
-function selectCityOption(i) {
-  const sel = $('citySelect');
-  const dd = $('cityDropdown');
-  const triggerLabel = $('cityTriggerLabel');
-  const opts = dd.querySelectorAll('.city-option');
-  if (!opts[i]) return;
-  const val = opts[i].dataset.value;
-  const txt = opts[i].textContent;
-  sel.value = val;
-  triggerLabel.textContent = txt;
-  closeCityDropdown();
-  sel.dispatchEvent(new Event('change'));
-}
-// Click-outside to close
-window.addEventListener('mousedown', (e) => {
-  const wrap = $('citySelectWrap');
-  if (wrap && !wrap.contains(e.target)) closeCityDropdown();
-});
-// Trigger click + keyboard
-(function initCityTrigger() {
-  const trigger = $('cityTrigger');
-  const dd = $('cityDropdown');
-  if (!trigger) return;
-  trigger.addEventListener('click', () => toggleCityDropdown());
-  trigger.addEventListener('keydown', (e) => {
-    const opts = dd.querySelectorAll('.city-option');
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault();
-      if (!dd.classList.contains('open')) toggleCityDropdown(true);
-      else if (cityKbdIdx >= 0) selectCityOption(cityKbdIdx);
-    }
-    if (e.key === 'Escape') { closeCityDropdown(); trigger.focus(); e.preventDefault(); return; }
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      if (!dd.classList.contains('open')) { toggleCityDropdown(true); }
-      e.preventDefault();
-      if (!opts.length) return;
-      const dir = e.key === 'ArrowDown' ? +1 : -1;
-      cityKbdIdx = cityKbdIdx < 0 ? (dir > 0 ? 0 : opts.length - 1) : (cityKbdIdx + dir + opts.length) % opts.length;
-      opts.forEach((el, k) => el.classList.toggle('kbd-focus', k === cityKbdIdx));
-      opts[cityKbdIdx].scrollIntoView({block:'nearest'});
-    }
-  });
-})();
 
-buildCityDropdown();
+function setCityFilter(c) {
+  selectedCity = c;
+  restart();
+}
+
 setLang('ar');
-loadListings();
-updateLeaderboardUI();
+switchMode('sale');
+loadLeaders();
 </script>
 </body>
 </html>
-);
-
