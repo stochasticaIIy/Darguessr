@@ -60,7 +60,7 @@ p{color:var(--muted);line-height:1.8}
   display:flex;
   justify-content:center;
   position:relative;
-  z-index:500
+  z-index:2000
 }
 .city-select{
   background:#fff;
@@ -112,7 +112,8 @@ html[dir="rtl"] .city-select{
   opacity:0;
   transition:opacity .18s ease, transform .18s ease;
   max-height:420px;
-  overflow-y:auto
+  overflow-y:auto;
+  z-index:2100
 }
 .city-dropdown.open{
   display:block;
@@ -155,9 +156,9 @@ html[dir="rtl"] .city-select{
 .next{right:16px;left:auto}
 .count{position:absolute;left:15px;bottom:14px;padding:5px 10px;border-radius:15px;background:#000000a6;color:#fff;font:12px 'DM Sans';z-index:3;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.1)}
 
-.zoom,.photo-zoom{position:absolute;z-index:1000!important;top:12px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,0.18)}
-.zoom{right:12px;left:auto;display:grid}
-.photo-zoom{left:12px;right:auto;display:grid}
+.zoom,.photo-zoom{position:absolute;top:12px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,0.18)}
+.zoom{z-index:500;right:12px;left:auto;display:grid}
+.photo-zoom{z-index:10;left:12px;right:auto;display:grid}
 .zoom button, .photo-zoom button{width:38px;height:38px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s, color .15s}
 .zoom button:hover, .photo-zoom button:hover{background:rgba(0,0,0,0.08)}
 .zoom button:last-child, .photo-zoom button:last-child{border-bottom:0}
@@ -315,7 +316,7 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
         <option value="Oujda">وجدة / Oujda</option>
         <option value="other">✨ مدن أخرى / Other Cities (إفران، الناظور، ورزازات، بركان، الداخلة...)</option>
       </select>
-      <div class="city-select" id="cityTrigger" onclick="toggleCityDropdown()">
+      <div class="city-select" id="cityTrigger" onclick="toggleCityDropdown(event)">
         <span id="cityTriggerLabel">📍 كل المدن / All Cities</span>
       </div>
       <div class="city-dropdown" id="cityDropdown"></div>
@@ -430,6 +431,47 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
+// Defensive patch for Leaflet to safeguard against any (NaN, NaN) inputs
+if (window.L) {
+  try {
+    const OrigLatLng = window.L.LatLng;
+    function SafeLatLng(lat, lng, alt) {
+      const nLat = Number(lat);
+      const nLng = Number(lng);
+      const vLat = (!isNaN(nLat) && isFinite(nLat)) ? nLat : 33.5731;
+      const vLng = (!isNaN(nLng) && isFinite(nLng)) ? nLng : -7.5898;
+      return new OrigLatLng(vLat, vLng, alt);
+    }
+    SafeLatLng.prototype = OrigLatLng.prototype;
+    window.L.LatLng = SafeLatLng;
+
+    const origLatLng = window.L.latLng;
+    window.L.latLng = function (a, b, c) {
+      try {
+        if (Array.isArray(a)) {
+          const lat = Number(a[0]);
+          const lng = Number(a[1]);
+          const vLat = (!isNaN(lat) && isFinite(lat)) ? lat : 33.5731;
+          const vLng = (!isNaN(lng) && isFinite(lng)) ? lng : -7.5898;
+          return new OrigLatLng(vLat, vLng, a[2]);
+        }
+        if (typeof a === 'number') {
+          const lat = Number(a);
+          const lng = Number(b);
+          const vLat = (!isNaN(lat) && isFinite(lat)) ? lat : 33.5731;
+          const vLng = (!isNaN(lng) && isFinite(lng)) ? lng : -7.5898;
+          return new OrigLatLng(vLat, vLng, c);
+        }
+        return origLatLng(a, b, c);
+      } catch {
+        return new OrigLatLng(33.5731, -7.5898);
+      }
+    };
+  } catch (e) {
+    // Ignore
+  }
+}
+
 let currentMode = 'sale'; // 'rent' or 'sale'
 let allListings = [], activeHomes = [], selectedCity = 'all';
 let L='ar', r=0, score=0, p=0, z=0, mapInst=null, marker=null, cachedLeaders=[];
@@ -767,29 +809,43 @@ function applyMapTiles() {
 }
 
 function placeMap(h) {
-  if (!h) return;
-  const lat = Number(h.lat);
-  const lng = Number(h.lng);
-  if (isNaN(lat) || isNaN(lng)) return;
-
+  const lat = Number(h?.lat);
+  const lng = Number(h?.lng);
+  const validLat = (!isNaN(lat) && isFinite(lat)) ? lat : 33.5731;
+  const validLng = (!isNaN(lng) && isFinite(lng)) ? lng : -7.5898;
   const currentZoom = 14 + (Number(z) || 0);
 
-  if (!mapInst) {
-    mapInst = window.L.map('map', { zoomControl: false }).setView([lat, lng], currentZoom);
-    applyMapTiles();
-    marker = window.L.circleMarker([lat, lng], { radius: 9, weight: 3, color: '#fff', fillColor: '#ff725e', fillOpacity: 1 }).addTo(mapInst);
-  } else {
-    mapInst.setView([lat, lng], currentZoom);
-    if (marker) marker.setLatLng([lat, lng]);
-    setTimeout(() => {
-      if (mapInst) mapInst.invalidateSize();
-    }, 100);
+  try {
+    if (!mapInst) {
+      mapInst = window.L.map('map', { zoomControl: false }).setView([validLat, validLng], currentZoom);
+      applyMapTiles();
+      marker = window.L.circleMarker([validLat, validLng], { radius: 9, weight: 3, color: '#fff', fillColor: '#ff725e', fillOpacity: 1 }).addTo(mapInst);
+    } else {
+      mapInst.setView([validLat, validLng], currentZoom);
+      if (marker) marker.setLatLng([validLat, validLng]);
+      setTimeout(() => {
+        if (mapInst) mapInst.invalidateSize();
+      }, 100);
+    }
+  } catch (err) {
+    console.warn('Leaflet standalone map error:', err);
   }
 }
 
 function zoom(n) {
   z = Math.max(-3, Math.min(5, z + n));
-  if (mapInst) mapInst.setZoom(14 + z);
+  if (mapInst) {
+    const h = activeHomes[r];
+    const lat = Number(h?.lat);
+    const lng = Number(h?.lng);
+    const validLat = (!isNaN(lat) && isFinite(lat)) ? lat : 33.5731;
+    const validLng = (!isNaN(lng) && isFinite(lng)) ? lng : -7.5898;
+    try {
+      mapInst.setView([validLat, validLng], 14 + z);
+    } catch {
+      // fallback
+    }
+  }
 }
 
 function resetMapZoom() {
@@ -798,10 +854,12 @@ function resetMapZoom() {
     const h = activeHomes[r];
     const lat = Number(h?.lat);
     const lng = Number(h?.lng);
-    if (!isNaN(lat) && !isNaN(lng)) {
-      mapInst.setView([lat, lng], 14);
-    } else {
-      mapInst.setZoom(14);
+    const validLat = (!isNaN(lat) && isFinite(lat)) ? lat : 33.5731;
+    const validLng = (!isNaN(lng) && isFinite(lng)) ? lng : -7.5898;
+    try {
+      mapInst.setView([validLat, validLng], 14);
+    } catch {
+      // fallback
     }
   }
 }
@@ -1025,7 +1083,8 @@ function toggleDarkMode() {
   applyMapTiles();
 }
 
-function toggleCityDropdown() {
+function toggleCityDropdown(e) {
+  if (e) e.stopPropagation();
   const dd = $('cityDropdown');
   dd.classList.toggle('open');
   if (dd.classList.contains('open')) {
@@ -1034,7 +1093,8 @@ function toggleCityDropdown() {
       const d = document.createElement('div');
       d.className = 'city-option' + (opt.value === selectedCity ? ' selected' : '');
       d.textContent = opt.textContent;
-      d.onclick = () => {
+      d.onclick = (ev) => {
+        ev.stopPropagation();
         $('citySelect').value = opt.value;
         $('cityTriggerLabel').textContent = opt.textContent;
         dd.classList.remove('open');
@@ -1045,6 +1105,17 @@ function toggleCityDropdown() {
   }
 }
 
+// Close city dropdown on outside click
+document.addEventListener('click', (e) => {
+  const dd = $('cityDropdown');
+  const trigger = $('cityTrigger');
+  if (dd && dd.classList.contains('open')) {
+    if (!dd.contains(e.target) && (!trigger || !trigger.contains(e.target))) {
+      dd.classList.remove('open');
+    }
+  }
+});
+
 function setCityFilter(c) {
   selectedCity = c;
   restart();
@@ -1054,8 +1125,13 @@ function setCityFilter(c) {
 window.addEventListener('keydown', (e) => {
   const isInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
 
-  // Escape key closes fullscreen or resets zoom
+  // Escape key closes city dropdown, fullscreen or resets zoom
   if (e.key === 'Escape') {
+    const dd = $('cityDropdown');
+    if (dd && dd.classList.contains('open')) {
+      dd.classList.remove('open');
+      return;
+    }
     if (isFullscreenOpen) {
       closeFullscreen();
     } else {
