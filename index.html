@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -17,6 +18,10 @@ body{margin:0;background:var(--cream);color:var(--ink);font-family:'Noto Kufi Ar
 .lang{display:flex;gap:6px;align-items:center}
 .lang button{border:0;background:#fff;padding:7px 12px;border-radius:18px;cursor:pointer;font-family:inherit;font-size:13px}
 .lang .on{color:#fff;background:var(--ink)}
+.lang a.other-game{border:0;background:#fff;padding:7px 12px;border-radius:18px;cursor:pointer;font-family:inherit;font-size:13px;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .2s,color .2s}
+.lang a.other-game:hover{background:var(--ink);color:#fff}
+body.dark .lang a.other-game{background:#1b2d29;color:var(--ink)}
+body.dark .lang a.other-game:hover{background:var(--lime);color:#132a26}
 .hero{padding:7vw;display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
 .eyebrow{font:600 12px 'DM Sans';letter-spacing:1px;color:var(--muted);text-transform:uppercase}
 h1{font-size:clamp(40px,6vw,80px);line-height:1.1;margin:15px 0;letter-spacing:-1.5px}
@@ -281,13 +286,14 @@ body.en{font-family:'DM Sans',sans-serif;direction:ltr}
 @media(max-width:800px){.hero,.grid{grid-template-columns:1fr}.hero,.game,.top{padding-inline:20px}.stats{gap:25px}.map-body{min-height:350px}.gallery,.reveal{height:420px}.leader-grid,.links{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
+<body class="dark">
 <header class="top">
   <div class="brand">DarGuessr</div>
   <div class="lang">
     <button id="arBtn" class="on" onclick="setLang('ar')">ع</button>
     <button id="enBtn" onclick="setLang('en')">EN</button>
     <button id="darkModeBtn" onclick="toggleDarkMode()">🌙</button>
+    <a class="other-game" href="https://rwidaguessr.zlayji.workers.dev/" target="_blank" rel="noopener noreferrer">🎮 RwidaGuessr</a>
   </div>
 </header>
 <main>
@@ -672,6 +678,16 @@ function switchMode(m) {
   updateModeButtonsActive();
   $('quickAdds').style.display = m === 'sale' ? 'flex' : 'none';
   gameSessionActive = false;
+
+  // Refresh the mode-dependent text (fixes labels like "Actual rent"
+  // staying visible after switching to Sale mode, and vice versa)
+  $('eyebrow').textContent = currentMode === 'sale' ? t().e_sale : t().e_rent;
+  $('title').textContent = currentMode === 'sale' ? t().t_sale : t().t_rent;
+  $('intro').textContent = currentMode === 'sale' ? t().i_sale : t().i_rent;
+  $('listing').textContent = currentMode === 'sale' ? t().l_sale : t().l_rent;
+  $('actualLabel').textContent = currentMode === 'sale' ? t().ac_sale : t().ac_rent;
+  $('scoreTitle').textContent = currentMode === 'sale' ? t().st_sale : t().st_rent;
+
   loadListings();
   updateModeButtonsState();
 }
