@@ -1,4 +1,5 @@
 
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -724,10 +725,147 @@ async function loadListings() {
   render();
 }
 
+const badListingIds = new Set();
+const verifiedImageUrls = new Set();
+let skipAttempts = 0;
+
+function testImageUrl(url, timeoutMs = 3000) {
+  if (!url) return Promise.resolve(false);
+  if (verifiedImageUrls.has(url)) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    const img = new Image();
+    let done = false;
+    const timer = setTimeout(() => {
+      if (!done) {
+        done = true;
+        img.src = "";
+        resolve(false);
+      }
+    }, timeoutMs);
+    img.onload = () => {
+      if (!done) {
+        done = true;
+        clearTimeout(timer);
+        verifiedImageUrls.add(url);
+        resolve(true);
+      }
+    };
+    img.onerror = () => {
+      if (!done) {
+        done = true;
+        clearTimeout(timer);
+        resolve(false);
+      }
+    };
+    img.src = url;
+  });
+}
+
+function getFilteredPool() {
+  if (!allListings || !allListings.length) return [];
+  let pool = allListings;
+  if (selectedCity === "other") {
+    const mainCityKeys = [
+      "casablanca", "rabat", "marrakech", "tanger", "agadir", "fes",
+      "sale", "meknes", "kenitra", "oujda", "bouskoura",
+      "mohammedia", "temara", "tetouan", "el jadida", "el-jadida", "essaouira"
+    ];
+    pool = allListings.filter(x => {
+      const c = (x.city || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+      return ["berkane", "dakhla", "laayoune", "nador", "ifrane", "ouarzazate"].includes(c) || !mainCityKeys.includes(c);
+    });
+  } else if (selectedCity !== "all") {
+    const cityNorm = selectedCity.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+    pool = allListings.filter(x => {
+      const c = (x.city || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+      return c === cityNorm;
+    });
+  }
+  if (!pool.length) pool = allListings;
+  return pool;
+}
+
+function getReplacementListing() {
+  const pool = getFilteredPool();
+  const candidates = pool.filter(item => 
+    !badListingIds.has(item.id) && !activeHomes.some(ah => ah && ah.id === item.id)
+  );
+  if (candidates.length > 0) {
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+  const fallback = allListings.filter(item => 
+    !badListingIds.has(item.id) && !activeHomes.some(ah => ah && ah.id === item.id)
+  );
+  if (fallback.length > 0) {
+    return fallback[Math.floor(Math.random() * fallback.length)];
+  }
+  return pool[Math.floor(Math.random() * pool.length)] || allListings[0];
+}
+
+function skipToNextListing() {
+  if (!activeHomes.length || !allListings.length) return;
+  const currentHome = activeHomes[r];
+  if (currentHome && currentHome.id) {
+    badListingIds.add(currentHome.id);
+  }
+  if (isFullscreenOpen) {
+    closeFullscreen();
+  }
+  const replacement = getReplacementListing();
+  if (replacement) {
+    activeHomes[r] = replacement;
+    render();
+  }
+}
+
+async function precheckActiveHomes() {
+  const snapshot = [...activeHomes];
+  for (let i = 0; i < snapshot.length; i++) {
+    const home = snapshot[i];
+    if (!home) continue;
+    const firstPic = (home.images && home.images[0]) || home.imageUrl;
+    if (!firstPic) {
+      badListingIds.add(home.id);
+      replaceActiveHome(i);
+      continue;
+    }
+    const ok = await testImageUrl(firstPic, 3000);
+    if (!ok) {
+      badListingIds.add(home.id);
+      replaceActiveHome(i);
+    }
+  }
+}
+
+function replaceActiveHome(idx) {
+  if (!activeHomes[idx]) return;
+  const repl = getReplacementListing();
+  if (repl) {
+    activeHomes[idx] = repl;
+    if (idx === r) {
+      render();
+    }
+  }
+}
+
 function updateHero() {
   if (!allListings.length) return;
-  const h = allListings[0];
-  $('heroImg').style.backgroundImage = `url("${h.images ? h.images[0] : h.imageUrl}")`;
+  const h = allListings.find(x => !badListingIds.has(x.id)) || allListings[0];
+  const heroUrl = (h.images && h.images[0]) || h.imageUrl;
+  if (heroUrl) {
+    const testHero = new Image();
+    testHero.onerror = () => {
+      badListingIds.add(h.id);
+      const nextH = allListings.find(x => !badListingIds.has(x.id));
+      if (nextH) {
+        const nextUrl = (nextH.images && nextH.images[0]) || nextH.imageUrl;
+        $('heroImg').style.backgroundImage = `url("${nextUrl}")`;
+        $('heroInfo').textContent = `${nextH.title} — ${nextH.city} (${nextH.type})`;
+      }
+    };
+    testHero.src = heroUrl;
+  }
+  $('heroImg').style.backgroundImage = `url("${heroUrl}")`;
   $('heroInfo').textContent = `${h.title} — ${h.city} (${h.type})`;
   $('heroPrice').textContent = currentMode === 'sale' ? '???? د.م. للبيع' : '???? د.م. / الشهر';
 }
@@ -737,50 +875,71 @@ function selectRandomRounds() {
     activeHomes = [];
     return;
   }
-  let pool = allListings;
-  if (selectedCity === 'other') {
-    const mainCityKeys = [
-      'casablanca', 'rabat', 'marrakech', 'tanger', 'agadir', 'fes',
-      'sale', 'meknes', 'kenitra', 'oujda', 'bouskoura',
-      'mohammedia', 'temara', 'tetouan', 'el jadida', 'el-jadida', 'essaouira'
-    ];
-    pool = allListings.filter(x => {
-      const c = (x.city || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-      return ['berkane', 'dakhla', 'laayoune', 'nador', 'ifrane', 'ouarzazate'].includes(c) || !mainCityKeys.includes(c);
-    });
-  } else if (selectedCity !== 'all') {
-    const cityNorm = selectedCity.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-    pool = allListings.filter(x => {
-      const c = (x.city || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-      return c === cityNorm;
-    });
-  }
-  if (!pool.length) pool = allListings;
-  if (!pool.length) {
-    activeHomes = [];
-    return;
-  }
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  const pool = getFilteredPool();
+  const validPool = pool.filter(x => !badListingIds.has(x.id));
+  const candidatePool = validPool.length >= 5 ? validPool : pool;
+  const shuffled = [...candidatePool].sort(() => Math.random() - 0.5);
   activeHomes = [];
   for (let i = 0; i < 5; i++) {
     const item = shuffled[i % shuffled.length];
     if (item) activeHomes.push(item);
   }
+  precheckActiveHomes();
 }
-
 function render() {
   if (!activeHomes.length) return;
   const h = activeHomes[r];
   if (!h) return;
-  
+
+  const pics = (h.images && h.images.length) ? h.images : (h.imageUrl ? [h.imageUrl] : []);
+  if (!pics.length) {
+    skipToNextListing();
+    return;
+  }
+
+  // Reactive verification: if the primary photo fails to load (404/error), seamlessly skip listing
+  const primaryPic = pics[0];
+  const roundAtRender = r;
+  const listingAtRender = h.id;
+
+  const testImg = new Image();
+  testImg.onload = () => {
+    skipAttempts = 0;
+    verifiedImageUrls.add(primaryPic);
+  };
+  testImg.onerror = () => {
+    if (r === roundAtRender && activeHomes[r]?.id === listingAtRender) {
+      skipAttempts++;
+      if (skipAttempts < 25) {
+        skipToNextListing();
+      }
+    }
+  };
+  testImg.src = primaryPic;
+
+  // Secondary images verification: if all photos fail, skip
+  let brokenSecondary = 0;
+  pics.forEach(picUrl => {
+    if (picUrl === primaryPic) return;
+    const secImg = new Image();
+    secImg.onerror = () => {
+      brokenSecondary++;
+      if (brokenSecondary >= pics.length - 1) {
+        if (r === roundAtRender && activeHomes[r]?.id === listingAtRender) {
+          skipToNextListing();
+        }
+      }
+    };
+    secImg.src = picUrl;
+  });
+
   $('gallery').style.display = 'block';
   $('reveal').style.display = 'none';
   $('final').style.display = 'none';
   $('details').style.display = 'block';
-  
+
   const track = $('track');
   track.replaceChildren();
-  const pics = h.images || [h.imageUrl];
   pics.forEach(p => {
     const s = document.createElement('div');
     s.className = 'slide';
@@ -790,7 +949,7 @@ function render() {
     s.appendChild(inner);
     track.appendChild(s);
   });
-  
+
   const roomText = h.bedrooms && h.bedrooms !== '—'
     ? (L === 'ar' ? `🛏️ ${h.bedrooms} غرف` : `🛏️ ${h.bedrooms} ${Number(h.bedrooms) === 1 ? 'room' : 'rooms'}`)
     : '';
@@ -806,7 +965,7 @@ function render() {
     bathText,
     currentMode === 'sale' ? (L === 'ar' ? '🏷️ للبيع' : '🏷️ For Sale') : (L === 'ar' ? '🔑 للكراء' : '🔑 For Rent')
   ].filter(Boolean);
-  
+
   const chipsEl = $('chips');
   chipsEl.replaceChildren();
   chips.forEach(c => {
@@ -815,21 +974,21 @@ function render() {
     span.textContent = c;
     chipsEl.appendChild(span);
   });
-  
+
   placeMap(h);
   $('guess').value = '';
   $('guess').placeholder = currentMode === 'sale' ? t().g_sale : t().g_rent;
   p = 0;
   move(0);
-  
+
   $('gameTitle').textContent = currentMode === 'sale' ? t().gt_sale : t().gt_rent;
   $('progress').childNodes[0].nodeValue = `${r + 1} / 05`;
   $('bar').style.width = `${((r + 1) / 5) * 100}%`;
-  
+
   if (r > 0) gameSessionActive = true;
   updateModeButtonsState();
   updateModeButtonsActive();
-  
+
   startTimer();
 }
 
@@ -873,12 +1032,21 @@ function openFullscreen() {
   fsZoom = 1;
   const h = activeHomes[r];
   const pics = h ? (h.images || [h.imageUrl]) : [];
+  if (!pics.length) {
+    skipToNextListing();
+    return;
+  }
+  $('fsImg').onerror = () => {
+    if (activeHomes[r]?.id === h.id) {
+      closeFullscreen();
+      skipToNextListing();
+    }
+  };
   $('fsImg').src = pics[p] || '';
   $('fsImg').style.transform = 'scale(1)';
   $('fsCount').textContent = `${p + 1} / ${pics.length}`;
   $('fsModal').style.display = 'flex';
 }
-
 function closeFullscreen() {
   isFullscreenOpen = false;
   $('fsModal').style.display = 'none';
@@ -897,7 +1065,10 @@ function resetFsZoom() {
 function move(n) {
   const h = activeHomes[r];
   const pics = h ? (h.images || [h.imageUrl]) : [];
-  if (!pics.length) return;
+  if (!pics.length) {
+    skipToNextListing();
+    return;
+  }
   // Reset zoom on photo change
   photoZoom = 1;
   panX = 0;
@@ -907,6 +1078,20 @@ function move(n) {
   $('count').textContent = `${p + 1} / ${pics.length}`;
   applyPhotoTransform();
 
+  // Test current slide image to ensure it is not a 404
+  const slideImg = new Image();
+  const moveRound = r;
+  const moveListingId = h.id;
+  slideImg.onerror = () => {
+    if (r === moveRound && activeHomes[r]?.id === moveListingId) {
+      skipAttempts++;
+      if (skipAttempts < 25) {
+        skipToNextListing();
+      }
+    }
+  };
+  slideImg.src = pics[p] || '';
+
   if (isFullscreenOpen) {
     $('fsImg').src = pics[p] || '';
     fsZoom = 1;
@@ -914,7 +1099,6 @@ function move(n) {
     $('fsCount').textContent = `${p + 1} / ${pics.length}`;
   }
 }
-
 let currentTileLayer = null;
 
 function applyMapTiles() {
