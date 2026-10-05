@@ -3,10 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DarGuessr — Rent & Sale Morocco Real Estate Challenge</title>
+<meta name="description" content="DarGuessr — Rent & Sale Morocco Real Estate Challenge">
+<meta property="og:title" content="DarGuessr — Rent & Sale Morocco Real Estate Challenge">
+<meta property="og:description" content="DarGuessr — Rent & Sale Morocco Real Estate Challenge">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<title>DarGuessr — Rent & Sale Morocco Real Estate Challenge</title>
 <style>
 :root{--ink:#132a26;--cream:#f7f4ea;--lime:#dfff74;--orange:#ff725e;--line:#d8d8ce;--muted:#698079}
 *{box-sizing:border-box}
@@ -1518,19 +1521,9 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// INTERACTIVE GALLERY (Wheel zoom, drag pan, double click, swipe)
+// INTERACTIVE GALLERY (Drag pan, swipe)
 const galleryEl = $('gallery');
 if (galleryEl) {
-  // Mouse wheel zoom
-  galleryEl.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    if (e.deltaY < 0) {
-      zoomPhoto(0.25);
-    } else {
-      zoomPhoto(-0.25);
-    }
-  }, { passive: false });
-
   // Mouse drag to pan when zoomed
   galleryEl.addEventListener('mousedown', (e) => {
     if (photoZoom <= 1 || e.target.closest('button') || e.target.closest('.photo-zoom')) return;
@@ -1539,17 +1532,6 @@ if (galleryEl) {
     startY = e.clientY - panY;
     const activeSlide = document.querySelectorAll('.slide-inner')[p];
     if (activeSlide) activeSlide.classList.add('grabbing');
-  });
-
-  // Double click to toggle zoom (1x -> 2x -> 1x)
-  galleryEl.addEventListener('dblclick', (e) => {
-    if (e.target.closest('button') || e.target.closest('.photo-zoom')) return;
-    if (photoZoom > 1) {
-      resetPhotoZoom();
-    } else {
-      photoZoom = 2;
-      applyPhotoTransform();
-    }
   });
 
   // Touch swipe support for mobile
